@@ -1,0 +1,360 @@
+html {
+	--size: .5;
+	--background: #EBEBEB;
+	--hard-background: #DDDDDD;
+	--soft-background: #EEEEEE;
+	--text: #1B1B1B;
+	--stroke: skyblue;
+	--fill: violet;
+	border: none;
+}
+
+body {
+	margin: 0;
+	overflow: hidden;
+}
+
+nav {
+	display: none;
+}
+
+div.content {
+	padding: 0;
+	overflow: hidden;
+}
+
+div#container {
+	position: relative;
+}
+
+div#container div.ui {
+	margin: 10px;
+	color: var(--text);
+	position: fixed;
+	display: inline-block;
+}
+
+div#container div.ui.bottom-left {
+	left: 0;
+	bottom: 0;
+	z-index: 50;
+}
+
+div#container div.ui.top-left {
+	top: 0;
+	left: 0;
+	overflow: auto;
+	max-height: 46.4vh;
+	z-index: 50;
+}
+
+div#container div.ui.top-right {
+	top: 0;
+	right: 0;
+	width: 260px;
+	flex-wrap: wrap;
+	display: inline-flex;
+	justify-content: flex-end;
+	z-index: 50;
+}
+
+div#container div.ui.bottom-right {
+	right: 0;
+	bottom: 0;
+	z-index: 50;
+}
+
+div#container div.ui.top-left #toolbar {
+	display: none;
+	flex-direction: column;
+}
+
+div#container div.ui.top-left #toolbar #advanced-tools {
+	display: none;
+	flex-direction: column;
+}
+
+div#container div.ui.bottom-left .option {
+	width: 130px;
+	height: 45px;
+	display: flex;
+	font-size: small;
+	overflow: hidden;
+	position: relative;
+	align-items: center;
+	justify-content: center;
+}
+
+div#container div.ui.bottom-left .option.disabled {
+	opacity: .5;
+	pointer-events: none;
+}
+
+div#container div.ui.bottom-left .option input {
+	top: 0;
+	left: 0;
+	position: absolute;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+div#container div.ui button, div#container div#layers button {
+	background-color: transparent;
+}
+
+div#container div#settings {
+	top: 0;
+	left: 0;
+	width: calc(100vw - 40vw);
+	height: calc(100vh - 30vh);
+	display: none;
+	overflow: hidden;
+	color: var(--text);
+	position: absolute;
+	align-items: center;
+	align-content: center;
+	place-content: center;
+	flex-flow: row wrap;
+	padding: 10vh 20vw 20vh 20vw;
+	z-index: 40;
+}
+
+div#container div#settings::before {
+	content: "";
+	opacity: .9;
+	top: inherit;
+	left: inherit;
+	width: inherit;
+	height: inherit;
+	padding: inherit;
+	position: inherit;
+	pointer-events: none;
+	background-color: var(--soft-background);
+	z-index: -1;
+}
+
+div#container iframe#patch-notes-iframe {
+	top: 0;
+	left: 0;
+	width: 70vw;
+	height: 60vh;
+	border: none;
+	opacity: .95;
+	padding: 2px;
+	overflow: hidden;
+	color: var(--text);
+	position: absolute;
+	align-items: center;
+	border-radius: 30px;
+	place-content: center;
+	flex-flow: column wrap;
+	margin: 20vh 15vw 20vh 15vw;
+	background-color: var(--border-color);
+	z-index: 20;
+}
+
+div#container div#layers {
+	top: 0;
+	left: 0;
+	/*opacity: .95;*/
+	width: 30vw;
+	height: 30vh;
+	display: none;
+	overflow: hidden;
+	color: var(--text);
+	position: absolute;
+	align-items: center;
+	border-radius: 30px;
+	place-content: center;
+	flex-flow: column wrap;
+	margin: 20vh 15vw 20vh 15vw;
+	padding: 10vh 20vw 20vh 20vw;
+	/*background-color: var(--hard-background);*/
+	z-index: 20;
+}
+
+div#container div#layers::before {
+	content: "";
+	opacity: .6;
+	top: inherit;
+	left: inherit;
+	width: inherit;
+	height: inherit;
+	padding: inherit;
+	position: inherit;
+	pointer-events: none;
+	background-color: var(--soft-background);
+	z-index: -1;
+}
+
+div#container div#layers button {
+	top: 3%;
+	color: var(--text);
+}
+
+div#container div#layers div#layer-container {
+	display: flex;
+	overflow: auto;
+	flex-wrap: wrap;
+	max-width: 53vw;
+	width: max-content;
+	align-items: center;
+	flex-direction: row;
+}
+
+div#container div#layers .layer {
+	margin: 10px;
+	padding: 10px;
+	display: flex;
+	overflow: hidden;
+	position: relative;
+	align-items: center;
+	border-radius: 10px;
+	place-content: center;
+	flex-flow: column wrap;
+}
+
+div#container div#layers .layer:not(div#container div#layers .layer.selected)::before {
+	content: "";
+	opacity: .3;
+	width: 100%;
+	height: 100%;
+	top: inherit;
+	left: inherit;
+	display: flex;
+	overflow: hidden;
+	position: absolute;
+	pointer-events: none;
+	border-radius: inherit;
+	background-color: var(--hard-background);
+	z-index: -1;
+}
+
+div#container div#layers .layer:not(div#container div#layers .layer.selected):hover::before {
+	opacity: .5;
+	pointer-events: none;
+	background-color: var(--hard-background);
+	transition: background-color 100ms;
+	z-index: -1;
+}
+
+div#container div#layers .layer.selected::before {
+	content: "";
+	opacity: .9;
+	width: 100%;
+	height: 100%;
+	top: inherit;
+	left: inherit;
+	display: flex;
+	overflow: hidden;
+	position: absolute;
+	border-radius: inherit;
+	pointer-events: none;
+	background-color: var(--hard-background);
+	z-index: -1;
+}
+
+div#container div#layers .layer input.selector {
+	display: inline-block;
+	width: 30px;
+	height: 20px;
+}
+
+div#container div#layers .layer .option {
+	width: 130px;
+	height: 45px;
+	display: flex;
+	font-size: small;
+	overflow: hidden;
+	position: relative;
+	align-items: center;
+	justify-content: center;
+}
+
+div#container div#layers .layer .option input {
+	margin-right: 8px;
+	pointer-events: none;
+}
+
+
+div#container div#layers .layer .options {
+	/*display: none;*/
+	display: flex;
+	flex-direction: column;
+	margin-top: 10px;
+}
+
+div#container span#settings {
+	top: 0;
+	right: 0;
+	margin: 10px;
+	color: var(--text);
+	position: absolute;
+}
+
+svg {
+	width: 100vw;
+	height: 100vh;
+	color: var(--text);
+	pointer-events: none;
+	background-color: var(--background);
+}
+
+line {
+	stroke: var(--text);
+	stroke-width: calc(8 * var(--size));
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+polyline {
+	fill: none;
+	stroke: var(--text);
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+cirlce {
+	fill: var(--text);
+}
+
+rect {
+	fill: var(--text);
+}
+
+
+input[type="color"]#colour {
+	visibility: hidden;
+	position: absolute;
+}
+
+.ripple::before {
+    top: calc(var(--offsetY) * 1px);
+	left: calc(var(--offsetX) * 1px);
+    opacity: 0;
+    content: "";
+    padding: 50%;
+	position: absolute;
+    transform: translate(-50%, -50%) scale(3);
+	transition: transform 800ms, opacity 1s;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.ripple:not(.ripple.rainbow)::before {
+    background-color: #EEEEEE;
+}
+
+.rainbow::before {
+	background: #EEEEEE; /* For browsers that do not support gradients */
+    background: -webkit-radial-gradient(red, orange , yellow, green, cyan, blue, indigo, violet);
+    background: -o-radial-gradient(red, orange, yellow, green, cyan, blue, indigo, violet);
+    background: -moz-radial-gradient(red, orange, yellow, green, cyan, blue, indigo, violet);
+    background: radial-gradient(red, orange , yellow, green, cyan, blue, indigo,violet);
+}
+
+.ripple:not(.focus):active::before, .ripple.focus:active:not(:focus-within)::before {
+    transition: 0s;
+    opacity: .5;
+    transform: translate(-50%, -50%) scale(0);
+}

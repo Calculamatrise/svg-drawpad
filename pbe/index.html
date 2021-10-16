@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SVG Drawpad - Calculamatrise</title>
+        <link rel="icon" href="/favicon.ico">
+        <link rel="stylesheet" href="/style.css">
+        <link rel="manifest" href="/manifest.json">
+        <meta name="author" content="Calculamatrise">
+        <meta name="title" property="og:title" content="Calculamatrise">
+        <meta name="description" property="og:description" content="A program that uses scalable vector graphics to create an image of your choosing.">
+        <meta name="image" property="og:image" content="/images/favicon.png">
+        <meta property="og:url" content="https://calculamatrise.github.io/">
+        <script src="/bootstrap.js" type="module"></script>
+    </head>
+    <body onload="
+        document.querySelector('#primary').parentElement.style.setProperty('background-color', (localStorage.getItem('primaryColor') || (document.querySelector('#primary').value = window.canvas.primary)) + '40');
+        document.querySelector('#secondary').parentElement.style.setProperty('background-color', (document.querySelector('#secondary').value = window.canvas.secondary) + '40');
+        document.querySelector('#randomColors').innerText = JSON.parse(sessionStorage.getItem('randomColors')) ? 'Disable Random Colours' : 'Enable Random Colours';
+    ">
+        <div class="content">
+            <div id="container">
+                <svg id="view" xmlns="http://www.w3.org/2000/svg">
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+                <div class="ui top-left">
+                    <button onclick="this.innerText = `${(document.querySelector('#toolbar').style.display = document.querySelector('#toolbar').style.display === 'flex' ? 'none' : 'flex') === 'flex' ? 'Hide' : 'Show'} Toolbar`;">Show Toolbar</button>
+                    <div id="toolbar">
+                        <button onclick="window.canvas.tools.select('line');">Line</button>
+                        <button onclick="window.canvas.tools.select('brush');">Brush</button>
+                        <button onclick="window.canvas.tools.select('curve');">Curve</button>
+                        <button onclick="window.canvas.tools.select('circle');">Circle</button>
+                        <button onclick="window.canvas.tools.select('rectangle');">Rectangle</button>
+                        <button onclick="window.canvas.tools.select('eraser');">Eraser</button>
+                        <button onclick="window.canvas.tools.select('camera');">Camera</button>
+                        <button onclick="window.canvas.tools.select('select');">Select</button>
+                        <button onclick="
+                            this.parentElement.querySelector('#toolbar #advanced-tools').style.display = this.parentElement.querySelector('#toolbar #advanced-tools').style.display === 'flex' ? 'none' : 'flex',
+                            this.parentElement.querySelector('#toolbar #advanced-tools').scrollIntoView({ behavior: 'smooth' }),
+                            this.innerText = this.innerText === 'Show Advanced Tools' ? 'Hide Advanced Tools' : 'Show Advanced Tools'
+                        ">Show Advanced Tools</button>
+                        <div id="advanced-tools">
+                            <button onclick="window.canvas.tools.select('dynamic_circle');">Dynamic Circle</button>
+                            <button class="option ripple rainbow" id="randomColors" onclick="
+                                if (JSON.parse(sessionStorage.getItem('randomColors'))) {
+                                    this.innerText = 'Enable Random Colours';
+                                    
+                                    sessionStorage.setItem('randomColors', false);
+
+                                    return;
+                                }
+
+                                this.innerText = 'Disable Random Colours';
+
+                                sessionStorage.setItem('randomColors', true);
+                            ">
+                                Enable Random Colours
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui bottom-left">
+                    <div class="option ripple" onclick="this.firstElementChild.click();">
+                        <input type="color" id="primary" oninput="
+                            this.parentElement.style.setProperty('background-color', (localStorage.getItem('primaryColor') || (window.canvas.primary = this.value)) + '40');
+                            
+                            sessionStorage.removeItem('randomColors');
+
+                            document.querySelector('#randomColors').innerText = 'Enable Random Colours';
+                        ">
+                        Primary Colour
+                    </div>
+                    <div class="option ripple disabled" onclick="this.firstElementChild.click();">
+                        <input type="color" id="secondary" oninput="
+                            this.parentElement.style.setProperty('background-color', (window.canvas.secondary = this.value) + '40');
+                            
+                            sessionStorage.removeItem('randomColors');
+
+                            document.querySelector('#randomColors').innerText = 'Enable Random Colours';
+                        ">
+                        Secondary Colour
+                    </div>
+                </div>
+                <div class="ui top-right">
+                    <button onclick="document.querySelector('#layers').style.display = document.querySelector('#layers').style.display === 'flex' ? 'none' : 'flex';">Layers</button>
+                    <button onclick="document.querySelector('#settings').style.display = document.querySelector('#settings').style.display === 'flex' ? 'none' : 'flex';">Settings</button>
+                </div>
+                <div class="ui bottom-right">
+                    <button id="patch-notes">Patch Notes</button>
+                </div>
+                <!-- <iframe id="patch-notes-iframe"></iframe> -->
+                <!-- Layers Overlay -->
+                <div id="layers">
+                    <button onclick="window.canvas.layers.create(), window.canvas.layerDepth = window.canvas.layerDepth + 1;" style="position: absolute;">New Layer</button>
+                    <div id="layer-container"></div>
+                </div>
+                <!-- Settings Overlay -->
+                <div id="settings" style="display: none;">
+                    <input type="file" id="import" accept="text/*" style="display: none;" onchange="
+                        this.classList.add('loading');
+                        this.files[0].text().then((text) => {
+                            if (this.classList.contains('loading')) {
+                                this.classList.remove('loading');
+                            }
+
+                            window.canvas.import(text);
+                        });
+                    ">
+                    <label for="import" class="button ripple" style="text-align: center; line-height: 350%; font-size: calc(40px / 3);">Import Canvas</label>
+                    <button onclick="
+                        const date = new Date(new Date().setHours(new Date().getHours() - new Date().getTimezoneOffset() / 60)).toISOString().split(/t/i);
+                        const link = document.createElement('a');
+                        const file = new Blob([
+                            window.canvas.export()
+                        ], {
+                            type: 'text/plain'
+                        });
+                        link.href = window.URL.createObjectURL(file);
+                        link.download = 'svg_canvas-' + date[0] + '_' + date[1].replace(/\..+/, '').replace(/:/g, '-');
+                        link.dispatchEvent(new MouseEvent('click'));
+                    ">Export Canvas</button>
+                </div>
+                <input type="color" id="colour" oninput="localStorage.setItem('primaryColor', this.value), window.canvas.color = this.value;">
+            </div>
+            <link rel="stylesheet" href="style.css">
+            <script type="module" src="bootstrap.js"></script>
+        </div>
+    </body>
+</html>
