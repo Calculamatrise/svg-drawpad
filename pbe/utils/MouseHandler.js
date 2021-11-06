@@ -19,15 +19,15 @@ export default class {
 	}
 	get position() {
 		return {
-			x: this.real.x + this.parent.viewBox.x,
-			y: this.real.y + this.parent.viewBox.y
+			x: (this.real.x * this.parent.zoom) + this.parent.viewBox.x,
+			y: (this.real.y * this.parent.zoom) + this.parent.viewBox.y
 		}
 	}
 	init() {
 		document.addEventListener("mousedown", this.down.bind(this));
 		document.addEventListener("mousemove", this.move.bind(this));
 		document.addEventListener("mouseup", this.up.bind(this));
-		document.addEventListener("wheel", this.wheel.bind(this));
+		document.addEventListener("wheel", this.wheel.bind(this), { passive: false });
 		document.addEventListener("touchstart", this.touchStart.bind(this));
 		document.addEventListener("touchmove", this.touchMove.bind(this));
 		document.addEventListener("touchend", this.touchEnd.bind(this));
@@ -56,9 +56,9 @@ export default class {
 		
 		this.isAlternate = !!event.button;
 		this.isDown = true;
-		this.pointA = {
-			x: event.offsetX + this.parent.viewBox.x,
-			y: event.offsetY + this.parent.viewBox.y
+		this.real = this.pointA = {
+			x: (event.offsetX * this.parent.zoom) + this.parent.viewBox.x,
+			y: (event.offsetY * this.parent.zoom) + this.parent.viewBox.y
 		}
 		
 		return this.emit("down", event);
@@ -86,13 +86,39 @@ export default class {
 		
 		this.isDown = false;
 		this.pointB = {
-			x: event.offsetX + this.parent.viewBox.x,
-			y: event.offsetY + this.parent.viewBox.y
+			x: (event.offsetX * this.parent.zoom) + this.parent.viewBox.x,
+			y: (event.offsetY * this.parent.zoom) + this.parent.viewBox.y
 		}
 		
 		return this.emit("up", event);
 	}
 	wheel(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		if (event.ctrlKey) {
+			if (event.deltaY < 0) {
+				if (this.parent.zoom <= 1) {
+					return;
+				}
+
+				this.parent.zoom -= this.parent.zoomIncrementValue;
+
+				this.parent.view.setAttribute("viewBox", `${this.parent.viewBox.x + (this.parent.viewBox.width - window.innerWidth * this.parent.zoom) / 2} ${this.parent.viewBox.y + (this.parent.viewBox.height - window.innerHeight * this.parent.zoom) / 2} ${window.innerWidth * this.parent.zoom} ${window.innerHeight * this.parent.zoom}`);
+				this.parent.text.setAttribute("y", 25 + this.parent.viewBox.y);
+			} else {
+				if (this.parent.zoom >= 10) {
+					return;
+				}
+
+				this.parent.zoom += this.parent.zoomIncrementValue;
+
+				this.parent.view.setAttribute("viewBox", `${this.parent.viewBox.x - (window.innerWidth * this.parent.zoom - this.parent.viewBox.width) / 2} ${this.parent.viewBox.y - (window.innerHeight * this.parent.zoom - this.parent.viewBox.height) / 2} ${window.innerWidth * this.parent.zoom} ${window.innerHeight * this.parent.zoom}`);
+				this.parent.text.setAttribute("y", 25 + this.parent.viewBox.y);
+			}
+
+			return;
+		}
+
 		if (event.deltaY > 0 && this.parent.tool.size <= 2) {
 			return;
 		} else if (event.deltaY < 0 && this.parent.tool.size >= 100) {
@@ -113,8 +139,8 @@ export default class {
 		for (const touch of event.touches) {
 			const mouseEvent = document.createEvent('MouseEvent');
 			mouseEvent.initMouseEvent('mousedown', true, true, window, event.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
-			
-			this.down(mouseEvent);
+
+			this.parent.container.dispatchEvent(mouseEvent);
 		}
 	}
 	touchMove(event) {
@@ -123,7 +149,7 @@ export default class {
 			const mouseEvent = document.createEvent('MouseEvent');
 			mouseEvent.initMouseEvent('mousemove', true, true, window, event.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
 			
-			this.move(mouseEvent);
+			this.parent.container.dispatchEvent(mouseEvent);
 		}
 	}
 	touchEnd(event) {
@@ -132,7 +158,7 @@ export default class {
 			const mouseEvent = document.createEvent('MouseEvent');
 			mouseEvent.initMouseEvent('mouseup', true, true, window, event.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
 
-			this.up(mouseEvent);
+			this.parent.container.dispatchEvent(mouseEvent);
 		}
 	}
 	touchCancel(event) {

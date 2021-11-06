@@ -1,13 +1,15 @@
 import MouseHandler from "./MouseHandler.js";
 import EventHandler from "./EventHandler.js";
-import LayerManager from "./LayerManager.js";
-
 import ToolHandler from "./ToolHandler.js";
+
+import LayerManager from "./LayerManager.js";
 
 export default class {
 	constructor(view) {
 		this.view = view;
-		this.view.setAttribute("viewBox", `0 0 ${view.width.baseVal.value} ${view.height.baseVal.value}`);
+		this.view.style.setProperty("stroke-linecap", "round");
+        this.view.style.setProperty("stroke-linejoin", "round");
+		this.view.setAttribute("viewBox", `0 0 ${this.view.width.baseVal.value} ${this.view.height.baseVal.value}`);
 
 		this.layers.create();
 
@@ -20,6 +22,8 @@ export default class {
 
 		document.addEventListener("keydown", this.keyDown.bind(this));
 	}
+	zoom = 1;
+	zoomIncrementValue = 0.5;
 	#layer = 1;
 	#fill = false;
 	#primary = "#87CEEB";
@@ -62,7 +66,7 @@ export default class {
 		clearTimeout(this.text.timeout);
 
 		this.text.innerHTML = "Layer " + layer;
-		this.text.setAttribute("x", this.view.width.baseVal.value / 2 + this.viewBox.x - this.text.innerHTML.length * 2.5);
+		this.text.setAttribute("x", this.viewBox.width / 2 + this.viewBox.x - this.text.innerHTML.length * 2.5);
 		this.text.setAttribute("y", 25 + this.viewBox.y);
 		this.text.setAttribute("fill", this.dark ? "#FBFBFB" : "1B1B1B");
 		this.view.appendChild(this.text);
@@ -86,72 +90,39 @@ export default class {
 		this.#fill = boolean;
 	}
 	get container() {
-		return this.view.parentElement;
+		return this.view.parentElement || document.querySelector("#container");
 	}
 	get viewBox() {
 		const viewBox = this.view.getAttribute("viewBox").split(/\s+/g);
 		return {
-			x: parseInt(viewBox[0]),
-			y: parseInt(viewBox[1])
+			x: parseFloat(viewBox[0]),
+			y: parseFloat(viewBox[1]),
+			width: parseFloat(viewBox[2]),
+			height: parseFloat(viewBox[3])
 		}
 	}
 	import(data) {
-		const layers = data.split(/\u003E/g);
-		for (const layer in layers) {
-			if (!this.layers.has(parseInt(layer) + 1)) {
+		try {
+			this.close();
+
+			const newView = new DOMParser().parseFromString(data, "text/xml").querySelector("svg");
+
+			this.view.innerHTML = newView.innerHTML;
+
+			let layerId = 1;
+			while(true) {
+				if ([...document.querySelectorAll("g:not([data-id])")].filter(element => element.parentElement.id === "view").length < 1) {
+					break;
+				}
+
 				this.layers.create();
+
+				layerId++;
 			}
-			
-			layers[layer].match(/(?<=line:)[^.]+/gi).map(line => line.split(/\u002D/g)).forEach((line) => {
-				const element = document.createElementNS("http://www.w3.org/2000/svg", "line");
-				element.style.setProperty("stroke", this.primary);
-        		element.style.setProperty("stroke-width", 4);
-				element.setAttribute("x1", line[0]);
-				element.setAttribute("y1", line[1]);
-				element.setAttribute("x2", line[2]);
-				element.setAttribute("y2", line[3]);
 
-				this.layers.get(parseInt(layer) + 1).base.appendChild(element);
-				this.layers.get(parseInt(layer) + 1).lines.push(element);
-			});
-
-			layers[layer].match(/(?<=brush:)[^.]+/gi).forEach((points) => {
-				const element = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-				element.style.setProperty("stroke", this.primary);
-        		element.style.setProperty("stroke-width", 4);
-				element.setAttribute("points", points);
-
-				this.layers.get(parseInt(layer) + 1).base.appendChild(element);
-				this.layers.get(parseInt(layer) + 1).lines.push(element);
-			});
-
-			layers[layer].match(/(?<=circle:)[^.]+/gi).map(line => line.split(/\u002D/g)).forEach((line) => {
-				const element = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-				element.style.setProperty("stroke", this.primary);
-				element.style.setProperty("fill", this.fill ? this.primary : "#FFFFFF00");
-        		element.style.setProperty("stroke-width", 4);
-				element.setAttribute("cx", line[0]);
-				element.setAttribute("cy", line[1]);
-				element.setAttribute("r", line[2]);
-
-				this.layers.get(parseInt(layer) + 1).base.appendChild(element);
-				this.layers.get(parseInt(layer) + 1).lines.push(element);
-			});
-
-			layers[layer].match(/(?<=rectangle:)[^.]+/gi).map(line => line.split(/\u002D/g)).forEach((line) => {
-				const element = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-				element.style.setProperty("stroke", this.primary);
-				element.style.setProperty("fill", this.fill ? this.primary : "#FFFFFF00");
-        		element.style.setProperty("stroke-width", 4);
-				element.setAttribute("x", line[0]);
-				element.setAttribute("y", line[1]);
-				element.setAttribute("width", line[2]);
-				element.setAttribute("height", line[3]);
-				element.setAttribute("rx", .5);
-
-				this.layers.get(parseInt(layer) + 1).base.appendChild(element);
-				this.layers.get(parseInt(layer) + 1).lines.push(element);
-			});
+			this.layerDepth = this.layers.cache.length;
+		} catch(error) {
+			console.error(error);
 		}
 	}
 	resize(event) {
@@ -303,9 +274,8 @@ export default class {
 				clearTimeout(this.text.timeout);
 
 				this.text.innerHTML = "Camera";
-				this.text.setAttribute("x", this.view.width.baseVal.value / 2 - this.text.innerHTML.length * 2 + this.viewBox.x);
+				this.text.setAttribute("x", this.viewBox.width / 2 - this.text.innerHTML.length * 2 + this.viewBox.x);
 				this.text.setAttribute("y", 20 + this.viewBox.y);
-				this.text.setAttribute("fill", this.primary);
 				this.view.appendChild(this.text);
 
 				this.text.timeout = setTimeout(() => {
@@ -325,25 +295,17 @@ export default class {
 		return;
 	}
 	mouseMove(event) {
-		if (this.tool.constructor.id === "eraser") {
-			this.tool.mouseMove(event);
-			
-			return;
-		} else if (this.tool.constructor.id === "curve") {
-			this.tool.mouseMove(event);
-
-			return;
-		}
-
 		if (this.mouse.isDown && !this.mouse.isAlternate) {	
 			if (event.shiftKey) {
-				this.view.setAttribute("viewBox", `${this.viewBox.x - event.movementX} ${this.viewBox.y - event.movementY} ${window.innerWidth} ${window.innerHeight}`);
-				this.text.setAttribute("x", this.view.width.baseVal.value / 2 - this.text.innerHTML.length * 2 + this.viewBox.x);
-				this.text.setAttribute("y", 20 + this.viewBox.y);
+				this.tools.get("camera").mouseMove(event);
 	
 				return;
 			}
 
+			this.tool.mouseMove(event);
+		}
+
+		if (["curve", "eraser"].includes(this.tool.constructor.id)) {
 			this.tool.mouseMove(event);
 		}
 
@@ -372,6 +334,21 @@ export default class {
 				break;
 			
 			case "=":
+				if (this.tool.constructor.id === "camera" || event.ctrlKey) {
+					if (this.zoom <= 1) {
+						break;
+					}
+
+					this.zoom -= this.zoomIncrementValue;
+					
+					this.view.setAttribute("viewBox", `${this.viewBox.x + (this.viewBox.width - window.innerWidth * this.zoom) / 2} ${this.viewBox.y + (this.viewBox.height - window.innerHeight * this.zoom) / 2} ${window.innerWidth * this.zoom} ${window.innerHeight * this.zoom}`);
+					this.text.setAttribute("y", 25 + this.viewBox.y);
+
+					this.tool.init();
+
+					break;
+				}
+
 				if (this.tool.size >= 100) {
 					break;
 				}
@@ -380,6 +357,21 @@ export default class {
 				break;
 				
 			case "-":
+				if (this.tool.constructor.id === "camera" || event.ctrlKey) {
+					if (this.zoom >= 10) {
+						break;
+					}
+
+					this.zoom += this.zoomIncrementValue;
+					
+					this.view.setAttribute("viewBox", `${this.viewBox.x - (window.innerWidth * this.zoom - this.viewBox.width) / 2} ${this.viewBox.y - (window.innerHeight * this.zoom - this.viewBox.height) / 2} ${window.innerWidth * this.zoom} ${window.innerHeight * this.zoom}`);
+					this.text.setAttribute("y", 25 + this.viewBox.y);
+
+					this.tool.init();
+
+					break;
+				}
+
 				if (this.tool.size <= 2) {
 					break;
 				}
@@ -462,12 +454,12 @@ export default class {
 				break;
 		}
 	}
-	export() {
-		return this.layers.cache.map(function(layer) {
-			return `${layer.toString()}`;
-		}).join(">");
+	toString() {
+		return this.view.outerHTML;
 	}
 	close() {
+		this.layers.close();
 		this.mouse.close();
+		this.events.close();
 	}
 }

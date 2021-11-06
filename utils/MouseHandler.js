@@ -56,7 +56,7 @@ export default class {
 		
 		this.isAlternate = !!event.button;
 		this.isDown = true;
-		this.pointA = {
+		this.real = this.pointA = {
 			x: (event.offsetX * this.parent.zoom) + this.parent.viewBox.x,
 			y: (event.offsetY * this.parent.zoom) + this.parent.viewBox.y
 		}
@@ -139,8 +139,8 @@ export default class {
 		for (const touch of event.touches) {
 			const mouseEvent = document.createEvent('MouseEvent');
 			mouseEvent.initMouseEvent('mousedown', true, true, window, event.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
-			
-			this.down(mouseEvent);
+
+			this.parent.container.dispatchEvent(mouseEvent);
 		}
 	}
 	touchMove(event) {
@@ -149,7 +149,7 @@ export default class {
 			const mouseEvent = document.createEvent('MouseEvent');
 			mouseEvent.initMouseEvent('mousemove', true, true, window, event.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
 			
-			this.move(mouseEvent);
+			this.parent.container.dispatchEvent(mouseEvent);
 		}
 	}
 	touchEnd(event) {
@@ -158,7 +158,7 @@ export default class {
 			const mouseEvent = document.createEvent('MouseEvent');
 			mouseEvent.initMouseEvent('mouseup', true, true, window, event.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
 
-			this.up(mouseEvent);
+			this.parent.container.dispatchEvent(mouseEvent);
 		}
 	}
 	touchCancel(event) {

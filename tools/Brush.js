@@ -25,6 +25,9 @@ export default class extends Tool {
     }
     mouseUp(event) {
         this.element.remove();
+        if (this.mouse.pointA.x === this.mouse.pointB.x && this.mouse.pointA.y === this.mouse.pointB.y) {
+            return;
+        }
         
         const temp = this.element.cloneNode();
         temp.erase = function(event) {

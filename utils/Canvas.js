@@ -1,8 +1,8 @@
 import MouseHandler from "./MouseHandler.js";
 import EventHandler from "./EventHandler.js";
-import LayerManager from "./LayerManager.js";
-
 import ToolHandler from "./ToolHandler.js";
+
+import LayerManager from "./LayerManager.js";
 
 export default class {
 	constructor(view) {

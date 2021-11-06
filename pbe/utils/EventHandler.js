@@ -23,4 +23,9 @@ export default class extends Array {
 
         return popped;
     }
+    close() {
+        this.splice(0, this.length);
+
+        this.cache = []
+    }
 }

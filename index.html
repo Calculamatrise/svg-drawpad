@@ -23,7 +23,7 @@
                     Sorry, your browser does not support inline SVG.
                 </svg>
                 <div class="ui top-left">
-                    <button onclick="this.innerText = `${(document.querySelector('#toolbar').style.display = document.querySelector('#toolbar').style.display === 'grid' ? 'none' : 'grid') === 'grid' ? 'Hide' : 'Show'} Toolbar`;">Show Toolbar</button>
+                    <button class="primary nav" onclick="this.innerText = `${(document.querySelector('#toolbar').style.display = document.querySelector('#toolbar').style.display === 'grid' ? 'none' : 'grid') === 'grid' ? 'Hide' : 'Show'} Toolbar`;">Show Toolbar</button>
                     <div id="toolbar">
                         <button onclick="window.canvas.tools.select('line');">Line</button>
                         <button onclick="window.canvas.tools.select('brush');">Brush</button>
@@ -81,19 +81,19 @@
                     </div>
                 </div>
                 <div class="ui top-right">
-                    <button onclick="document.querySelector('#layers').style.display = document.querySelector('#layers').style.display === 'flex' ? 'none' : 'flex';">Layers</button>
-                    <button onclick="document.querySelector('#settings').style.display = document.querySelector('#settings').style.display === 'flex' ? 'none' : 'flex';">Settings</button>
+                    <button class="primary nav" onclick="document.querySelector('#layers').style.display = document.querySelector('#layers').style.display === 'flex' ? 'none' : 'flex';">Layers</button>
+                    <button class="primary nav" onclick="document.querySelector('#settings').style.display = document.querySelector('#settings').style.display === 'flex' ? 'none' : 'flex';">Settings</button>
                 </div>
                 <div class="ui bottom-right">
-                    <button id="patch-notes">Patch Notes</button>
+                    <button class="primary nav" id="patch-notes">Patch Notes</button>
                 </div>
                 <!-- Layers Overlay -->
-                <div id="layers">
-                    <button onclick="window.canvas.layers.create(), window.canvas.layerDepth = window.canvas.layerDepth + 1;" style="position: absolute;">New Layer</button>
+                <div class="overlay" id="layers">
+                    <button class="nav ripple" onclick="window.canvas.layers.create(), window.canvas.layerDepth = window.canvas.layerDepth + 1;">New Layer</button>
                     <div id="layer-container"></div>
                 </div>
                 <!-- Settings Overlay -->
-                <div id="settings" style="display: none;">
+                <div class="overlay" id="settings" style="display: none;">
                     <input type="file" id="import" accept="image/svg+xml" style="display: none;" onchange="
                         this.classList.add('loading');
                         this.files[0].text().then((text) => {
@@ -104,8 +104,8 @@
                             window.canvas.import(text);
                         });
                     ">
-                    <label for="import" class="button ripple" style="text-align: center; line-height: 350%; font-size: calc(40px / 3);">Import Canvas</label>
-                    <button onclick="
+                    <label for="import" class="button nav ripple" style="text-align: center; line-height: 350%; font-size: calc(40px / 3);">Import Canvas</label>
+                    <button class="nav ripple" onclick="
                         const date = new Date(new Date().setHours(new Date().getHours() - new Date().getTimezoneOffset() / 60)).toISOString().split(/t/i);
                         const link = document.createElement('a');
                         const file = new Blob([

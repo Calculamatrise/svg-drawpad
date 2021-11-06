@@ -106,7 +106,7 @@ export default class extends Tool {
     }
     mouseMove() {
         const points = []
-        for (let i = 0; i <= 360; i += this.segmentLength) {
+        for (let i = 0; i <= 360; i += this.segmentLength/*1000 / (this.width / 2 + this.height / 2) / 2 / 10*/) {
             points.push([
                 this.x + this.width * Math.cos(i * Math.PI / 180),
                 this.y + this.height * Math.sin(i * Math.PI / 180)

@@ -225,7 +225,7 @@ export default class {
             behavior: "smooth"
         });
 
-        this.base = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        this.base = document.querySelector(`g[data-id='${this.id}']`) ?? [...document.querySelectorAll("g:not([data-id])")].filter(element => element.parentElement.id === "view")[0] ?? document.createElementNS("http://www.w3.org/2000/svg", "g");
         this.base.dataset.id = this.id;
 
         if (this.id === 1) {
@@ -307,10 +307,5 @@ export default class {
         }
 
         return this;
-    }
-    toString() {
-        return this.lines.map(function(line) {
-            return line.toString();
-        }).join(".");
     }
 }

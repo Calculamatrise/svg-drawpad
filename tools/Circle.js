@@ -135,22 +135,10 @@ export default class extends Tool {
         return lines;
     }
     get radius() {
-        let sumX = this.mouse.position.x - this.mouse.pointA.x;
-        if (sumX < 0) {
-            sumX *= -1;
-        }
+        let sumX = Math.abs(this.mouse.position.x - this.mouse.pointA.x);
+        let sumY = Math.abs(this.mouse.position.y - this.mouse.pointA.y);
 
-        let sumY = this.mouse.position.y - this.mouse.pointA.y;
-        if (sumY < 0) {
-            sumY *= -1;
-        }
-
-        let radius = sumX + sumY;
-        if (radius < 0) {
-            radius *= -1;
-        }
-
-        return radius  / 1.5;
+        return Math.abs(sumX + sumY) / 1.5;
     }
     init() {
         this.element.style.setProperty("stroke", this.canvas.primary);

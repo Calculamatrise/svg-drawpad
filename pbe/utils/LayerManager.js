@@ -85,4 +85,11 @@ export default class {
 	
 		return element;
 	}
+    close() {
+        this.cache.forEach(function(layer) {
+            layer.remove();
+        });
+
+        this.cache = []
+    }
 }
