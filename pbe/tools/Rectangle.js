@@ -3,7 +3,7 @@ import Tool from "./Tool.js";
 export default class extends Tool {
     static id = "rectangle";
 
-    size = 4;
+    _size = 4;
     element = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     mouseDown() {
         this.element.style.setProperty("stroke", this.canvas.primary);
@@ -77,9 +77,6 @@ export default class extends Tool {
             }
 
             return false;
-        }
-        rectangle.toString = function() {
-            return `rectangle:${this.getAttribute("x")}-${this.getAttribute("y")}-${this.getAttribute("width")}-${this.getAttribute("height")}.`
         }
 
         if (!this.canvas.layer.hidden) {

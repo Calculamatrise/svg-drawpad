@@ -3,7 +3,7 @@ import Tool from "./Tool.js";
 export default class extends Tool {
     static id = "curve";
 
-    size = 4;
+    _size = 4;
     active = false;
     anchorA = null;
     anchorB = null;
@@ -100,9 +100,6 @@ export default class extends Tool {
 
                     return false;
                 });
-            }
-            temp.toString = function() {
-                return `brush:${this.getAttribute("points")}.`;
             }
         
             if (!this.canvas.layer.hidden) {

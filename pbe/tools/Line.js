@@ -9,6 +9,8 @@ export default class extends Tool {
         this.element.style.setProperty("stroke-width", this.size);
     }
     mouseDown(event) {
+        this.active = true;
+
         this.element.style.setProperty("stroke", this.canvas.primary);
         this.element.style.setProperty("stroke-width", this.size);
         this.element.setAttribute("x1", this.mouse.pointA.x);
@@ -19,11 +21,21 @@ export default class extends Tool {
         this.canvas.layer.base.appendChild(this.element);
     }
     mouseMove(event) {
+        if (!this.active) {
+            return;
+        }
+
         this.element.style.setProperty("stroke-width", this.size);
         this.element.setAttribute("x2", this.mouse.position.x);
         this.element.setAttribute("y2", this.mouse.position.y);
     }
     mouseUp(event) {
+        if (!this.active) {
+            return;
+        }
+
+        this.active = false;
+        
         this.element.remove();
         if (this.mouse.pointA.x === this.mouse.pointB.x && this.mouse.pointA.y === this.mouse.pointB.y) {
             return;
@@ -69,9 +81,6 @@ export default class extends Tool {
 
             return false;
         }
-        line.toString = function() {
-            return `line:${this.getAttribute("x1")}-${this.getAttribute("y1")}-${this.getAttribute("x2")}-${this.getAttribute("y2")}.`
-        }
 
         if (!this.canvas.layer.hidden) {
             this.canvas.layer.base.appendChild(line);
@@ -82,5 +91,10 @@ export default class extends Tool {
             action: "add",
             value: line
         });
+    }
+    close() {
+        this.active = false;
+        
+        this.element.remove();
     }
 }

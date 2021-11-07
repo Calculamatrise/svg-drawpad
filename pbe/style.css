@@ -6,6 +6,7 @@ html {
 	--text: #1B1B1B;
 	--stroke: skyblue;
 	--fill: violet;
+	color: var(--text);
 	border: none;
 }
 
@@ -25,56 +26,60 @@ div.content {
 
 div#container {
 	position: relative;
+	touch-action: none;
 }
 
-div#container div.ui {
+div#container :is(user-interface, mobile-user-interface) :is(top-left-nav, top-right-nav, bottom-left-nav, bottom-right-nav) {
 	margin: 10px;
-	color: var(--text);
 	position: fixed;
 	display: inline-block;
+	z-index: 0;
 }
 
-div#container div.ui.bottom-left {
-	left: 0;
-	bottom: 0;
-	z-index: 50;
+div#container mobile-user-interface {
+	display: none;
 }
 
-div#container div.ui.top-left {
+div#container :is(user-interface, mobile-user-interface) top-left-nav {
 	top: 0;
 	left: 0;
-	overflow: auto;
-	max-height: 46.4vh;
 	z-index: 50;
 }
 
-div#container div.ui.top-right {
+div#container :is(user-interface, mobile-user-interface) top-right-nav {
 	top: 0;
 	right: 0;
-	width: 260px;
+	max-width: 48vw;
 	flex-wrap: wrap;
 	display: inline-flex;
 	justify-content: flex-end;
 	z-index: 50;
 }
 
-div#container div.ui.bottom-right {
+div#container :is(user-interface, mobile-user-interface) bottom-left-nav {
+	left: 0;
+	bottom: 0;
+	z-index: 50;
+}
+
+div#container :is(user-interface, mobile-user-interface) bottom-right-nav {
 	right: 0;
 	bottom: 0;
 	z-index: 50;
 }
 
-div#container div.ui.top-left #toolbar {
+div#container user-interface top-left-nav #toolbar {
+	display: none;
+	overflow: auto;
+	max-height: 43.55vh;
+}
+
+div#container user-interface top-left-nav #toolbar #advanced-tools {
 	display: none;
 	flex-direction: column;
 }
 
-div#container div.ui.top-left #toolbar #advanced-tools {
-	display: none;
-	flex-direction: column;
-}
-
-div#container div.ui.bottom-left .option {
+div#container user-interface bottom-left-nav .option {
 	width: 130px;
 	height: 45px;
 	display: flex;
@@ -85,12 +90,12 @@ div#container div.ui.bottom-left .option {
 	justify-content: center;
 }
 
-div#container div.ui.bottom-left .option.disabled {
+div#container user-interface bottom-left-nav .option.disabled {
 	opacity: .5;
 	pointer-events: none;
 }
 
-div#container div.ui.bottom-left .option input {
+div#container user-interface bottom-left-nav .option input {
 	top: 0;
 	left: 0;
 	position: absolute;
@@ -98,98 +103,56 @@ div#container div.ui.bottom-left .option input {
 	pointer-events: none;
 }
 
-div#container div.ui button, div#container div#layers button {
+div#container :is(user-interface, mobile-user-interface) button, div#container div#layers button {
 	background-color: transparent;
 }
 
-div#container div#settings {
-	top: 0;
-	left: 0;
-	width: calc(100vw - 40vw);
-	height: calc(100vh - 30vh);
-	display: none;
+div#container .overlay {
+	top: 15vh;
+	left: 15vw;
+	width: 40vw;
+	height: 40vh;
+	padding: 5vh 5vw;
 	overflow: hidden;
-	color: var(--text);
 	position: absolute;
 	align-items: center;
-	align-content: center;
+	border-radius: 20px;
 	place-content: center;
 	flex-flow: row wrap;
-	padding: 10vh 20vw 20vh 20vw;
-	z-index: 40;
-}
-
-div#container div#settings::before {
-	content: "";
-	opacity: .9;
-	top: inherit;
-	left: inherit;
-	width: inherit;
-	height: inherit;
-	padding: inherit;
-	position: inherit;
-	pointer-events: none;
-	background-color: var(--soft-background);
-	z-index: -1;
+	box-shadow: inset 0px 5px 8px -10px #ffffff80;
 }
 
 div#container iframe#patch-notes-iframe {
-	top: 0;
-	left: 0;
+	top: 20vh;
 	width: 70vw;
 	height: 60vh;
 	border: none;
 	opacity: .95;
 	padding: 2px;
-	overflow: hidden;
-	color: var(--text);
-	position: absolute;
-	align-items: center;
 	border-radius: 30px;
-	place-content: center;
 	flex-flow: column wrap;
-	margin: 20vh 15vw 20vh 15vw;
 	background-color: var(--border-color);
 	z-index: 20;
 }
 
-div#container div#layers {
-	top: 0;
-	left: 0;
-	/*opacity: .95;*/
-	width: 30vw;
-	height: 30vh;
+div#container div#settings {
+	top: 10vh;
+	left: 10vw;
+	width: 70vw;
+	height: 70vh;
 	display: none;
-	overflow: hidden;
-	color: var(--text);
-	position: absolute;
-	align-items: center;
+	background-color: #ffffff30;
+	backdrop-filter: blur(2em);
+	z-index: 40;
+}
+
+div#container div#layers {
+	display: none;
 	border-radius: 30px;
-	place-content: center;
-	flex-flow: column wrap;
-	margin: 20vh 15vw 20vh 15vw;
-	padding: 10vh 20vw 20vh 20vw;
-	/*background-color: var(--hard-background);*/
+	flex-flow: column;
+	padding: 10vh 15vw 20vh;
+	background-color: #ffffff20; /* var(--hard-background); */
 	z-index: 20;
-}
-
-div#container div#layers::before {
-	content: "";
-	opacity: .6;
-	top: inherit;
-	left: inherit;
-	width: inherit;
-	height: inherit;
-	padding: inherit;
-	position: inherit;
-	pointer-events: none;
-	background-color: var(--soft-background);
-	z-index: -1;
-}
-
-div#container div#layers button {
-	top: 3%;
-	color: var(--text);
 }
 
 div#container div#layers div#layer-container {
@@ -200,6 +163,7 @@ div#container div#layers div#layer-container {
 	width: max-content;
 	align-items: center;
 	flex-direction: row;
+	max-height: 80%;
 }
 
 div#container div#layers .layer {
@@ -288,14 +252,17 @@ div#container span#settings {
 	top: 0;
 	right: 0;
 	margin: 10px;
-	color: var(--text);
 	position: absolute;
 }
 
-svg {
+input[type="color"]#colour {
+	visibility: hidden;
+	position: absolute;
+}
+
+svg#view {
 	width: 100vw;
 	height: 100vh;
-	color: var(--text);
 	pointer-events: none;
 	background-color: var(--background);
 }
@@ -322,39 +289,15 @@ rect {
 	fill: var(--text);
 }
 
+@media only screen 
+and (min-device-width: 320px) 
+and (max-device-width: 568px)
+and (-webkit-min-device-pixel-ratio: 2) {
+	div#container user-interface, div#container user-interface * {
+		display: none;
+	}
 
-input[type="color"]#colour {
-	visibility: hidden;
-	position: absolute;
-}
-
-.ripple::before {
-    top: calc(var(--offsetY) * 1px);
-	left: calc(var(--offsetX) * 1px);
-    opacity: 0;
-    content: "";
-    padding: 50%;
-	position: absolute;
-    transform: translate(-50%, -50%) scale(3);
-	transition: transform 800ms, opacity 1s;
-    border-radius: 50%;
-    pointer-events: none;
-}
-
-.ripple:not(.ripple.rainbow)::before {
-    background-color: #EEEEEE;
-}
-
-.rainbow::before {
-	background: #EEEEEE; /* For browsers that do not support gradients */
-    background: -webkit-radial-gradient(red, orange , yellow, green, cyan, blue, indigo, violet);
-    background: -o-radial-gradient(red, orange, yellow, green, cyan, blue, indigo, violet);
-    background: -moz-radial-gradient(red, orange, yellow, green, cyan, blue, indigo, violet);
-    background: radial-gradient(red, orange , yellow, green, cyan, blue, indigo,violet);
-}
-
-.ripple:not(.focus):active::before, .ripple.focus:active:not(:focus-within)::before {
-    transition: 0s;
-    opacity: .5;
-    transform: translate(-50%, -50%) scale(0);
+	div#container mobile-user-interface {
+		display: block;
+	}
 }

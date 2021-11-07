@@ -3,7 +3,7 @@ import Tool from "./Tool.js";
 export default class extends Tool {
     static id = "circle";
 
-    size = 4;
+    _size = 4;
     segmentLength = 1;
     element = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     get polyline() {
@@ -135,22 +135,10 @@ export default class extends Tool {
         return lines;
     }
     get radius() {
-        let sumX = this.mouse.position.x - this.mouse.pointA.x;
-        if (sumX < 0) {
-            sumX *= -1;
-        }
+        let sumX = Math.abs(this.mouse.position.x - this.mouse.pointA.x);
+        let sumY = Math.abs(this.mouse.position.y - this.mouse.pointA.y);
 
-        let sumY = this.mouse.position.y - this.mouse.pointA.y;
-        if (sumY < 0) {
-            sumY *= -1;
-        }
-
-        let radius = sumX + sumY;
-        if (radius < 0) {
-            radius *= -1;
-        }
-
-        return radius  / 1.5;
+        return Math.abs(sumX + sumY) / 1.5;
     }
     init() {
         this.element.style.setProperty("stroke", this.canvas.primary);
@@ -216,9 +204,6 @@ export default class extends Tool {
             }
 
             return false;
-        }
-        circle.toString = function() {
-            return `circle:${this.getAttribute("cx")}-${this.getAttribute("cy")}-${this.getAttribute("r")}.`;
         }
 
         if (!this.canvas.layer.hidden) {

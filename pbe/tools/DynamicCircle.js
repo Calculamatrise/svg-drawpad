@@ -3,7 +3,7 @@ import Tool from "./Tool.js";
 export default class extends Tool {
     static id = "dynamic_circle";
 
-    size = 4;
+    _size = 4;
     color = null;
     segmentLength = 5;
     element = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
@@ -106,7 +106,7 @@ export default class extends Tool {
     }
     mouseMove() {
         const points = []
-        for (let i = 0; i <= 360; i += this.segmentLength) {
+        for (let i = 0; i <= 360; i += this.segmentLength/*1000 / (this.width / 2 + this.height / 2) / 2 / 10*/) {
             points.push([
                 this.x + this.width * Math.cos(i * Math.PI / 180),
                 this.y + this.height * Math.sin(i * Math.PI / 180)
@@ -174,9 +174,6 @@ export default class extends Tool {
 
                 return false;
             });
-        }
-        circle.toString = function() {
-            return `brush:${this.getAttribute("points")}.`;
         }
 
         if (!this.canvas.layer.hidden) {

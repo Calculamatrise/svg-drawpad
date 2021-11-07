@@ -333,6 +333,7 @@ export default class {
 				settings.style.display = settings.style.display === "flex" ? "none" : "flex";
 				break;
 			
+			case "+":
 			case "=":
 				if (this.tool.constructor.id === "camera" || event.ctrlKey) {
 					if (this.zoom <= 1) {
