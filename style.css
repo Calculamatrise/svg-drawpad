@@ -275,7 +275,8 @@ line {
 }
 
 path {
-	stroke: var(--text);
+	stroke: none;
+	fill: var(--text);
 }
 
 polyline {
