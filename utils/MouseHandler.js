@@ -1,3 +1,6 @@
+let lastX;
+let lastY;
+
 export default class {
 	constructor(parent) {
 		this.parent = parent;
@@ -56,7 +59,12 @@ export default class {
 		
 		this.isAlternate = !!event.button;
 		this.isDown = true;
-		this.real = this.pointA = {
+		this.real = {
+			x: event.offsetX,
+			y: event.offsetY
+		}
+
+		this.pointA = {
 			x: (event.offsetX * this.parent.zoom) + this.parent.viewBox.x,
 			y: (event.offsetY * this.parent.zoom) + this.parent.viewBox.y
 		}
@@ -127,7 +135,7 @@ export default class {
 
 		this.parent.tool.size -= event.deltaY / 100;
 
-		// const zoom = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--size'));
+		// const zoom = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--size"));
 		// if (event.deltaY > 0 && zoom >= 100 || event.deltaY < 0 && zoom < 1) {
 		// 	return;
 		// }
@@ -137,28 +145,40 @@ export default class {
 	touchStart(event) {
 		event.stopPropagation();
 		for (const touch of event.touches) {
-			const mouseEvent = document.createEvent('MouseEvent');
-			mouseEvent.initMouseEvent('mousedown', true, true, window, event.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
+			const mouseEvent = document.createEvent("MouseEvent");
+			mouseEvent.initMouseEvent("mousedown", true, true, window, event.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
 
-			this.parent.container.dispatchEvent(mouseEvent);
+			lastX = touch.clientX;
+			lastY = touch.clientY;
+
+			touch.target.dispatchEvent(mouseEvent);
 		}
 	}
 	touchMove(event) {
 		event.stopPropagation();
 		for (const touch of event.touches) {
-			const mouseEvent = document.createEvent('MouseEvent');
-			mouseEvent.initMouseEvent('mousemove', true, true, window, event.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
-			
-			this.parent.container.dispatchEvent(mouseEvent);
+			const mouseEvent = new MouseEvent("mousemove", {
+				movementX: touch.clientX - lastX,
+				movementY: touch.clientY - lastY
+			});
+			mouseEvent.initMouseEvent("mousemove", true, true, window, event.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
+
+			lastX = touch.clientX;
+			lastY = touch.clientY;
+
+			touch.target.dispatchEvent(mouseEvent);
 		}
 	}
 	touchEnd(event) {
 		event.stopPropagation();
 		for (const touch of event.changedTouches) {
-			const mouseEvent = document.createEvent('MouseEvent');
-			mouseEvent.initMouseEvent('mouseup', true, true, window, event.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
+			const mouseEvent = document.createEvent("MouseEvent");
+			mouseEvent.initMouseEvent("mouseup", true, true, window, event.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
 
-			this.parent.container.dispatchEvent(mouseEvent);
+			lastX = null;
+			lastY = null;
+
+			touch.target.dispatchEvent(mouseEvent);
 		}
 	}
 	touchCancel(event) {
