@@ -62,9 +62,6 @@ export default class extends Tool {
                 return false;
             });
         }
-        temp.toString = function() {
-            return `brush:${this.getAttribute("points")}.`;
-        }
 
         const points = []
         for (let i = 0; i <= 360; i += this.segmentLength) {
@@ -125,9 +122,6 @@ export default class extends Tool {
     
                 return false;
             }
-            temp.toString = function() {
-                return `line:${this.getAttribute("x1")}-${this.getAttribute("y1")}-${this.getAttribute("x2")}-${this.getAttribute("y2")}.`;
-            }
 
             lines.push(temp);
         }
@@ -135,10 +129,7 @@ export default class extends Tool {
         return lines;
     }
     get radius() {
-        let sumX = Math.abs(this.mouse.position.x - this.mouse.pointA.x);
-        let sumY = Math.abs(this.mouse.position.y - this.mouse.pointA.y);
-
-        return Math.abs(sumX + sumY) / 1.5;
+        return Math.sqrt(Math.abs(this.mouse.position.x - this.mouse.pointA.x) ** 2 + Math.abs(this.mouse.position.y - this.mouse.pointA.y) ** 2);
     }
     init() {
         this.element.style.setProperty("stroke", this.canvas.primary);

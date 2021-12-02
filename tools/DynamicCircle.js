@@ -54,9 +54,6 @@ export default class extends Tool {
     
                 return false;
             }
-            temp.toString = function() {
-                return `line:${this.getAttribute("x1")}-${this.getAttribute("y1")}-${this.getAttribute("x2")}-${this.getAttribute("y2")}.`;
-            }
 
             lines.push(temp);
         }
