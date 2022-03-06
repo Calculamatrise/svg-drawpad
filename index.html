@@ -4,6 +4,7 @@
         <title>SVG Drawpad - Calculamatrise</title>
         <link rel="icon" href="/favicon.ico">
         <link rel="stylesheet" href="/style.css">
+        <link rel="stylesheet" href="/light.css" id="theme" onload="JSON.parse(localStorage.getItem('dark')) && (this.href = '/dark.css')">
         <link rel="manifest" href="/manifest.json">
         <meta name="author" content="Calculamatrise">
         <meta name="title" property="og:title" content="Calculamatrise">
@@ -24,35 +25,33 @@
                 </svg>
                 <user-interface>
                     <top-left-nav>
-                        <button class="primary nav" onclick="this.innerText = `${(document.querySelector('#toolbar').style.display = document.querySelector('#toolbar').style.display === 'grid' ? 'none' : 'grid') === 'grid' ? 'Hide' : 'Show'} Toolbar`;">Show Toolbar</button>
+                        <button class="secondary" onclick="this.innerText = `${(document.querySelector('#toolbar').style.display = document.querySelector('#toolbar').style.display === 'grid' ? 'none' : 'grid') === 'grid' ? 'Hide' : 'Show'} Toolbar`;">Show Toolbar</button>
                         <div id="toolbar">
-                            <button onclick="window.canvas.tools.select('line');">Line</button>
-                            <button onclick="window.canvas.tools.select('brush');">Brush</button>
-                            <button onclick="window.canvas.tools.select('curve');">Curve</button>
-                            <button onclick="window.canvas.tools.select('circle');">Circle</button>
-                            <button onclick="window.canvas.tools.select('rectangle');">Rectangle</button>
-                            <button onclick="window.canvas.tools.select('eraser');">Eraser</button>
-                            <button onclick="window.canvas.tools.select('camera');">Camera</button>
-                            <button onclick="window.canvas.tools.select('select');">Select</button>
-                            <button onclick="
+                            <button class="ripple" onclick="window.canvas.tools.select('line');">Line</button>
+                            <button class="ripple" onclick="window.canvas.tools.select('brush');">Brush</button>
+                            <button class="ripple" onclick="window.canvas.tools.select('curve');">Curve</button>
+                            <button class="ripple" onclick="window.canvas.tools.select('circle');">Circle</button>
+                            <button class="ripple" onclick="window.canvas.tools.select('rectangle');">Rectangle</button>
+                            <button class="ripple" onclick="window.canvas.tools.select('eraser');">Eraser</button>
+                            <button class="ripple" onclick="window.canvas.tools.select('camera');">Camera</button>
+                            <button class="ripple" onclick="window.canvas.tools.select('select');">Select</button>
+                            <button class="ripple" onclick="
                                 this.parentElement.querySelector('#toolbar #advanced-tools').style.display = this.parentElement.querySelector('#toolbar #advanced-tools').style.display === 'flex' ? 'none' : 'flex',
                                 this.parentElement.querySelector('#toolbar #advanced-tools').scrollIntoView({ behavior: 'smooth' }),
                                 this.innerText = this.innerText === 'Show Advanced Tools' ? 'Hide Advanced Tools' : 'Show Advanced Tools'
                             ">Show Advanced Tools</button>
                             <div id="advanced-tools">
-                                <button onclick="window.canvas.tools.select('dynamic_circle');">Dynamic Circle</button>
+                                <button onclick="window.canvas.tools.select('dynamic_circle');">Ellipse</button>
                                 <button class="option ripple rainbow" id="randomColors" onclick="
                                     if (JSON.parse(sessionStorage.getItem('randomColors'))) {
                                         this.innerText = 'Enable Random Colours';
                                         
                                         sessionStorage.setItem('randomColors', false);
+                                    } else {
+                                        this.innerText = 'Disable Random Colours';
 
-                                        return;
+                                        sessionStorage.setItem('randomColors', true);
                                     }
-
-                                    this.innerText = 'Disable Random Colours';
-
-                                    sessionStorage.setItem('randomColors', true);
                                 ">
                                     Enable Random Colours
                                 </button>
@@ -60,8 +59,8 @@
                         </div>
                     </top-left-nav>
                     <top-right-nav>
-                        <button class="primary nav" onclick="document.querySelector('#layers').style.display = document.querySelector('#layers').style.display === 'flex' ? 'none' : 'flex';">Layers</button>
-                        <button class="primary nav" onclick="document.querySelector('#settings').style.display = document.querySelector('#settings').style.display === 'flex' ? 'none' : 'flex';">Settings</button>
+                        <button class="secondary" onclick="document.querySelector('#layers').style.display = document.querySelector('#layers').style.display === 'flex' ? 'none' : 'flex';">Layers</button>
+                        <button class="secondary" onclick="document.querySelector('#settings').style.display = document.querySelector('#settings').style.display === 'flex' ? 'none' : 'flex';">Settings</button>
                     </top-right-nav>
                     <bottom-left-nav>
                         <div class="option ripple" onclick="this.firstElementChild.click();">
@@ -86,7 +85,7 @@
                         </div>
                     </bottom-left-nav>
                     <bottom-right-nav>
-                        <button class="primary nav" id="patch-notes">Patch Notes</button>
+                        <button class="secondary" id="patch-notes">Patch Notes</button>
                     </bottom-right-nav>
                 </user-interface>
                 <mobile-user-interface>
@@ -216,12 +215,12 @@
                         </div>
                     </bottom-left-nav>
                     <bottom-right-nav style="display: none;">
-                        <button class="primary nav" id="patch-notes">Patch Notes</button>
+                        <button class="secondary" id="patch-notes">Patch Notes</button>
                     </bottom-right-nav>
                 </mobile-user-interface>
                 <!-- Layers Overlay -->
                 <div class="overlay" id="layers">
-                    <button class="nav ripple" onclick="window.canvas.layers.create(), window.canvas.layerDepth = window.canvas.layerDepth + 1;">New Layer</button>
+                    <button class="secondary ripple" onclick="window.canvas.layers.create(), window.canvas.layerDepth = window.canvas.layerDepth + 1;">New Layer</button>
                     <div id="layer-container"></div>
                 </div>
                 <!-- Settings Overlay -->
@@ -236,8 +235,8 @@
                             window.canvas.import(text);
                         });
                     ">
-                    <label for="import" class="button nav ripple" style="text-align: center; line-height: 350%; font-size: calc(40px / 3);">Import Canvas</label>
-                    <button class="nav ripple" onclick="
+                    <label for="import" class="button secondary ripple" style="text-align: center; line-height: 350%; font-size: calc(40px / 3);">Import Canvas</label>
+                    <button class="secondary ripple" onclick="
                         const date = new Date(new Date().setHours(new Date().getHours() - new Date().getTimezoneOffset() / 60)).toISOString().split(/t/i);
                         const link = document.createElement('a');
                         const file = new Blob([

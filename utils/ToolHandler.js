@@ -2,7 +2,7 @@ import Line from "../tools/Line.js";
 import Brush from "../tools/Brush.js";
 import Curve from "../tools/Curve.js";
 import Circle from "../tools/Circle.js";
-import DynamicCircle from "../tools/DynamicCircle.js";
+import Ellipse from "../tools/Ellipse.js";
 import Rectangle from "../tools/Rectangle.js";
 import Text from "../tools/Text.js";
 import Eraser from "../tools/Eraser.js";
@@ -16,7 +16,7 @@ export default class {
         this.registerTool(Brush);
         this.registerTool(Curve);
         this.registerTool(Circle);
-        this.registerTool(DynamicCircle);
+        this.registerTool(Ellipse);
         this.registerTool(Rectangle);
         this.registerTool(Text);
         this.registerTool(Eraser);
