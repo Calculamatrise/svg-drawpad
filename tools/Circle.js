@@ -29,6 +29,7 @@ export default class extends Tool {
                     x: (parseInt(points[index - 1].x) - window.canvas.viewBox.x) - (parseInt(point.x) - window.canvas.viewBox.x),
                     y: (parseInt(points[index - 1].y) - window.canvas.viewBox.y) - (parseInt(point.y) - window.canvas.viewBox.y)
                 }
+
                 let len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
                 let b = (event.offsetX - (parseInt(point.x) - window.canvas.viewBox.x)) * (vector.x / len) + (event.offsetY - (parseInt(point.y) - window.canvas.viewBox.y)) * (vector.y / len);
                 const v = {
@@ -164,31 +165,15 @@ export default class extends Tool {
                 x: (parseInt(this.getAttribute("r")) - window.canvas.viewBox.x) - (parseInt(this.getAttribute("cx")) - window.canvas.viewBox.x),
                 y: (parseInt(this.getAttribute("r")) - window.canvas.viewBox.y) - (parseInt(this.getAttribute("cy")) - window.canvas.viewBox.y)
             }
+            
             let len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
-            let b = (event.offsetX - (parseInt(this.getAttribute("cx")) - window.canvas.viewBox.x)) * (vector.x / len) + (event.offsetY - (parseInt(this.getAttribute("cy")) - window.canvas.viewBox.y)) * (vector.y / len);
-            const v = {
-                x: 0,
-                y: 0
+            vector = {
+                x: event.offsetX - parseInt(this.getAttribute("cx")) - window.canvas.viewBox.x,
+                y: event.offsetY - parseInt(this.getAttribute("cy")) - window.canvas.viewBox.y
             }
 
-            if (b <= 0) {
-                v.x = parseInt(this.getAttribute("cx")) - window.canvas.viewBox.x;
-                v.y = parseInt(this.getAttribute("cy")) - window.canvas.viewBox.y;
-            } else if (b >= len) {
-                v.x = parseInt(this.getAttribute("r")) - window.canvas.viewBox.x;
-                v.y = parseInt(this.getAttribute("r")) - window.canvas.viewBox.y;
-            } else {
-                v.x = (parseInt(this.getAttribute("cx")) - window.canvas.viewBox.x) + vector.x / len * b;
-                v.y = (parseInt(this.getAttribute("cy")) - window.canvas.viewBox.y) + vector.y / len * b;
-            }
-
-            const res = {
-                x: event.offsetX - v.x,
-                y: event.offsetY - v.y
-            }
-
-            len = Math.sqrt(res.x ** 2 + res.y ** 2);
-            if (len <= window.canvas.tool.size) {
+            len = Math.sqrt((vector.x ** 2 + vector.y ** 2) + parseInt(this.getAttribute("r")));
+            if (len <= window.canvas.tool.size + parseInt(this.getAttribute("r"))) {
                 this.remove();
 
                 return true;
