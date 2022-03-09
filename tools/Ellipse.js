@@ -129,12 +129,10 @@ export default class extends Tool {
             }
 
             // Can't use basic math.
-            len = Math.abs(Math.sqrt(vector.x ** 2 / this.getAttribute("rx") ** 2 + vector.y ** 2 / this.getAttribute("ry") ** 2)) + 1e4;
-            
-            // console.log(len - 1e4, Math.sqrt((vector.x + this.getAttribute("rx")) ** 2 + (vector.y + this.getAttribute("ry")) ** 2))
+            len = Math.sqrt(vector.x ** 2 / this.getAttribute("rx") ** 2 + vector.y ** 2 / this.getAttribute("ry") ** 2);
             
             Math.sqrt(vector.x ** 2 / this.getAttribute("rx") ** 2 + vector.y ** 2 / this.getAttribute("ry") ** 2) <= 1 && console.log("Touching");
-
+            
             return len <= window.canvas.tool.size / window.canvas.tool.size && !this.remove();
         }
 
