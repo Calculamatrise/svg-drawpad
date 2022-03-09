@@ -129,21 +129,9 @@ export default class extends Tool {
             ].filter(point => isFinite(point));
 
             if (this.mouse.position.x - this.mouse.pointA.x > 0) {
-                passing = !!points.find((point) => {
-                    if (point > this.mouse.pointA.x && point < this.mouse.position.x) {
-                        return true;
-                    }
-
-                    return false;
-                });
+                passing = !!points.find((point) => point > this.mouse.pointA.x && point < this.mouse.position.x);
             } else {
-                passing = !!points.find((point) => {
-                    if (point > this.mouse.position.x && point < this.mouse.pointA.x) {
-                        return true;
-                    }
-
-                    return false;
-                });
+                passing = !!points.find((point) => point > this.mouse.position.x && point < this.mouse.pointA.x);
             }
 
             points = [
@@ -156,21 +144,9 @@ export default class extends Tool {
 
             if (passing) {
                 if (this.mouse.position.y - this.mouse.pointA.y > 0) {
-                    passing = !!points.find((point) => {
-                        if (point > this.mouse.pointA.y && point < this.mouse.position.y) {
-                            return true;
-                        }
-
-                        return false;
-                    });
+                    passing = !!points.find((point) => point > this.mouse.pointA.y && point < this.mouse.position.y);
                 } else {
-                    passing = !!points.find((point) => {
-                        if (point > this.mouse.position.y && point < this.mouse.pointA.y) {
-                            return true;
-                        }
-
-                        return false;
-                    });
+                    passing = !!points.find((point) => point > this.mouse.position.y && point < this.mouse.pointA.y);
                 }
             }
 

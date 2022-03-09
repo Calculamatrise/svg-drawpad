@@ -118,8 +118,8 @@ export default class extends Tool {
         const ellipse = this.element.cloneNode();
         ellipse.erase = function(event) {
             let vector = {
-                x: (parseInt(this.getAttribute("rx")) - window.canvas.viewBox.x) - (parseInt(this.getAttribute("cx")) - window.canvas.viewBox.x),
-                y: (parseInt(this.getAttribute("ry")) - window.canvas.viewBox.y) - (parseInt(this.getAttribute("cy")) - window.canvas.viewBox.y)
+                x: (parseInt(this.getAttribute("r")) - window.canvas.viewBox.x) - (parseInt(this.getAttribute("cx")) - window.canvas.viewBox.x),
+                y: (parseInt(this.getAttribute("r")) - window.canvas.viewBox.y) - (parseInt(this.getAttribute("cy")) - window.canvas.viewBox.y)
             }
             
             let len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
@@ -128,14 +128,9 @@ export default class extends Tool {
                 y: event.offsetY - parseInt(this.getAttribute("cy")) - window.canvas.viewBox.y
             }
 
-            len = Math.sqrt((vector.x + parseInt(this.getAttribute("rx"))) ** 2 + (vector.y + parseInt(this.getAttribute("ry"))) ** 2);
-            if (len <= window.canvas.tool.size + parseInt(this.getAttribute("rx")) + parseInt(this.getAttribute("ry")) / 2) {
-                this.remove();
+            len = Math.sqrt((vector.x ** 2 + vector.y ** 2) + parseInt(this.getAttribute("r")));
 
-                return true;
-            }
-
-            return false;
+            return len - +this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size + parseInt(this.getAttribute("r")) && !this.remove();
         }
 
         if (!this.canvas.layer.hidden) {

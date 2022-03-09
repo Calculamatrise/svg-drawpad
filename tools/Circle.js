@@ -173,13 +173,8 @@ export default class extends Tool {
             }
 
             len = Math.sqrt((vector.x ** 2 + vector.y ** 2) + parseInt(this.getAttribute("r")));
-            if (len <= window.canvas.tool.size + parseInt(this.getAttribute("r"))) {
-                this.remove();
 
-                return true;
-            }
-
-            return false;
+            return len - +this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size + parseInt(this.getAttribute("r")) && !this.remove();
         }
 
         if (!this.canvas.layer.hidden) {

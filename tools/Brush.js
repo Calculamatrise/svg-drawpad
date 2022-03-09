@@ -12,7 +12,7 @@ export default class extends Tool {
         this.element.style.setProperty("stroke", this.canvas.primary);
         this.element.style.setProperty("fill", "transparent");
         this.element.style.setProperty("stroke-width", this.size);
-        this.element.setAttribute("points", `${this.mouse.pointA.x} ${this.mouse.pointA.y}`);
+        this.element.setAttribute("points", `${this.mouse.pointA.x},${this.mouse.pointA.y}`);
         
         this.canvas.layer.base.appendChild(this.element);
     }
@@ -21,7 +21,7 @@ export default class extends Tool {
             return;
         }
 
-        this.element.setAttribute("points", `${this.element.getAttribute("points")},${this.mouse.position.x} ${this.mouse.position.y}`);
+        this.element.setAttribute("points", `${this.element.getAttribute("points")} ${this.mouse.position.x},${this.mouse.position.y}`);
     }
     mouseUp(event) {
         this.element.remove();
@@ -31,12 +31,11 @@ export default class extends Tool {
         
         const temp = this.element.cloneNode();
         temp.erase = function(event) {
-            const points = this.getAttribute("points").split(",").map(function(point) {
-                const xAndY = point.split(/\s+/g);
-
+            const points = this.getAttribute("points").split(/\s+/g).map(function(point) {
+                const [ x, y ] = point.split(",");
                 return {
-                    x: parseInt(xAndY[0]),
-                    y: parseInt(xAndY[1])
+                    x: parseInt(x),
+                    y: parseInt(y)
                 }
             });
 
@@ -49,37 +48,25 @@ export default class extends Tool {
                     x: (parseInt(points[index - 1].x) - window.canvas.viewBox.x) - (parseInt(point.x) - window.canvas.viewBox.x),
                     y: (parseInt(points[index - 1].y) - window.canvas.viewBox.y) - (parseInt(point.y) - window.canvas.viewBox.y)
                 }
+
                 let len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
                 let b = (event.offsetX - (parseInt(point.x) - window.canvas.viewBox.x)) * (vector.x / len) + (event.offsetY - (parseInt(point.y) - window.canvas.viewBox.y)) * (vector.y / len);
-                const v = {
-                    x: 0,
-                    y: 0
-                }
-
-                if (b <= 0) {
-                    v.x = parseInt(point.x) - window.canvas.viewBox.x;
-                    v.y = parseInt(point.y) - window.canvas.viewBox.y;
-                } else if (b >= len) {
-                    v.x = parseInt(points[index - 1].x) - window.canvas.viewBox.x;
-                    v.y = parseInt(points[index - 1].y) - window.canvas.viewBox.y;
+                if (b >= len) {
+                    vector.x = event.offsetX - parseInt(points[index - 1].x) - window.canvas.viewBox.x;
+                    vector.y = event.offsetY - parseInt(points[index - 1].y) - window.canvas.viewBox.y;
                 } else {
-                    v.x = (parseInt(point.x) - window.canvas.viewBox.x) + vector.x / len * b;
-                    v.y = (parseInt(point.y) - window.canvas.viewBox.y) + vector.y / len * b;
+                    let { x, y } = window.structuredClone(vector);
+                    vector.x = event.offsetX - point.x - window.canvas.viewBox.x;
+                    vector.y = event.offsetY - point.y - window.canvas.viewBox.y;
+                    if (b > 0) {
+                        vector.x -= x / len * b;
+                        vector.y -= y / len * b;
+                    }
                 }
-
-                const res = {
-                    x: event.offsetX - v.x,
-                    y: event.offsetY - v.y
-                }
-
-                len = Math.sqrt(res.x ** 2 + res.y ** 2);
-                if (len <= window.canvas.tool.size) {
-                    this.remove();
-
-                    return true;
-                }
-
-                return false;
+    
+                len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
+                
+                return len - +this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size && !this.remove();
             });
         }
 

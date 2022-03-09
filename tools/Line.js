@@ -46,40 +46,28 @@ export default class extends Tool {
         line.setAttribute("y2", this.mouse.pointB.y);
         line.erase = function(event) {
             let vector = {
-                x: (parseInt(this.getAttribute("x2")) - window.canvas.viewBox.x) - (parseInt(this.getAttribute("x1")) - window.canvas.viewBox.x),
-                y: (parseInt(this.getAttribute("y2")) - window.canvas.viewBox.y) - (parseInt(this.getAttribute("y1")) - window.canvas.viewBox.y)
+                x: (+this.getAttribute("x2") - window.canvas.viewBox.x) - (+this.getAttribute("x1") - window.canvas.viewBox.x),
+                y: (+this.getAttribute("y2") - window.canvas.viewBox.y) - (+this.getAttribute("y1") - window.canvas.viewBox.y)
             }
+
             let len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
-            let b = (event.offsetX - (parseInt(this.getAttribute("x1")) - window.canvas.viewBox.x)) * (vector.x / len) + (event.offsetY - (parseInt(this.getAttribute("y1")) - window.canvas.viewBox.y)) * (vector.y / len);
-            const v = {
-                x: 0,
-                y: 0
-            }
-
-            if (b <= 0) {
-                v.x = parseInt(this.getAttribute("x1")) - window.canvas.viewBox.x;
-                v.y = parseInt(this.getAttribute("y1")) - window.canvas.viewBox.y;
-            } else if (b >= len) {
-                v.x = parseInt(this.getAttribute("x2")) - window.canvas.viewBox.x;
-                v.y = parseInt(this.getAttribute("y2")) - window.canvas.viewBox.y;
+            let b = (event.offsetX - (+this.getAttribute("x1") - window.canvas.viewBox.x)) * (vector.x / len) + (event.offsetY - (+this.getAttribute("y1") - window.canvas.viewBox.y)) * (vector.y / len);
+            if (b >= len) {
+                vector.x = event.offsetX - (+this.getAttribute("x2") - window.canvas.viewBox.x);
+                vector.y = event.offsetY - (+this.getAttribute("y2") - window.canvas.viewBox.y);
             } else {
-                v.x = (parseInt(this.getAttribute("x1")) - window.canvas.viewBox.x) + vector.x / len * b;
-                v.y = (parseInt(this.getAttribute("y1")) - window.canvas.viewBox.y) + vector.y / len * b;
+                let { x, y } = window.structuredClone(vector);
+                vector.x = event.offsetX - (+this.getAttribute("x1") - window.canvas.viewBox.x);
+                vector.y = event.offsetY - (+this.getAttribute("y1") - window.canvas.viewBox.y);
+                if (b > 0) {
+                    vector.x -= x / len * b;
+                    vector.y -= y / len * b;
+                }
             }
 
-            const res = {
-                x: event.offsetX - v.x,
-                y: event.offsetY - v.y
-            }
-
-            len = Math.sqrt(res.x ** 2 + res.y ** 2);
-            if (len <= window.canvas.tool.size) {
-                this.remove();
-
-                return true;
-            }
-
-            return false;
+            len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
+            
+            return len - +this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size && !this.remove();
         }
 
         if (!this.canvas.layer.hidden) {
