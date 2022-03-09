@@ -43,7 +43,7 @@
                                 this.innerText = this.innerText === 'Show Advanced Tools' ? 'Hide Advanced Tools' : 'Show Advanced Tools'
                             ">Show Advanced Tools</button>
                             <div id="advanced-tools">
-                                <button onclick="window.canvas.tools.select('dynamic_circle');">Ellipse</button>
+                                <button onclick="window.canvas.tools.select('ellipse');">Ellipse</button>
                                 <button class="option ripple rainbow" id="randomColors" onclick="
                                     if (JSON.parse(sessionStorage.getItem('randomColors'))) {
                                         this.innerText = 'Enable Random Colours';
@@ -102,7 +102,7 @@
                             <option value="camera">Camera</option>
                             <option value="select">Select</option>
                             <optgroup label="Advanced">
-                                <option value="dynamic_circle">Dynamic Circle</option>
+                                <option value="ellipse">Ellipse</option>
                             </optgroup>
                         </select>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 433.046 433.046" style="width: 40px; height: 40px">

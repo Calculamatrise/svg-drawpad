@@ -32,10 +32,10 @@ export default class extends Tool {
         const temp = this.element.cloneNode();
         temp.erase = function(event) {
             const points = this.getAttribute("points").split(/\s+/g).map(function(point) {
-                const [ x, y ] = point.split(",");
+                const [ x, y ] = point.split(",").map(value => +value);
                 return {
-                    x: parseInt(x),
-                    y: parseInt(y)
+                    x,
+                    y
                 }
             });
 
@@ -45,15 +45,15 @@ export default class extends Tool {
                 }
 
                 let vector = {
-                    x: (parseInt(points[index - 1].x) - window.canvas.viewBox.x) - (parseInt(point.x) - window.canvas.viewBox.x),
-                    y: (parseInt(points[index - 1].y) - window.canvas.viewBox.y) - (parseInt(point.y) - window.canvas.viewBox.y)
+                    x: (points[index - 1].x - window.canvas.viewBox.x) - (point.x - window.canvas.viewBox.x),
+                    y: (points[index - 1].y - window.canvas.viewBox.y) - (point.y - window.canvas.viewBox.y)
                 }
 
                 let len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
-                let b = (event.offsetX - (parseInt(point.x) - window.canvas.viewBox.x)) * (vector.x / len) + (event.offsetY - (parseInt(point.y) - window.canvas.viewBox.y)) * (vector.y / len);
+                let b = (event.offsetX - (point.x - window.canvas.viewBox.x)) * (vector.x / len) + (event.offsetY - (point.y - window.canvas.viewBox.y)) * (vector.y / len);
                 if (b >= len) {
-                    vector.x = event.offsetX - parseInt(points[index - 1].x) - window.canvas.viewBox.x;
-                    vector.y = event.offsetY - parseInt(points[index - 1].y) - window.canvas.viewBox.y;
+                    vector.x = event.offsetX - points[index - 1].x - window.canvas.viewBox.x;
+                    vector.y = event.offsetY - points[index - 1].y - window.canvas.viewBox.y;
                 } else {
                     let { x, y } = window.structuredClone(vector);
                     vector.x = event.offsetX - point.x - window.canvas.viewBox.x;
@@ -66,7 +66,7 @@ export default class extends Tool {
     
                 len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
                 
-                return len - +this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size && !this.remove();
+                return len - this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size && !this.remove();
             });
         }
 

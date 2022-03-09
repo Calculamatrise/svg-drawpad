@@ -162,19 +162,19 @@ export default class extends Tool {
         const circle = this.element.cloneNode();
         circle.erase = function(event) {
             let vector = {
-                x: (parseInt(this.getAttribute("r")) - window.canvas.viewBox.x) - (parseInt(this.getAttribute("cx")) - window.canvas.viewBox.x),
-                y: (parseInt(this.getAttribute("r")) - window.canvas.viewBox.y) - (parseInt(this.getAttribute("cy")) - window.canvas.viewBox.y)
+                x: this.getAttribute("r") - window.canvas.viewBox.x - this.getAttribute("cx") - window.canvas.viewBox.x,
+                y: this.getAttribute("r") - window.canvas.viewBox.y - this.getAttribute("cy") - window.canvas.viewBox.y
             }
             
             let len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
             vector = {
-                x: event.offsetX - parseInt(this.getAttribute("cx")) - window.canvas.viewBox.x,
-                y: event.offsetY - parseInt(this.getAttribute("cy")) - window.canvas.viewBox.y
+                x: event.offsetX - (this.getAttribute("cx") - window.canvas.viewBox.x),
+                y: event.offsetY - (this.getAttribute("cy") - window.canvas.viewBox.y)
             }
 
-            len = Math.sqrt((vector.x ** 2 + vector.y ** 2) + parseInt(this.getAttribute("r")));
-
-            return len - +this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size + parseInt(this.getAttribute("r")) && !this.remove();
+            len = Math.abs(Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.getAttribute("r"));
+            
+            return len - this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size && window.canvas.tool.size <= len + this.style.getPropertyValue("stroke-width") / 2 && !this.remove();
         }
 
         if (!this.canvas.layer.hidden) {

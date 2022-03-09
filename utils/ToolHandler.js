@@ -60,7 +60,7 @@ export default class {
             "brush",
             "curve",
             "circle",
-            "dynamic_circle",
+            "ellipse",
             "rectangle"
         ].includes(toolName.toLowerCase())) {
             primary.parentElement.style.setProperty("display", "flex");

@@ -1,7 +1,7 @@
 import Tool from "./Tool.js";
 
 export default class extends Tool {
-    static id = "dynamic_circle";
+    static id = "ellipse";
 
     _size = 4;
     color = null;
@@ -118,19 +118,24 @@ export default class extends Tool {
         const ellipse = this.element.cloneNode();
         ellipse.erase = function(event) {
             let vector = {
-                x: (parseInt(this.getAttribute("r")) - window.canvas.viewBox.x) - (parseInt(this.getAttribute("cx")) - window.canvas.viewBox.x),
-                y: (parseInt(this.getAttribute("r")) - window.canvas.viewBox.y) - (parseInt(this.getAttribute("cy")) - window.canvas.viewBox.y)
+                x: this.getAttribute("rx") - window.canvas.viewBox.x - this.getAttribute("cx") - window.canvas.viewBox.x,
+                y: this.getAttribute("ry") - window.canvas.viewBox.y - this.getAttribute("cy") - window.canvas.viewBox.y
             }
             
             let len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
             vector = {
-                x: event.offsetX - parseInt(this.getAttribute("cx")) - window.canvas.viewBox.x,
-                y: event.offsetY - parseInt(this.getAttribute("cy")) - window.canvas.viewBox.y
+                x: event.offsetX - (this.getAttribute("cx") - window.canvas.viewBox.x),
+                y: event.offsetY - (this.getAttribute("cy") - window.canvas.viewBox.y)
             }
 
-            len = Math.sqrt((vector.x ** 2 + vector.y ** 2) + parseInt(this.getAttribute("r")));
+            // Can't use basic math.
+            len = Math.abs(Math.sqrt(vector.x ** 2 / this.getAttribute("rx") ** 2 + vector.y ** 2 / this.getAttribute("ry") ** 2)) + 1e4;
+            
+            // console.log(len - 1e4, Math.sqrt((vector.x + this.getAttribute("rx")) ** 2 + (vector.y + this.getAttribute("ry")) ** 2))
+            
+            Math.sqrt(vector.x ** 2 / this.getAttribute("rx") ** 2 + vector.y ** 2 / this.getAttribute("ry") ** 2) <= 1 && console.log("Touching");
 
-            return len - +this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size + parseInt(this.getAttribute("r")) && !this.remove();
+            return len <= window.canvas.tool.size / window.canvas.tool.size && !this.remove();
         }
 
         if (!this.canvas.layer.hidden) {
