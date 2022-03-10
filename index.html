@@ -15,8 +15,8 @@
         <script type="module" src="bootstrap.js"></script>
     </head>
     <body onload="
-        document.querySelector('#primary').parentElement.style.setProperty('background-color', (document.querySelector('#primary').value = window.canvas.primary) + '40');
-        document.querySelector('#secondary').parentElement.style.setProperty('background-color', (document.querySelector('#secondary').value = window.canvas.secondary) + '40');
+        document.querySelector('#primary').parentElement.style.setProperty('background-color', (document.querySelector('#primary').value = window.canvas.settings.styles.primary) + '40');
+        document.querySelector('#secondary').parentElement.style.setProperty('background-color', (document.querySelector('#secondary').value = window.canvas.settings.styles.secondary) + '40');
         document.querySelector('#randomColors').innerText = window.canvas.settings.randomizeStyle ? 'Disable Random Colours' : 'Enable Random Colours';
     ">
         <div class="content">
@@ -234,7 +234,7 @@
                         link.dispatchEvent(new MouseEvent('click'));
                     ">Export Canvas</button>
                 </div>
-                <input type="color" id="colour" oninput="localStorage.setItem('primaryColor', this.value), window.canvas.color = this.value;">
+                <input type="color" id="colour" oninput="window.canvas.color = this.value;">
             </div>
         </div>
     </body>
