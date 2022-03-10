@@ -24,7 +24,7 @@ export default class {
 
         clearTimeout(this.canvas.text.timeout);
 
-        this.canvas.text.innerHTML = this.constructor.id.charAt(0).toUpperCase() + this.constructor.id.slice(1) + " size - " + this.size;
+        this.canvas.text.innerHTML = this.parent.canvas.tools._selected.charAt(0).toUpperCase() + this.parent.canvas.tools._selected.slice(1) + " size - " + this.size;
 		this.canvas.text.setAttribute("x", this.canvas.viewBox.width / 2 - this.canvas.text.innerHTML.length * 2.5 + this.canvas.viewBox.x);
 		this.canvas.text.setAttribute("y", 25 + this.canvas.viewBox.y);
 		this.canvas.text.setAttribute("fill", this.canvas.dark ? "#FBFBFB" : "1B1B1B");

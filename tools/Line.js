@@ -6,6 +6,7 @@ export default class extends Tool {
     init() {
         this.element.style.setProperty("stroke-width", this.size);
     }
+
     mouseDown(event) {
         this.active = true;
 
@@ -18,6 +19,7 @@ export default class extends Tool {
 
         this.canvas.layer.base.appendChild(this.element);
     }
+
     mouseMove(event) {
         if (!this.active) {
             return;
@@ -27,36 +29,37 @@ export default class extends Tool {
         this.element.setAttribute("x2", this.mouse.position.x);
         this.element.setAttribute("y2", this.mouse.position.y);
     }
+
     mouseUp(event) {
         if (!this.active) {
             return;
         }
 
         this.active = false;
-        
+
         this.element.remove();
         if (this.mouse.pointA.x === this.mouse.pointB.x && this.mouse.pointA.y === this.mouse.pointB.y) {
             return;
         }
-        
+
         const line = this.element.cloneNode();
         line.setAttribute("x2", this.mouse.pointB.x);
         line.setAttribute("y2", this.mouse.pointB.y);
         line.erase = function(event) {
             let vector = {
-                x: this.getAttribute("x2") - window.canvas.viewBox.x - this.getAttribute("x1") - window.canvas.viewBox.x,
-                y: this.getAttribute("y2") - window.canvas.viewBox.y - this.getAttribute("y1") - window.canvas.viewBox.y
+                x: this.getAttribute("x2") - this.getAttribute("x1"),
+                y: this.getAttribute("y2") - this.getAttribute("y1")
             }
 
             let len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
-            let b = -(this.getAttribute("x1") - window.canvas.viewBox.x - event.offsetX) * (vector.x / len) - (this.getAttribute("y1") - window.canvas.viewBox.y - event.offsetY) * (vector.y / len);
+            let b = (event.offsetX - window.canvas.viewBox.x - this.getAttribute("x1")) * (vector.x / len) + (event.offsetY - window.canvas.viewBox.y - this.getAttribute("y1")) * (vector.y / len);
             if (b >= len) {
-                vector.x = this.getAttribute("x2") - window.canvas.viewBox.x - event.offsetX;
-                vector.y = this.getAttribute("y2") - window.canvas.viewBox.y - event.offsetY;
+                vector.x = this.getAttribute("x2") - event.offsetX - window.canvas.viewBox.x;
+                vector.y = this.getAttribute("y2") - event.offsetY - window.canvas.viewBox.y;
             } else {
                 let { x, y } = window.structuredClone(vector);
-                vector.x = this.getAttribute("x1") - window.canvas.viewBox.x - event.offsetX;
-                vector.y = this.getAttribute("y1") - window.canvas.viewBox.y - event.offsetY;
+                vector.x = this.getAttribute("x1") - event.offsetX - window.canvas.viewBox.x;
+                vector.y = this.getAttribute("y1") - event.offsetY - window.canvas.viewBox.y;
                 if (b > 0) {
                     vector.x += x / len * b;
                     vector.y += y / len * b;
@@ -76,6 +79,7 @@ export default class extends Tool {
             value: line
         });
     }
+
     close() {
         this.active = false;
         

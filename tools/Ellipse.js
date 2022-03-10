@@ -45,28 +45,12 @@ export default class extends Tool {
         return lines;
     }
 
-    get x() {
-        if (this.mouse.position.x - this.mouse.pointA.x > 0) {
-            return this.mouse.pointA.x + this.width;
-        }
-        
-        return this.mouse.position.x + this.width;
-    }
-
-    get y() {
-        if (this.mouse.position.y - this.mouse.pointA.y > 0) {
-            return this.mouse.pointA.y + this.height;
-        }
-
-        return this.mouse.position.y + this.height;
-    }
-
     get width() {        
-        return Math.abs(this.mouse.pointA.x - this.mouse.position.x) / 2;
+        return Math.sqrt((this.mouse.position.x - this.mouse.pointA.x) ** 2);
     }
 
     get height() {        
-        return Math.abs(this.mouse.pointA.y - this.mouse.position.y) / 2;
+        return Math.sqrt((this.mouse.position.y - this.mouse.pointA.y) ** 2);
     }
 
     init() {
@@ -97,8 +81,8 @@ export default class extends Tool {
         // }
 
         this.element.style.setProperty("stroke-width", this.size);
-        this.element.setAttribute("rx", Math.sqrt(Math.abs(this.mouse.position.x - this.mouse.pointA.x) ** 2) || 1);
-        this.element.setAttribute("ry", Math.sqrt(Math.abs(this.mouse.position.y - this.mouse.pointA.y) ** 2) || 1);
+        this.element.setAttribute("rx", Math.sqrt((this.mouse.position.x - this.mouse.pointA.x) ** 2) || 1);
+        this.element.setAttribute("ry", Math.sqrt((this.mouse.position.y - this.mouse.pointA.y) ** 2) || 1);
     }
     
     mouseUp() {
