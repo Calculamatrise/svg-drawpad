@@ -1,8 +1,6 @@
 import Tool from "./Tool.js";
 
 export default class extends Tool {
-    static id = "ellipse";
-
     _size = 4;
     color = null;
     segmentLength = 5;
@@ -19,40 +17,26 @@ export default class extends Tool {
             temp.setAttribute("y2", this.y + this.height * Math.sin((i + this.segmentLength) * Math.PI / 180));
             temp.erase = function(event) {
                 let vector = {
-                    x: (parseInt(this.getAttribute("x2")) - window.canvas.viewBox.x) - (parseInt(this.getAttribute("x1")) - window.canvas.viewBox.x),
-                    y: (parseInt(this.getAttribute("y2")) - window.canvas.viewBox.y) - (parseInt(this.getAttribute("y1")) - window.canvas.viewBox.y)
+                    x: this.getAttribute("x2") - window.canvas.viewBox.x - this.getAttribute("x1") - window.canvas.viewBox.x,
+                    y: this.getAttribute("y2") - window.canvas.viewBox.y - this.getAttribute("y1") - window.canvas.viewBox.y
                 }
+
                 let len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
-                let b = (event.offsetX - (parseInt(this.getAttribute("x1")) - window.canvas.viewBox.x)) * (vector.x / len) + (event.offsetY - (parseInt(this.getAttribute("y1")) - window.canvas.viewBox.y)) * (vector.y / len);
-                const v = {
-                    x: 0,
-                    y: 0
-                }
-    
-                if (b <= 0) {
-                    v.x = parseInt(this.getAttribute("x1")) - window.canvas.viewBox.x;
-                    v.y = parseInt(this.getAttribute("y1")) - window.canvas.viewBox.y;
-                } else if (b >= len) {
-                    v.x = parseInt(this.getAttribute("x2")) - window.canvas.viewBox.x;
-                    v.y = parseInt(this.getAttribute("y2")) - window.canvas.viewBox.y;
+                let b = (this.getAttribute("x1") - window.canvas.viewBox.x - event.offsetX) * (vector.x / len) + (this.getAttribute("y1") - window.canvas.viewBox.y - event.offsetY) * (vector.y / len);
+                if (b >= len) {
+                    vector.x = this.getAttribute("x2") - window.canvas.viewBox.x - event.offsetX;
+                    vector.y = this.getAttribute("y2") - window.canvas.viewBox.y - event.offsetY;
                 } else {
-                    v.x = (parseInt(this.getAttribute("x1")) - window.canvas.viewBox.x) + vector.x / len * b;
-                    v.y = (parseInt(this.getAttribute("y1")) - window.canvas.viewBox.y) + vector.y / len * b;
+                    let { x, y } = window.structuredClone(vector);
+                    vector.x = this.getAttribute("x1") - window.canvas.viewBox.x - event.offsetX;
+                    vector.y = this.getAttribute("y1") - window.canvas.viewBox.y - event.offsetY;
+                    if (b > 0) {
+                        vector.x += x / len * b;
+                        vector.y += y / len * b;
+                    }
                 }
-    
-                const res = {
-                    x: event.offsetX - v.x,
-                    y: event.offsetY - v.y
-                }
-    
-                len = Math.sqrt(res.x ** 2 + res.y ** 2);
-                if (len <= window.canvas.tool.size) {
-                    this.remove();
-    
-                    return true;
-                }
-    
-                return false;
+
+                return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size && !this.remove();
             }
 
             lines.push(temp);
@@ -60,6 +44,7 @@ export default class extends Tool {
 
         return lines;
     }
+
     get x() {
         if (this.mouse.position.x - this.mouse.pointA.x > 0) {
             return this.mouse.pointA.x + this.width;
@@ -67,6 +52,7 @@ export default class extends Tool {
         
         return this.mouse.position.x + this.width;
     }
+
     get y() {
         if (this.mouse.position.y - this.mouse.pointA.y > 0) {
             return this.mouse.pointA.y + this.height;
@@ -74,17 +60,21 @@ export default class extends Tool {
 
         return this.mouse.position.y + this.height;
     }
+
     get width() {        
         return Math.abs(this.mouse.pointA.x - this.mouse.position.x) / 2;
     }
+
     get height() {        
         return Math.abs(this.mouse.pointA.y - this.mouse.position.y) / 2;
     }
+
     init() {
         this.element.style.setProperty("stroke", this.color = this.canvas.primary);
         this.element.style.setProperty("fill", this.canvas.fill ? this.canvas.primary : "#FFFFFF00");
         this.element.style.setProperty("stroke-width", this.size);
     }
+
     mouseDown() {
         this.element.style.setProperty("stroke", this.color = this.canvas.primary);
         this.element.style.setProperty("fill", this.canvas.fill ? this.canvas.primary : "#FFFFFF00");
@@ -96,6 +86,7 @@ export default class extends Tool {
 
         this.canvas.layer.base.appendChild(this.element);
     }
+
     mouseMove() {
         // const points = []
         // for (let i = 0; i <= 360; i += this.segmentLength/*1000 / (this.width / 2 + this.height / 2) / 2 / 10*/) {
@@ -109,6 +100,7 @@ export default class extends Tool {
         this.element.setAttribute("rx", Math.sqrt(Math.abs(this.mouse.position.x - this.mouse.pointA.x) ** 2));
         this.element.setAttribute("ry", Math.sqrt(Math.abs(this.mouse.position.y - this.mouse.pointA.y) ** 2));
     }
+    
     mouseUp() {
         this.element.remove();
         if (this.mouse.pointA.x === this.mouse.pointB.x && this.mouse.pointA.y === this.mouse.pointB.y) {
@@ -118,22 +110,11 @@ export default class extends Tool {
         const ellipse = this.element.cloneNode();
         ellipse.erase = function(event) {
             let vector = {
-                x: this.getAttribute("rx") - window.canvas.viewBox.x - this.getAttribute("cx") - window.canvas.viewBox.x,
-                y: this.getAttribute("ry") - window.canvas.viewBox.y - this.getAttribute("cy") - window.canvas.viewBox.y
-            }
-            
-            let len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
-            vector = {
-                x: event.offsetX - (this.getAttribute("cx") - window.canvas.viewBox.x),
-                y: event.offsetY - (this.getAttribute("cy") - window.canvas.viewBox.y)
+                x: this.getAttribute("cx") - window.canvas.viewBox.x - event.offsetX,
+                y: this.getAttribute("cy") - window.canvas.viewBox.y - event.offsetY
             }
 
-            // Can't use basic math.
-            len = Math.sqrt(vector.x ** 2 / this.getAttribute("rx") ** 2 + vector.y ** 2 / this.getAttribute("ry") ** 2);
-            
-            Math.sqrt(vector.x ** 2 / this.getAttribute("rx") ** 2 + vector.y ** 2 / this.getAttribute("ry") ** 2) <= 1 && console.log("Touching");
-            
-            return len <= window.canvas.tool.size / window.canvas.tool.size && !this.remove();
+            return Math.sqrt(vector.x ** 2 / (+this.getAttribute("rx") - this.style.getPropertyValue("stroke-width") / 2 - window.canvas.tool.size) ** 2 + vector.y ** 2 / (+this.getAttribute("ry") - this.style.getPropertyValue("stroke-width") / 2 - window.canvas.tool.size) ** 2) >= 1 && Math.sqrt(vector.x ** 2 / (+this.getAttribute("rx") + this.style.getPropertyValue("stroke-width") / 2 + window.canvas.tool.size) ** 2 + vector.y ** 2 / (+this.getAttribute("ry") + this.style.getPropertyValue("stroke-width") / 2 + window.canvas.tool.size) ** 2) <= 1 && !this.remove();
         }
 
         if (!this.canvas.layer.hidden) {

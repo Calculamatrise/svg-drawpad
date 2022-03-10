@@ -26,42 +26,61 @@ export default class {
 	zoomIncrementValue = 0.5;
 	#layer = 1;
 	#fill = false;
-	#primary = "#87CEEB";
-	#secondary = "#967BB6";
 	mouse = new MouseHandler(this);
 	layers = new LayerManager();
 	events = new EventHandler();
 	tools = new ToolHandler(this);
 	text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    get settings() {
+        const settings = new Proxy(this.settings = JSON.parse(localStorage.getItem("svg-drawpad-settings")), {
+            get(target, key, object) {
+                if (typeof target[key] === "object" && target[key] !== null) {
+                    return new Proxy(target[key], this);
+                }
+
+                return target[key];
+            },
+            set(object, property, value) {
+                object[property] = value;
+
+                localStorage.setItem("svg-drawpad-settings", JSON.stringify(settings));
+            }
+        });
+
+        return settings;
+    }
+
+    set settings(value) {
+        localStorage.setItem("svg-drawpad-settings", JSON.stringify(Object.assign({
+            randomizeStyle: false,
+            styles: {
+                primary: "#87Ceeb",
+                secondary: "#967bb6"
+            },
+            theme: window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+        }, value ?? {})));
+    }
+
 	get dark() {
 		return JSON.parse(localStorage.getItem("dark")) ?? window.matchMedia('(prefers-color-scheme: dark)').matches;
 	}
+
 	get tool() {
 		return this.tools.selected;
 	}
+
 	get primary() {
-		if (JSON.parse(sessionStorage.getItem("randomColors"))) {
+		if (this.settings.randomizeStyle) {
 			return `rgb(${Math.ceil(Math.random() * 255)}, ${Math.ceil(Math.random() * 255)}, ${Math.ceil(Math.random() * 255)})`;
 		}
 
-		return localStorage.getItem("primaryColor") || this.#primary;
+		return this.settings.styles.primary;
 	}
-	set primary(color) {
-		localStorage.setItem("primaryColor", color);
 
-		this.#primary = color;
-	}
-	get secondary() {
-		return localStorage.getItem("secondaryColor") || this.#secondary;
-	}
-	set secondary(color) {
-		localStorage.setItem("secondaryColor", color);
-
-		this.#secondary = color;
-	}
 	get layerDepth() {
 		return this.#layer;
 	}
+
 	set layerDepth(layer) {
 		clearTimeout(this.text.timeout);
 
@@ -77,21 +96,26 @@ export default class {
 
 		this.#layer = layer;
 	}
+
 	get layer() {
 		return this.layers.get(this.#layer);
 	}
+
 	get fill() {
 		return this.#fill;
 	}
+
 	set fill(boolean) {
 		this.text.setAttribute("fill", boolean ? this.primary : "#FFFFFF00");
 		this.tool.element.setAttribute("fill", boolean ? this.primary : "#FFFFFF00");
 
 		this.#fill = boolean;
 	}
+
 	get container() {
 		return this.view.parentElement || document.querySelector("#container");
 	}
+
 	get viewBox() {
 		const viewBox = this.view.getAttribute("viewBox").split(/\s+/g);
 		return {
@@ -101,6 +125,7 @@ export default class {
 			height: parseFloat(viewBox[3])
 		}
 	}
+
 	import(data) {
 		try {
 			this.close();
@@ -125,6 +150,7 @@ export default class {
 			console.error(error);
 		}
 	}
+
 	resize(event) {
 		const boundingRect = this.view.getBoundingClientRect();
 		this.view.setAttribute("viewBox", `0 0 ${boundingRect.width} ${boundingRect.height}`);
@@ -132,6 +158,7 @@ export default class {
 		this.text.setAttribute("x", boundingRect.width / 2 + this.viewBox.x - this.text.innerHTML.length * 2.5);
 		this.text.setAttribute("y", 25 + this.viewBox.y);
 	}
+
 	undo() {
 		const event = this.events.pop();
 		if (event) {
@@ -189,6 +216,7 @@ export default class {
 
 		return null;
 	}
+
 	redo() {
 		const event = this.events.cache.pop();
 		if (event) {
@@ -246,6 +274,7 @@ export default class {
 
 		return null;
 	}
+
 	mouseDown(event) {
 		const patchNotes = this.container.querySelector("#patch-notes") || {};
 		if (patchNotes.iframe) {
@@ -255,7 +284,7 @@ export default class {
 		}
 
 		if (event.button === 1) {
-			this.tools.select(this.tool.constructor.id === "line" ? "brush" : this.tool.constructor.id === "brush" ? "eraser" : this.tool.constructor.id === "eraser" ? "camera" : "line");
+			this.tools.select(this.tools._selected === "line" ? "brush" : this.tools._selected === "brush" ? "eraser" : this.tools._selected === "eraser" ? "camera" : "line");
 			
 			return;
 		} else if (event.button === 2) {
@@ -294,10 +323,11 @@ export default class {
 		
 		return;
 	}
+
 	mouseMove(event) {
 		if (this.mouse.isDown && !this.mouse.isAlternate) {	
 			if (event.shiftKey) {
-				this.tools.get("camera").mouseMove(event);
+				this.tools.cache.get("camera").mouseMove(event);
 	
 				return;
 			}
@@ -305,12 +335,13 @@ export default class {
 			this.tool.mouseMove(event);
 		}
 
-		if (["curve", "eraser"].includes(this.tool.constructor.id)) {
+		if (new Set(["curve", "eraser"]).has(this.tools._selected)) {
 			this.tool.mouseMove(event);
 		}
 
 		return;
 	}
+
 	mouseUp(event) {
 		if (!this.mouse.isAlternate) {
 			this.tool.mouseUp(event);
@@ -318,6 +349,7 @@ export default class {
 		
 		return;
 	}
+
 	keyDown(event) {
 		event.preventDefault();
 		event.stopPropagation();
@@ -329,13 +361,17 @@ export default class {
 					break;
 				}
 	
-				//settings.style.visibility = "show";
-				settings.style.display = settings.style.display === "flex" ? "none" : "flex";
+                const settings = document.querySelector("#settings");
+                if (settings === null) {
+                    break;
+                }
+
+				settings.style.setProperty("display", settings.style.display === "flex" ? "none" : "flex");
 				break;
 			
 			case "+":
 			case "=":
-				if (this.tool.constructor.id === "camera" || event.ctrlKey) {
+				if (this.tools._selected === "camera" || event.ctrlKey) {
 					if (this.zoom <= 1) {
 						break;
 					}
@@ -358,7 +394,7 @@ export default class {
 				break;
 				
 			case "-":
-				if (this.tool.constructor.id === "camera" || event.ctrlKey) {
+				if (this.tools._selected === "camera" || event.ctrlKey) {
 					if (this.zoom >= 10) {
 						break;
 					}
@@ -437,7 +473,7 @@ export default class {
 				break;
 	
 			case "c":
-				if (this.tool.constructor.id === "select" && event.ctrlKey) {
+				if (this.tools._selected === "select" && event.ctrlKey) {
 					this.tool.copy();
 	
 					break;
@@ -446,7 +482,7 @@ export default class {
 				break;
 	
 			case "v":
-				if (this.tool.constructor.id === "select" && event.ctrlKey) {
+				if (this.tools._selected === "select" && event.ctrlKey) {
 					this.tool.paste();
 	
 					break;
@@ -455,9 +491,11 @@ export default class {
 				break;
 		}
 	}
+
 	toString() {
 		return this.view.outerHTML;
 	}
+
 	close() {
 		this.layers.close();
 		this.mouse.close();

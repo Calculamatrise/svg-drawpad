@@ -1,8 +1,6 @@
 import Tool from "./Tool.js";
 
 export default class extends Tool {
-    static id = "select";
-    
     active = false;
     selected = []
     cache = []
@@ -76,23 +74,10 @@ export default class extends Tool {
             return;
         }
 
-        if (this.mouse.position.x - this.mouse.pointA.x > 0) {
-            this.element.setAttribute("x", this.mouse.pointA.x);
-            this.element.setAttribute("width", this.mouse.position.x - this.mouse.pointA.x);
-        } else {
-            this.element.setAttribute("x", this.mouse.position.x);
-            this.element.setAttribute("width", this.mouse.pointA.x - this.mouse.position.x);
-        }
-
-        if (this.mouse.position.y - this.mouse.pointA.y > 0) {
-            this.element.setAttribute("y", this.mouse.pointA.y);
-            this.element.setAttribute("height", this.mouse.position.y - this.mouse.pointA.y);
-        } else {
-            this.element.setAttribute("y", this.mouse.position.y);
-            this.element.setAttribute("height", this.mouse.pointA.y - this.mouse.position.y);
-        }
-
-        return;
+        this.element.setAttribute("x", this.mouse.position.x - this.mouse.pointA.x > 0 ? this.mouse.pointA.x : this.mouse.position.x);
+        this.element.setAttribute("y", this.mouse.position.y - this.mouse.pointA.y > 0 ? this.mouse.pointA.y : this.mouse.position.y);
+        this.element.setAttribute("width", Math.abs(this.mouse.position.x - this.mouse.pointA.x));
+        this.element.setAttribute("height", Math.abs(this.mouse.position.y - this.mouse.pointA.y));
     }
     mouseUp(event) {
         if (this.active) {
@@ -178,8 +163,6 @@ export default class extends Tool {
         if (this.selected.length > 0) {
             this.active = true;
         }
-
-        return;
     }
     copy() {
         clearTimeout(this.parent.this.canvas.text.timeout);

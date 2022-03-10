@@ -2,17 +2,21 @@ export default class {
     constructor(parent) {
         this.parent = parent;
     }
+    
     _size = null;
     active = false;
     get canvas() {
         return this.parent.canvas;
     }
+
     get mouse() {
         return this.canvas.mouse;
     }
+
     get size() {
         return this._size;
     }
+
     set size(size) {
         this._size = size;
 
@@ -30,6 +34,8 @@ export default class {
 			this.canvas.text.remove();
 		}, 2000);
     }
+
+    init() {}
     createElementNS(element, properties = {}) {
         if (typeof element !== "string" || element === void 0) {
 			throw new Error("Invalid element! What were you thinking?");
@@ -56,7 +62,7 @@ export default class {
 
         return element;
     }
-    init() {}
+    
     mouseDown() {}
     mouseMove() {}
     mouseUp() {}

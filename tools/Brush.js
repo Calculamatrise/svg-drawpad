@@ -1,8 +1,6 @@
 import Tool from "./Tool.js";
 
 export default class extends Tool {
-    static id = "brush";
-
     _size = 4;
     element = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
     init() {
@@ -45,28 +43,26 @@ export default class extends Tool {
                 }
 
                 let vector = {
-                    x: (points[index - 1].x - window.canvas.viewBox.x) - (point.x - window.canvas.viewBox.x),
-                    y: (points[index - 1].y - window.canvas.viewBox.y) - (point.y - window.canvas.viewBox.y)
+                    x: points[index - 1].x - window.canvas.viewBox.x - point.x - window.canvas.viewBox.x,
+                    y: points[index - 1].y - window.canvas.viewBox.y - point.y - window.canvas.viewBox.y
                 }
 
                 let len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
-                let b = (event.offsetX - (point.x - window.canvas.viewBox.x)) * (vector.x / len) + (event.offsetY - (point.y - window.canvas.viewBox.y)) * (vector.y / len);
+                let b = -(point.x - window.canvas.viewBox.x - event.offsetX) * (vector.x / len) - (point.y - window.canvas.viewBox.y - event.offsetY) * (vector.y / len);
                 if (b >= len) {
-                    vector.x = event.offsetX - points[index - 1].x - window.canvas.viewBox.x;
-                    vector.y = event.offsetY - points[index - 1].y - window.canvas.viewBox.y;
+                    vector.x = points[index - 1].x - window.canvas.viewBox.x - event.offsetX;
+                    vector.y = points[index - 1].y - window.canvas.viewBox.y - event.offsetY;
                 } else {
                     let { x, y } = window.structuredClone(vector);
-                    vector.x = event.offsetX - point.x - window.canvas.viewBox.x;
-                    vector.y = event.offsetY - point.y - window.canvas.viewBox.y;
+                    vector.x = point.x - window.canvas.viewBox.x - event.offsetX;
+                    vector.y = point.y - window.canvas.viewBox.y - event.offsetY;
                     if (b > 0) {
-                        vector.x -= x / len * b;
-                        vector.y -= y / len * b;
+                        vector.x += x / len * b;
+                        vector.y += y / len * b;
                     }
                 }
-    
-                len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
-                
-                return len - this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size && !this.remove();
+
+                return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size && !this.remove();
             });
         }
 

@@ -112,7 +112,6 @@ div#container .overlay {
 	left: 15vw;
 	width: 40vw;
 	height: 40vh;
-	padding: 5vh 5vw;
 	overflow: hidden;
 	position: absolute;
 	align-items: center;
@@ -136,10 +135,10 @@ div#container iframe#patch-notes-iframe {
 }
 
 div#container div#settings {
-	top: 10vh;
-	left: 10vw;
-	width: 70vw;
-	height: 70vh;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
 	display: none;
 	background-color: #ffffff30;
 	backdrop-filter: blur(2em);
@@ -165,6 +164,15 @@ div#container div#layers div#layer-container {
 	flex-direction: row;
 	max-height: 80%;
 }
+
+/* Automatic layer counter >>>
+div#container div#layers .layer {
+	counter-increment: layer;
+}
+
+div#container div#layers .layer > div:nth-child(1):after {
+	content: counter(layer);
+} */
 
 div#container div#layers .layer {
 	margin: 10px;

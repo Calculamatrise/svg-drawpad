@@ -1,8 +1,6 @@
 import Tool from "./Tool.js";
 
 export default class extends Tool {
-    static id = "eraser";
-    
     _size = 20;
     element = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     init() {
@@ -11,8 +9,10 @@ export default class extends Tool {
         this.element.setAttribute("cx", this.mouse.position.x);
         this.element.setAttribute("cy", this.mouse.position.y);
         this.element.setAttribute("r", this.size);
+        
         this.canvas.view.appendChild(this.element);
     }
+
     mouseDown(event) {
         this.canvas.layer.lines.filter(line => !!line.parentElement).forEach(line => {
             if (line.erase(event)) {
@@ -23,6 +23,7 @@ export default class extends Tool {
             }
         });
     }
+    
     mouseMove(event) {
         this.element.setAttribute("cx", this.mouse.position.x);
         this.element.setAttribute("cy", this.mouse.position.y);
@@ -37,6 +38,7 @@ export default class extends Tool {
             });
         }
     }
+
     close() {
         this.element.remove();
     }

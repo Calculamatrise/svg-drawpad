@@ -2,15 +2,14 @@
 <html>
     <head>
         <title>SVG Drawpad - Calculamatrise</title>
-        <link rel="icon" href="/favicon.ico">
         <link rel="stylesheet" href="https://calculamatrise.github.io/style.css">
         <link rel="stylesheet" href="https://calculamatrise.github.io/light.css" id="theme" onload="JSON.parse(localStorage.getItem('dark')) && (this.href = 'https:\/\/calculamatrise.github.io/dark.css')">
         <link rel="stylesheet" href="style.css">
-        <link rel="manifest" href="/manifest.json">
+        <link rel="manifest" href="https://calculamatrise.github.io/manifest.json">
         <meta name="author" content="Calculamatrise">
         <meta name="title" property="og:title" content="Calculamatrise">
         <meta name="description" property="og:description" content="A program that uses scalable vector graphics to create an image of your choosing.">
-        <meta name="image" property="og:image" content="/images/favicon.png">
+        <meta name="image" property="og:image" content="https://calculamatrise.github.io/images/favicon.png">
         <meta property="og:url" content="https://calculamatrise.github.io/">
         <script type="module" src="https://calculamatrise.github.io/bootstrap.js"></script>
         <script type="module" src="bootstrap.js"></script>
@@ -18,7 +17,7 @@
     <body onload="
         document.querySelector('#primary').parentElement.style.setProperty('background-color', (document.querySelector('#primary').value = window.canvas.primary) + '40');
         document.querySelector('#secondary').parentElement.style.setProperty('background-color', (document.querySelector('#secondary').value = window.canvas.secondary) + '40');
-        document.querySelector('#randomColors').innerText = JSON.parse(sessionStorage.getItem('randomColors')) ? 'Disable Random Colours' : 'Enable Random Colours';
+        document.querySelector('#randomColors').innerText = window.canvas.settings.randomizeStyle ? 'Disable Random Colours' : 'Enable Random Colours';
     ">
         <div class="content">
             <div id="container">
@@ -45,15 +44,8 @@
                             <div id="advanced-tools">
                                 <button onclick="window.canvas.tools.select('ellipse');">Ellipse</button>
                                 <button class="option ripple rainbow" id="randomColors" onclick="
-                                    if (JSON.parse(sessionStorage.getItem('randomColors'))) {
-                                        this.innerText = 'Enable Random Colours';
-                                        
-                                        sessionStorage.setItem('randomColors', false);
-                                    } else {
-                                        this.innerText = 'Disable Random Colours';
-
-                                        sessionStorage.setItem('randomColors', true);
-                                    }
+                                    window.canvas.settings.randomizeStyle = !window.canvas.settings.randomizeStyle;
+                                    this.innerText = window.canvas.settings.randomizeStyle ? 'Disable Random Colours' : 'Enable Random Colours';
                                 ">
                                     Enable Random Colours
                                 </button>
@@ -67,21 +59,15 @@
                     <bottom-left-nav>
                         <div class="option ripple" onclick="this.firstElementChild.click();">
                             <input type="color" id="primary" oninput="
-                                this.parentElement.style.setProperty('background-color', (window.canvas.primary = this.value) + '40');
-                                
-                                sessionStorage.removeItem('randomColors');
-
-                                document.querySelector('#randomColors').innerText = 'Enable Random Colours';
+                                this.parentElement.style.setProperty('background-color', (window.canvas.settings.styles.primary = this.value) + '40');
+                                window.canvas.settings.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
                             ">
                             Primary Colour
                         </div>
                         <div class="option ripple disabled" onclick="this.firstElementChild.click();">
                             <input type="color" id="secondary" oninput="
-                                this.parentElement.style.setProperty('background-color', (window.canvas.secondary = this.value) + '40');
-                                
-                                sessionStorage.removeItem('randomColors');
-
-                                document.querySelector('#randomColors').innerText = 'Enable Random Colours';
+                                this.parentElement.style.setProperty('background-color', (window.canvas.settings.styles.secondary = this.value) + '40');
+                                window.canvas.settings.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
                             ">
                             Secondary Colour
                         </div>
@@ -168,11 +154,8 @@
                     <bottom-left-nav>
                         <div onclick="this.firstElementChild.click();">
                             <input type="color" id="primary" oninput="
-                                this.parentElement.style.setProperty('background-color', (window.canvas.primary = this.value) + '40');
-                                
-                                sessionStorage.removeItem('randomColors');
-
-                                document.querySelector('#randomColors').innerText = 'Enable Random Colours';
+                                this.parentElement.style.setProperty('background-color', (window.canvas.settings.styles.primary = this.value) + '40');
+                                window.canvas.settings.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
                             " style="display: none;">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 289.421 289.421" style="width: 40px; height: 40px">
                                 <path d="M198.05,111.681c0-59.463-48.382-107.841-107.845-107.841c-29.425,0-56.922,11.633-77.413,32.756

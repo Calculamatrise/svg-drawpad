@@ -1,8 +1,6 @@
 import Tool from "./Tool.js";
 
 export default class extends Tool {
-    static id = "text";
-
     active = false;
     element = document.createElementNS("http://www.w3.org/2000/svg", "text");
     mouseDown() {
@@ -18,6 +16,7 @@ export default class extends Tool {
         
         this.canvas.layer.base.appendChild(text);
     }
+
     mouseMove() {
         // make sure it works without having to press down.
 
@@ -26,6 +25,7 @@ export default class extends Tool {
         this.element.setAttribute("y", this.mouse.pointA.y);
         this.canvas.layer.base.appendChild(this.element);
     }
+
     mouseUp() {
         if (this.active) {
             this.active = false;
@@ -35,6 +35,7 @@ export default class extends Tool {
 
         // add event listener to type the actual text.
     }
+    
     recordKeys(event) {
         this.element.innerText += event.key;
     }
