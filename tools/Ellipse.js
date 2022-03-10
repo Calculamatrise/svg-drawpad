@@ -97,8 +97,8 @@ export default class extends Tool {
         // }
 
         this.element.style.setProperty("stroke-width", this.size);
-        this.element.setAttribute("rx", Math.sqrt(Math.abs(this.mouse.position.x - this.mouse.pointA.x) ** 2));
-        this.element.setAttribute("ry", Math.sqrt(Math.abs(this.mouse.position.y - this.mouse.pointA.y) ** 2));
+        this.element.setAttribute("rx", Math.sqrt(Math.abs(this.mouse.position.x - this.mouse.pointA.x) ** 2) || 1);
+        this.element.setAttribute("ry", Math.sqrt(Math.abs(this.mouse.position.y - this.mouse.pointA.y) ** 2) || 1);
     }
     
     mouseUp() {
