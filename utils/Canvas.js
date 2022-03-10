@@ -32,7 +32,7 @@ export default class {
 	tools = new ToolHandler(this);
 	text = document.createElementNS("http://www.w3.org/2000/svg", "text");
     get settings() {
-        const settings = new Proxy(this.settings = JSON.parse(localStorage.getItem("svg-drawpad-settings")), {
+        const settings = new Proxy(this.settings = JSON.parse(localStorage.getItem("svg-drawpad-settings")) ?? {}, {
             get(target, key) {
                 if (typeof target[key] === "object" && target[key] !== null) {
                     return new Proxy(target[key], this);
@@ -44,6 +44,8 @@ export default class {
                 object[property] = value;
 
                 localStorage.setItem("svg-drawpad-settings", JSON.stringify(settings));
+            
+                return true;
             }
         });
 
