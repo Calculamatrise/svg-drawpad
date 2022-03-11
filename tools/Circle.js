@@ -153,7 +153,7 @@ export default class extends Tool {
             }
 
             let len = Math.abs(Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.getAttribute("r"));
-            return len - this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size && window.canvas.tool.size <= len + this.style.getPropertyValue("stroke-width") / 2 && !this.remove();
+            return len - this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size && (window.canvas.tool.size <= len + this.style.getPropertyValue("stroke-width") / 2 || this.getAttribute("r") < window.canvas.tool.size) && !this.remove();
         }
 
         if (!this.canvas.layer.hidden) {
