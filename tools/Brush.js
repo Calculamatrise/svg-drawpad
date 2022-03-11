@@ -6,7 +6,8 @@ export default class extends Tool {
     init() {
         this.element.style.setProperty("stroke-width", this.size);
     }
-    mouseDown() {
+    
+    press() {
         this.element.style.setProperty("stroke", this.canvas.primary);
         this.element.style.setProperty("fill", "transparent");
         this.element.style.setProperty("stroke-width", this.size);
@@ -14,14 +15,16 @@ export default class extends Tool {
         
         this.canvas.layer.base.appendChild(this.element);
     }
-    mouseMove() {
+
+    stroke() {
         if (this.mouse.pointA.x === this.mouse.position.x && this.mouse.pointA.y === this.mouse.position.y) {
             return;
         }
 
         this.element.setAttribute("points", `${this.element.getAttribute("points")} ${this.mouse.position.x},${this.mouse.position.y}`);
     }
-    mouseUp(event) {
+
+    clip(event) {
         this.element.remove();
         if (this.mouse.pointA.x === this.mouse.pointB.x && this.mouse.pointA.y === this.mouse.pointB.y) {
             return;
@@ -76,6 +79,7 @@ export default class extends Tool {
             value: temp
         });
     }
+    
     close() {
         this.element.remove();
     }

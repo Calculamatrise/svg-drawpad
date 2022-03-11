@@ -2,7 +2,6 @@ export default class {
     constructor(parent) {
         this.parent = parent;
     }
-    
     _size = null;
     active = false;
     get canvas() {
@@ -35,7 +34,6 @@ export default class {
 		}, 2000);
     }
 
-    init() {}
     createElementNS(element, properties = {}) {
         if (typeof element !== "string" || element === void 0) {
 			throw new Error("Invalid element! What were you thinking?");
@@ -62,9 +60,10 @@ export default class {
 
         return element;
     }
-    
-    mouseDown() {}
-    mouseMove() {}
-    mouseUp() {}
+
+    init() {}
+    press() {}
+    stroke() {}
+    clip() {}
     close() {}
 }

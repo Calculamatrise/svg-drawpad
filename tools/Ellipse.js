@@ -59,7 +59,7 @@ export default class extends Tool {
         this.element.style.setProperty("stroke-width", this.size);
     }
 
-    mouseDown() {
+    press() {
         this.element.style.setProperty("stroke", this.color = this.canvas.primary);
         this.element.style.setProperty("fill", this.canvas.fill ? this.canvas.primary : "#FFFFFF00");
         this.element.style.setProperty("stroke-width", this.size);
@@ -71,7 +71,7 @@ export default class extends Tool {
         this.canvas.layer.base.appendChild(this.element);
     }
 
-    mouseMove() {
+    stroke() {
         // const points = []
         // for (let i = 0; i <= 360; i += this.segmentLength/*1000 / (this.width / 2 + this.height / 2) / 2 / 10*/) {
         //     points.push([
@@ -85,7 +85,7 @@ export default class extends Tool {
         this.element.setAttribute("ry", Math.sqrt((this.mouse.position.y - this.mouse.pointA.y) ** 2) || 1);
     }
     
-    mouseUp() {
+    clip() {
         this.element.remove();
         if (this.mouse.pointA.x === this.mouse.pointB.x && this.mouse.pointA.y === this.mouse.pointB.y) {
             return;

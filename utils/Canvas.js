@@ -31,8 +31,9 @@ export default class {
 	events = new EventHandler();
 	tools = new ToolHandler(this);
 	text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    get settings() {
-        const settings = new Proxy(this.settings = JSON.parse(localStorage.getItem("svg-drawpad-settings")) ?? {}, {
+    get storage() {
+        let storage; this.storage = {};
+        return storage = new Proxy(JSON.parse(localStorage.getItem("svg-drawpad-settings")), {
             get(target, key) {
                 if (typeof target[key] === "object" && target[key] !== null) {
                     return new Proxy(target[key], this);
@@ -43,16 +44,14 @@ export default class {
             set(object, property, value) {
                 object[property] = value;
 
-                localStorage.setItem("svg-drawpad-settings", JSON.stringify(settings));
+                localStorage.setItem("svg-drawpad-settings", JSON.stringify(storage));
             
                 return true;
             }
         });
-
-        return settings;
     }
 
-    set settings(value) {
+    set storage(value) {
         localStorage.setItem("svg-drawpad-settings", JSON.stringify(Object.assign({
             randomizeStyle: false,
             styles: {
@@ -72,11 +71,11 @@ export default class {
 	}
 
 	get primary() {
-		if (this.settings.randomizeStyle) {
+		if (this.storage.randomizeStyle) {
 			return `rgb(${Math.ceil(Math.random() * 255)}, ${Math.ceil(Math.random() * 255)}, ${Math.ceil(Math.random() * 255)})`;
 		}
 
-		return this.settings.styles.primary;
+		return this.storage.styles.primary;
 	}
 
 	get layerDepth() {
@@ -320,7 +319,7 @@ export default class {
 				this.tools.select("select");
 			}
 
-			this.tool.mouseDown(event);
+			this.tool.press(event);
 		}
 		
 		return;
@@ -329,16 +328,16 @@ export default class {
 	mouseMove(event) {
 		if (this.mouse.isDown && !this.mouse.isAlternate) {	
 			if (event.shiftKey) {
-				this.tools.cache.get("camera").mouseMove(event);
+				this.tools.cache.get("camera").stroke(event);
 	
 				return;
 			}
 
-			this.tool.mouseMove(event);
+			this.tool.stroke(event);
 		}
 
 		if (new Set(["curve", "eraser"]).has(this.tools._selected)) {
-			this.tool.mouseMove(event);
+			this.tool.stroke(event);
 		}
 
 		return;
@@ -346,7 +345,7 @@ export default class {
 
 	mouseUp(event) {
 		if (!this.mouse.isAlternate) {
-			this.tool.mouseUp(event);
+			this.tool.clip(event);
 		}
 		
 		return;

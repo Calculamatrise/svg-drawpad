@@ -13,7 +13,7 @@ export default class extends Tool {
         this.canvas.view.appendChild(this.element);
     }
 
-    mouseDown(event) {
+    press(event) {
         this.canvas.layer.lines.filter(line => !!line.parentElement).forEach(line => {
             if (line.erase(event)) {
                 this.canvas.events.push({
@@ -24,7 +24,7 @@ export default class extends Tool {
         });
     }
     
-    mouseMove(event) {
+    stroke(event) {
         this.element.setAttribute("cx", this.mouse.position.x);
         this.element.setAttribute("cy", this.mouse.position.y);
         if (this.mouse.isDown && !this.mouse.isAlternate) {

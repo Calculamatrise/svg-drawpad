@@ -7,7 +7,7 @@ export default class extends Tool {
     secondaryCache = []
     clipboard = []
     element = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    mouseDown(event) {
+    press(event) {
         if (this.active) {
             this.cache = this.selected.map(function(line) {
                 return line.cloneNode();
@@ -27,7 +27,8 @@ export default class extends Tool {
         
         this.canvas.view.appendChild(this.element);
     }
-    mouseMove(event) {
+    
+    stroke(event) {
         if (this.active) {
             this.canvas.view.style.setProperty("cursor", "move");
             this.selected.map(function(line) {
@@ -79,7 +80,8 @@ export default class extends Tool {
         this.element.setAttribute("width", Math.abs(this.mouse.position.x - this.mouse.pointA.x));
         this.element.setAttribute("height", Math.abs(this.mouse.position.y - this.mouse.pointA.y));
     }
-    mouseUp(event) {
+
+    clip(event) {
         if (this.active) {
             this.deselect();
 
@@ -164,6 +166,7 @@ export default class extends Tool {
             this.active = true;
         }
     }
+
     copy() {
         clearTimeout(this.parent.this.canvas.text.timeout);
 
@@ -184,6 +187,7 @@ export default class extends Tool {
 			this.parent.this.canvas.text.remove();
 		}, 2000);
     }
+
     paste() {
         clearTimeout(this.parent.this.canvas.text.timeout);
 
@@ -209,6 +213,7 @@ export default class extends Tool {
 			this.parent.this.canvas.text.remove();
 		}, 2000);
     }
+
     deselect() {
         for (const line of this.selected) {
             clearInterval(line.blinkInterval);
@@ -218,6 +223,7 @@ export default class extends Tool {
 
         this.active = false;
     }
+
     close() {
         this.deselect();
         this.element.remove();

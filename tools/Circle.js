@@ -74,6 +74,7 @@ export default class extends Tool {
 
         return temp;
     }
+    
     get lines() {
         const lines = [];
         for (let i = 0; i <= 360; i += this.segmentLength) {
@@ -115,9 +116,11 @@ export default class extends Tool {
 
         return lines;
     }
+
     get radius() {
-        return Math.sqrt(Math.abs(this.mouse.position.x - this.mouse.pointA.x) ** 2 + Math.abs(this.mouse.position.y - this.mouse.pointA.y) ** 2);
+        return Math.sqrt((this.mouse.position.x - this.mouse.pointA.x) ** 2 + (this.mouse.position.y - this.mouse.pointA.y) ** 2);
     }
+
     init() {
         this.element.style.setProperty("stroke", this.canvas.primary);
         this.element.style.setProperty("fill", this.canvas.fill ? this.canvas.primary : "#FFFFFF00");
@@ -126,7 +129,8 @@ export default class extends Tool {
         this.element.setAttribute("cx", this.mouse.pointA.x);
         this.element.setAttribute("cy", this.mouse.pointA.y);
     }
-    mouseDown() {
+
+    press() {
         this.element.style.setProperty("stroke", this.canvas.primary);
         this.element.style.setProperty("fill", this.canvas.fill ? this.canvas.primary : "#FFFFFF00");
         this.element.style.setProperty("stroke-width", this.size);
@@ -136,10 +140,12 @@ export default class extends Tool {
         
         this.canvas.layer.base.appendChild(this.element);
     }
-    mouseMove() {
+
+    stroke() {
         this.element.setAttribute("r", this.radius);
     }
-    mouseUp() {
+
+    clip() {
         this.element.remove();
         if (this.mouse.pointA.x === this.mouse.pointB.x && this.mouse.pointA.y === this.mouse.pointB.y) {
             return;

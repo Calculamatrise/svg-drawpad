@@ -10,7 +10,8 @@ export default class extends Tool {
     init() {
         this.element.style.setProperty("stroke-width", this.size);
     }
-    mouseDown() {
+
+    press() {
         if (this.active) {
             return;
         }
@@ -23,7 +24,8 @@ export default class extends Tool {
         
         this.canvas.layer.base.appendChild(this.element);
     }
-    mouseMove() {
+    
+    stroke() {
         if (this.active) {
             const points = []
             for (let i = 0; i < 1; i += this.segmentLength / 100) {
@@ -40,7 +42,8 @@ export default class extends Tool {
             this.element.setAttribute("points", `${this.anchorA.x},${this.anchorA.y} ${this.mouse.position.x},${this.mouse.position.y}`);
         }
     }
-    mouseUp(event) {
+
+    clip(event) {
         if (this.active) {
             this.active = false;
 

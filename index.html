@@ -15,9 +15,9 @@
         <script type="module" src="bootstrap.js"></script>
     </head>
     <body onload="
-        document.querySelector('#primary').parentElement.style.setProperty('background-color', (document.querySelector('#primary').value = window.canvas.settings.styles.primary) + '40');
-        document.querySelector('#secondary').parentElement.style.setProperty('background-color', (document.querySelector('#secondary').value = window.canvas.settings.styles.secondary) + '40');
-        document.querySelector('#randomColors').innerText = window.canvas.settings.randomizeStyle ? 'Disable Random Colours' : 'Enable Random Colours';
+        document.querySelector('#primary').parentElement.style.setProperty('background-color', (document.querySelector('#primary').value = window.canvas.storage.styles.primary) + '40');
+        document.querySelector('#secondary').parentElement.style.setProperty('background-color', (document.querySelector('#secondary').value = window.canvas.storage.styles.secondary) + '40');
+        document.querySelector('#randomColors').innerText = window.canvas.storage.randomizeStyle ? 'Disable Random Colours' : 'Enable Random Colours';
     ">
         <div class="content">
             <div id="container">
@@ -44,8 +44,8 @@
                             <div id="advanced-tools">
                                 <button onclick="window.canvas.tools.select('ellipse');">Ellipse</button>
                                 <button class="option ripple rainbow" id="randomColors" onclick="
-                                    window.canvas.settings.randomizeStyle = !window.canvas.settings.randomizeStyle;
-                                    this.innerText = window.canvas.settings.randomizeStyle ? 'Disable Random Colours' : 'Enable Random Colours';
+                                    window.canvas.storage.randomizeStyle = !window.canvas.storage.randomizeStyle;
+                                    this.innerText = window.canvas.storage.randomizeStyle ? 'Disable Random Colours' : 'Enable Random Colours';
                                 ">
                                     Enable Random Colours
                                 </button>
@@ -59,15 +59,15 @@
                     <bottom-left-nav>
                         <div class="option ripple" onclick="this.firstElementChild.click();">
                             <input type="color" id="primary" oninput="
-                                this.parentElement.style.setProperty('background-color', (window.canvas.settings.styles.primary = this.value) + '40');
-                                window.canvas.settings.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
+                                this.parentElement.style.setProperty('background-color', (window.canvas.storage.styles.primary = this.value) + '40');
+                                window.canvas.storage.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
                             ">
                             Primary Colour
                         </div>
                         <div class="option ripple disabled" onclick="this.firstElementChild.click();">
                             <input type="color" id="secondary" oninput="
-                                this.parentElement.style.setProperty('background-color', (window.canvas.settings.styles.secondary = this.value) + '40');
-                                window.canvas.settings.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
+                                this.parentElement.style.setProperty('background-color', (window.canvas.storage.styles.secondary = this.value) + '40');
+                                window.canvas.storage.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
                             ">
                             Secondary Colour
                         </div>
@@ -154,8 +154,8 @@
                     <bottom-left-nav>
                         <div onclick="this.firstElementChild.click();">
                             <input type="color" id="primary" oninput="
-                                this.parentElement.style.setProperty('background-color', (window.canvas.settings.styles.primary = this.value) + '40');
-                                window.canvas.settings.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
+                                this.parentElement.style.setProperty('background-color', (window.canvas.storage.styles.primary = this.value) + '40');
+                                window.canvas.storage.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
                             " style="display: none;">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 289.421 289.421" style="width: 40px; height: 40px">
                                 <path d="M198.05,111.681c0-59.463-48.382-107.841-107.845-107.841c-29.425,0-56.922,11.633-77.413,32.756

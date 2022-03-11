@@ -3,7 +3,7 @@ import Tool from "./Tool.js";
 export default class extends Tool {
     _size = 4;
     element = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    mouseDown() {
+    press() {
         this.element.style.setProperty("stroke", this.canvas.primary);
         this.element.style.setProperty("fill", this.canvas.fill ? this.canvas.primary : "#FFFFFF00");
         this.element.style.setProperty("stroke-width", this.size);
@@ -16,14 +16,14 @@ export default class extends Tool {
         this.canvas.layer.base.appendChild(this.element);
     }
 
-    mouseMove() {
+    stroke() {
         this.element.setAttribute("x", this.mouse.position.x - this.mouse.pointA.x > 0 ? this.mouse.pointA.x : this.mouse.position.x);
         this.element.setAttribute("y", this.mouse.position.y - this.mouse.pointA.y > 0 ? this.mouse.pointA.y : this.mouse.position.y);
         this.element.setAttribute("width", Math.abs(this.mouse.position.x - this.mouse.pointA.x));
         this.element.setAttribute("height", Math.abs(this.mouse.position.y - this.mouse.pointA.y));
     }
 
-    mouseUp() {
+    clip() {
         this.element.remove();
         if (this.mouse.pointA.x === this.mouse.pointB.x && this.mouse.pointA.y === this.mouse.pointB.y) {
             return;

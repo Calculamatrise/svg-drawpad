@@ -7,7 +7,7 @@ export default class extends Tool {
         this.element.style.setProperty("stroke-width", this.size);
     }
 
-    mouseDown(event) {
+    press(event) {
         this.active = true;
 
         this.element.style.setProperty("stroke", this.canvas.primary);
@@ -20,7 +20,7 @@ export default class extends Tool {
         this.canvas.layer.base.appendChild(this.element);
     }
 
-    mouseMove(event) {
+    stroke(event) {
         if (!this.active) {
             return;
         }
@@ -30,7 +30,7 @@ export default class extends Tool {
         this.element.setAttribute("y2", this.mouse.position.y);
     }
 
-    mouseUp(event) {
+    clip(event) {
         if (!this.active) {
             return;
         }

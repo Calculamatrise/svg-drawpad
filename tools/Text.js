@@ -3,7 +3,7 @@ import Tool from "./Tool.js";
 export default class extends Tool {
     active = false;
     element = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    mouseDown() {
+    press() {
         if (this.active) {
             return;
         }
@@ -17,7 +17,7 @@ export default class extends Tool {
         this.canvas.layer.base.appendChild(text);
     }
 
-    mouseMove() {
+    stroke() {
         // make sure it works without having to press down.
 
         this.element.style.setProperty("fill", this.canvas.fill ? this.canvas.primary : "#FFFFFF00");
@@ -26,7 +26,7 @@ export default class extends Tool {
         this.canvas.layer.base.appendChild(this.element);
     }
 
-    mouseUp() {
+    clip() {
         if (this.active) {
             this.active = false;
 
