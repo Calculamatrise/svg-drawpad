@@ -44,9 +44,7 @@ export default class {
             set(object, property, value) {
                 object[property] = value;
 
-                localStorage.setItem("svg-drawpad-settings", JSON.stringify(storage));
-            
-                return true;
+                return localStorage.setItem("svg-drawpad-settings", JSON.stringify(storage)), true;
             }
         });
     }
@@ -59,7 +57,7 @@ export default class {
                 secondary: "#967bb6"
             },
             theme: window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
-        }, value ?? {})));
+        }, Object.assign(JSON.parse(localStorage.getItem("svg-drawpad-settings")) ?? {}, value ?? {}))));
     }
 
 	get dark() {
