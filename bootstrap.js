@@ -23,7 +23,7 @@ document.querySelector("#patch-notes").addEventListener("click", function(event)
 	document.querySelector("#container").appendChild(this.iframe);
 });
 
-if (JSON.parse(localStorage.getItem("dark")) ?? window.matchMedia('(prefers-color-scheme: dark)').matches) {
+if (Application.storage.theme === "dark") {
 	document.documentElement.style.setProperty("--background", "#1B1B1B");
 	document.documentElement.style.setProperty("--hard-background", "#111111");
 	document.documentElement.style.setProperty("--soft-background", "#333333");

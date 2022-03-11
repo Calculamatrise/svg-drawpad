@@ -3,7 +3,7 @@
     <head>
         <title>SVG Drawpad - Calculamatrise</title>
         <link rel="stylesheet" href="https://calculamatrise.github.io/style.css">
-        <link rel="stylesheet" href="https://calculamatrise.github.io/light.css" id="theme" onload="JSON.parse(localStorage.getItem('dark')) && (this.href = 'https:\/\/calculamatrise.github.io/dark.css')">
+        <link rel="stylesheet" href="https://calculamatrise.github.io/dark.css" id="theme" onload="Application.storage.theme !== 'dark' && (this.href = 'https:\/\/calculamatrise.github.io/light.css')">
         <link rel="stylesheet" href="style.css">
         <link rel="manifest" href="https://calculamatrise.github.io/manifest.json">
         <meta name="author" content="Calculamatrise">
