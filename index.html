@@ -14,9 +14,9 @@
         <script type="module" src="bootstrap.js"></script>
     </head>
     <body onload="
-        document.querySelector('#primary').parentElement.style.setProperty('background-color', (document.querySelector('#primary').value = window.canvas.storage.styles.primary) + '40');
-        document.querySelector('#secondary').parentElement.style.setProperty('background-color', (document.querySelector('#secondary').value = window.canvas.storage.styles.secondary) + '40');
-        document.querySelector('#randomColors').innerText = window.canvas.storage.randomizeStyle ? 'Disable Random Colours' : 'Enable Random Colours';
+        document.querySelector('#primary').parentElement.style.setProperty('background-color', (document.querySelector('#primary').value = canvas.storage.styles.primary) + '40');
+        document.querySelector('#secondary').parentElement.style.setProperty('background-color', (document.querySelector('#secondary').value = canvas.storage.styles.secondary) + '40');
+        document.querySelector('#randomColors').innerText = canvas.storage.randomizeStyle ? 'Disable Random Colours' : 'Enable Random Colours';
     ">
         <div class="content">
             <div id="container">
@@ -27,24 +27,25 @@
                     <top-left-nav>
                         <button class="secondary" onclick="this.innerText = `${(document.querySelector('#toolbar').style.display = document.querySelector('#toolbar').style.display === 'grid' ? 'none' : 'grid') === 'grid' ? 'Hide' : 'Show'} Toolbar`;">Show Toolbar</button>
                         <div id="toolbar">
-                            <button class="ripple" onclick="window.canvas.tools.select('line');">Line</button>
-                            <button class="ripple" onclick="window.canvas.tools.select('brush');">Brush</button>
-                            <button class="ripple" onclick="window.canvas.tools.select('curve');">Curve</button>
-                            <button class="ripple" onclick="window.canvas.tools.select('circle');">Circle</button>
-                            <button class="ripple" onclick="window.canvas.tools.select('rectangle');">Rectangle</button>
-                            <button class="ripple" onclick="window.canvas.tools.select('eraser');">Eraser</button>
-                            <button class="ripple" onclick="window.canvas.tools.select('camera');">Camera</button>
-                            <button class="ripple" onclick="window.canvas.tools.select('select');">Select</button>
+                            <button class="ripple" onclick="canvas.tools.select('line');">Line</button>
+                            <button class="ripple" onclick="canvas.tools.select('brush');">Brush</button>
+                            <button class="ripple" onclick="canvas.tools.select('curve');">Curve</button>
+                            <button class="ripple" onclick="canvas.tools.select('circle');">Circle</button>
+                            <button class="ripple" onclick="canvas.tools.select('rectangle');">Rectangle</button>
+                            <button class="ripple" onclick="canvas.tools.select('eraser');">Eraser</button>
+                            <button class="ripple" onclick="canvas.tools.select('camera');">Camera</button>
+                            <button class="ripple" onclick="canvas.tools.select('select');">Select</button>
                             <button class="ripple" onclick="
                                 this.parentElement.querySelector('#toolbar #advanced-tools').style.display = this.parentElement.querySelector('#toolbar #advanced-tools').style.display === 'flex' ? 'none' : 'flex',
                                 this.parentElement.querySelector('#toolbar #advanced-tools').scrollIntoView({ behavior: 'smooth' }),
                                 this.innerText = this.innerText === 'Show Advanced Tools' ? 'Hide Advanced Tools' : 'Show Advanced Tools'
                             ">Show Advanced Tools</button>
                             <div id="advanced-tools">
-                                <button onclick="window.canvas.tools.select('ellipse');">Ellipse</button>
+                                <button onclick="canvas.tools.select('beziercurve');">Bezier Curve</button>
+                                <button onclick="canvas.tools.select('ellipse');">Ellipse</button>
                                 <button class="option ripple rainbow" id="randomColors" onclick="
-                                    window.canvas.storage.randomizeStyle = !window.canvas.storage.randomizeStyle;
-                                    this.innerText = window.canvas.storage.randomizeStyle ? 'Disable Random Colours' : 'Enable Random Colours';
+                                    canvas.storage.randomizeStyle = !canvas.storage.randomizeStyle;
+                                    this.innerText = canvas.storage.randomizeStyle ? 'Disable Random Colours' : 'Enable Random Colours';
                                 ">
                                     Enable Random Colours
                                 </button>
@@ -58,15 +59,15 @@
                     <bottom-left-nav>
                         <div class="option ripple" onclick="this.firstElementChild.click();">
                             <input type="color" id="primary" oninput="
-                                this.parentElement.style.setProperty('background-color', (window.canvas.storage.styles.primary = this.value) + '40');
-                                window.canvas.storage.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
+                                this.parentElement.style.setProperty('background-color', (canvas.storage.styles.primary = this.value) + '40');
+                                canvas.storage.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
                             ">
                             Primary Colour
                         </div>
                         <div class="option ripple disabled" onclick="this.firstElementChild.click();">
                             <input type="color" id="secondary" oninput="
-                                this.parentElement.style.setProperty('background-color', (window.canvas.storage.styles.secondary = this.value) + '40');
-                                window.canvas.storage.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
+                                this.parentElement.style.setProperty('background-color', (canvas.storage.styles.secondary = this.value) + '40');
+                                canvas.storage.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
                             ">
                             Secondary Colour
                         </div>
@@ -77,7 +78,7 @@
                 </user-interface>
                 <mobile-user-interface>
                     <top-left-nav>
-                        <select name="Line" id="tools" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0;" oninput="window.canvas.tools.select(event.target.value);">
+                        <select name="Line" id="tools" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0;" oninput="canvas.tools.select(event.target.value);">
                             <option value="line" selected>Line</option>
                             <option value="brush">Brush</option>
                             <option value="curve">Curve</option>
@@ -153,8 +154,8 @@
                     <bottom-left-nav>
                         <div onclick="this.firstElementChild.click();">
                             <input type="color" id="primary" oninput="
-                                this.parentElement.style.setProperty('background-color', (window.canvas.storage.styles.primary = this.value) + '40');
-                                window.canvas.storage.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
+                                this.parentElement.style.setProperty('background-color', (canvas.storage.styles.primary = this.value) + '40');
+                                canvas.storage.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
                             " style="display: none;">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 289.421 289.421" style="width: 40px; height: 40px">
                                 <path d="M198.05,111.681c0-59.463-48.382-107.841-107.845-107.841c-29.425,0-56.922,11.633-77.413,32.756
@@ -204,7 +205,7 @@
                 </mobile-user-interface>
                 <!-- Layers Overlay -->
                 <div class="overlay" id="layers">
-                    <button class="secondary ripple" onclick="window.canvas.layers.create(), window.canvas.layerDepth = window.canvas.layerDepth + 1;">New Layer</button>
+                    <button class="secondary ripple" onclick="canvas.layers.create(), canvas.layerDepth = canvas.layerDepth + 1;">New Layer</button>
                     <div id="layer-container"></div>
                 </div>
                 <!-- Settings Overlay -->
@@ -216,7 +217,7 @@
                                 this.classList.remove('loading');
                             }
 
-                            window.canvas.import(text);
+                            canvas.import(text);
                         });
                     ">
                     <label for="import" class="button secondary ripple" style="text-align: center; line-height: 350%; font-size: calc(40px / 3);">Import Canvas</label>
@@ -224,16 +225,16 @@
                         const date = new Date(new Date().setHours(new Date().getHours() - new Date().getTimezoneOffset() / 60)).toISOString().split(/t/i);
                         const link = document.createElement('a');
                         const file = new Blob([
-                            window.canvas.toString()
+                            canvas.toString()
                         ], {
                             type: 'image/svg+xml'
                         });
-                        link.href = window.URL.createObjectURL(file);
+                        link.href = URL.createObjectURL(file);
                         link.download = 'svg_canvas-' + date[0] + '_' + date[1].replace(/\..+/, '').replace(/:/g, '-');
                         link.dispatchEvent(new MouseEvent('click'));
                     ">Export Canvas</button>
                 </div>
-                <input type="color" id="colour" oninput="window.canvas.color = this.value;">
+                <input type="color" id="colour" oninput="canvas.color = this.value;">
             </div>
         </div>
     </body>

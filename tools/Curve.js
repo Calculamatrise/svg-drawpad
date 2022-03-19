@@ -27,7 +27,7 @@ export default class extends Tool {
     
     stroke() {
         if (this.active) {
-            const points = []
+            const points = [];
             for (let i = 0; i < 1; i += this.segmentLength / 100) {
                 points.push([
                     Math.pow((1 - i), 2) * this.anchorA.x + 2 * (1 - i) * i * this.mouse.position.x + Math.pow(i, 2) * this.anchorB.x,
@@ -43,10 +43,12 @@ export default class extends Tool {
         }
     }
 
-    clip(event) {
+    clip() {
         if (this.active) {
             this.active = false;
 
+            this.anchorA = null;
+            this.anchorB = null;
             this.element.remove();
 
             const temp = this.element.cloneNode();
@@ -102,11 +104,9 @@ export default class extends Tool {
         } else if (this.mouse.pointA.x === this.mouse.pointB.x && this.mouse.pointA.y === this.mouse.pointB.y) {
             return this.element.remove();
         }
-        
-        this.anchorB = this.mouse.pointB;
-
-        this.element.setAttribute("points", `${this.anchorA.x},${this.anchorA.y} ${this.anchorB.x},${this.anchorB.y}`);
 
         this.active = true;
+        this.anchorB = this.mouse.pointB;
+        this.element.setAttribute("points", `${this.anchorA.x},${this.anchorA.y} ${this.anchorB.x},${this.anchorB.y}`);
     }
 }

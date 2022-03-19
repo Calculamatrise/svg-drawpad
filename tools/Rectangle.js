@@ -3,6 +3,20 @@ import Tool from "./Tool.js";
 export default class extends Tool {
     _size = 4;
     element = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    arc(anchorA, anchorB) {
+        let points = []
+        for (let i = 0; i < 1; i += this.segmentLength / 100) {
+            points.push([
+                Math.pow((1 - i), 2) * anchorA.x + 2 * (1 - i) * i * anchorB.x + Math.pow(i, 2) * this.anchorB.x,
+                Math.pow((1 - i), 2) * anchorA.y + 2 * (1 - i) * i * anchorB.position.y + Math.pow(i, 2) * this.anchorB.y
+            ]);
+        }
+
+        return points;
+    }
+
+    roundedRect() {}
+
     press() {
         this.element.style.setProperty("stroke", this.canvas.primary);
         this.element.style.setProperty("fill", this.canvas.fill ? this.canvas.primary : "#FFFFFF00");

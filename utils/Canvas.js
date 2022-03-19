@@ -334,7 +334,7 @@ export default class {
 			this.tool.stroke(event);
 		}
 
-		if (new Set(["curve", "eraser"]).has(this.tools._selected)) {
+		if (new Set(["beziercurve", "curve", "eraser"]).has(this.tools._selected)) {
 			this.tool.stroke(event);
 		}
 

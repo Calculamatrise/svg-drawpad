@@ -1,8 +1,10 @@
 import Line from "../tools/Line.js";
+import BezierCurve from "../tools/BezierCurve.js";
 import Brush from "../tools/Brush.js";
 import Curve from "../tools/Curve.js";
 import Circle from "../tools/Circle.js";
 import Ellipse from "../tools/Ellipse.js";
+import Heart from "../tools/Heart.js";
 import Rectangle from "../tools/Rectangle.js";
 import Text from "../tools/Text.js";
 import Eraser from "../tools/Eraser.js";
@@ -13,10 +15,12 @@ export default class {
     constructor(parent) {
         this.canvas = parent;
         this.cache.set("line", new Line(this));
+        this.cache.set("beziercurve", new BezierCurve(this));
         this.cache.set("brush", new Brush(this));
         this.cache.set("curve", new Curve(this));
         this.cache.set("circle", new Circle(this));
         this.cache.set("ellipse", new Ellipse(this));
+        this.cache.set("heart", new Heart(this));
         this.cache.set("rectangle", new Rectangle(this));
         this.cache.set("text", new Text(this));
         this.cache.set("eraser", new Eraser(this));
