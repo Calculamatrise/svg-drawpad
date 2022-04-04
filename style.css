@@ -141,6 +141,7 @@ div#container div#settings {
 	width: 100%;
 	height: 100%;
 	display: none;
+    border-radius: 0;
 	background-color: #ffffff30;
 	backdrop-filter: blur(2em);
 	z-index: 40;
