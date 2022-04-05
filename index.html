@@ -234,7 +234,7 @@
                         <button class="secondary ripple" onclick="
                             let date = new Date(new Date().setHours(new Date().getHours() - new Date().getTimezoneOffset() / 60)).toISOString().split(/t/i);
                             let link = document.createElement('a');
-                            link.href = URL.createObjectURL(
+                            link.href = window.URL.createObjectURL(
                                 new Blob([ canvas.toString() ], { type: 'image/svg+xml' })
                             );
                             link.download = 'svg_canvas-' + date[0] + '_' + date[1].replace(/\..+/, '').replace(/:/g, '-');
@@ -242,7 +242,7 @@
                         ">Export Canvas</button>
                     </div>
                     <div class="tab-content" data-id="theme" style="display: none;">
-                        <button onclick="document.querySelector('line#theme')?.href = (Application.storage.theme = Application.storage.theme !== 'dark' ? 'dark' : 'light') === 'dark' ? '/styles/dark.css' : '/styles/light.css'">Change Theme</button>
+                        <button class="secondary" onclick="document.querySelector('line#theme') && (document.querySelector('line#theme').href = (Application.storage.theme = Application.storage.theme !== 'dark' ? 'dark' : 'light') === 'dark' ? '/styles/dark.css' : '/styles/light.css')">Change Theme</button>
                     </div>
                 </div>
             </div>
