@@ -23,14 +23,18 @@ document.querySelector("#patch-notes").addEventListener("click", function(event)
 	document.querySelector("#container").appendChild(this.iframe);
 });
 
-if (Application.storage.theme === "dark") {
-	document.documentElement.style.setProperty("--background", "#1B1B1B");
-	document.documentElement.style.setProperty("--hard-background", "#111111");
-	document.documentElement.style.setProperty("--soft-background", "#333333");
-	document.documentElement.style.setProperty("--text", "#FBFBFB");
-} else {
-	document.documentElement.style.setProperty("--background", "#EBEBEB");
-	document.documentElement.style.setProperty("--hard-background", "#EEEEEE");
-	document.documentElement.style.setProperty("--soft-background", "#CCCCCC");
-	document.documentElement.style.setProperty("--text", "#1B1B1B");
+window.setTheme = function(theme) {
+    if (theme === "dark") {
+        document.documentElement.style.setProperty("--background", "#1B1B1B");
+        document.documentElement.style.setProperty("--hard-background", "#111111");
+        document.documentElement.style.setProperty("--soft-background", "#333333");
+        document.documentElement.style.setProperty("--text", "#FBFBFB");
+    } else {
+        document.documentElement.style.setProperty("--background", "#EBEBEB");
+        document.documentElement.style.setProperty("--hard-background", "#EEEEEE");
+        document.documentElement.style.setProperty("--soft-background", "#CCCCCC");
+        document.documentElement.style.setProperty("--text", "#1B1B1B");
+    }
 }
+
+setTheme(Application.storage.theme);

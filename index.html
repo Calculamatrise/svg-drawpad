@@ -242,7 +242,7 @@
                         ">Export Canvas</button>
                     </div>
                     <div class="tab-content" data-id="theme" style="display: none;">
-                        <button class="secondary" onclick="Application.themedStylesheet && (Application.themedStylesheet.href = (Application.storage.theme = Application.storage.theme !== 'dark' ? 'dark' : 'light') === 'dark' ? '/styles/dark.css' : '/styles/light.css')">Change Theme</button>
+                        <button class="secondary" onclick="Application.themedStylesheet && (Application.themedStylesheet.href = (Application.storage.theme = Application.storage.theme !== 'dark' ? 'dark' : 'light') === 'dark' ? '/styles/dark.css' : '/styles/light.css') && setTheme(Application.storage.theme)">Change Theme</button>
                     </div>
                 </div>
             </div>
