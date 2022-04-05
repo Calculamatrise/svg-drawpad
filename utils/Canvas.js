@@ -14,9 +14,9 @@ export default class {
 		this.layers.create();
 
 		this.mouse.init();
-		this.mouse.on("down", this.mouseDown.bind(this));
-		this.mouse.on("move", this.mouseMove.bind(this));
-		this.mouse.on("up", this.mouseUp.bind(this));
+		this.mouse.on("down", this.press.bind(this));
+		this.mouse.on("move", this.stroke.bind(this));
+		this.mouse.on("up", this.clip.bind(this));
 
 		window.addEventListener("resize", this.resize.bind(this));
 
@@ -274,56 +274,42 @@ export default class {
 		return null;
 	}
 
-	mouseDown(event) {
+	press(event) {
 		const patchNotes = this.container.querySelector("#patch-notes") || {};
 		if (patchNotes.iframe) {
 			patchNotes.iframe.remove();
-
 			patchNotes.iframe = null;
 		}
 
 		if (event.button === 1) {
 			this.tools.select(this.tools._selected === "line" ? "brush" : this.tools._selected === "brush" ? "eraser" : this.tools._selected === "eraser" ? "camera" : "line");
-			
 			return;
-		} else if (event.button === 2) {
-			// open colour palette
-			colour.style.left = this.mouse.real.x + "px";
-			colour.style.top = this.mouse.real.y + "px";
-			setTimeout(() => {
-				colour.click();
-			});
-			
-			return;
-		}
+		} else if (event.button === 2 || this.mouse.isAlternate) {
+            return;
+        }
 
-		if (!this.mouse.isAlternate) {
-			if (event.shiftKey) {
-				clearTimeout(this.text.timeout);
+        if (event.shiftKey) {
+            clearTimeout(this.text.timeout);
 
-				this.text.innerHTML = "Camera";
-				this.text.setAttribute("x", this.viewBox.width / 2 - this.text.innerHTML.length * 2 + this.viewBox.x);
-				this.text.setAttribute("y", 20 + this.viewBox.y);
-				this.view.appendChild(this.text);
+            this.text.innerHTML = "Camera";
+            this.text.setAttribute("x", this.viewBox.width / 2 - this.text.innerHTML.length * 2 + this.viewBox.x);
+            this.text.setAttribute("y", 20 + this.viewBox.y);
+            this.text.timeout = setTimeout(() => {
+                this.text.remove();
+            }, 2000);
 
-				this.text.timeout = setTimeout(() => {
-					this.text.remove();
-				}, 2000);
+            this.view.appendChild(this.text);
+            return;
+        }
 
-				return;
-			}
+        if (event.ctrlKey) {
+            this.tools.select("select");
+        }
 
-			if (event.ctrlKey) {
-				this.tools.select("select");
-			}
-
-			this.tool.press(event);
-		}
-		
-		return;
+        this.tool.press(event);
 	}
 
-	mouseMove(event) {
+	stroke(event) {
 		if (this.mouse.isDown && !this.mouse.isAlternate) {	
 			if (event.shiftKey) {
 				this.tools.cache.get("camera").stroke(event);
@@ -337,16 +323,12 @@ export default class {
 		if (new Set(["beziercurve", "curve", "eraser"]).has(this.tools._selected)) {
 			this.tool.stroke(event);
 		}
-
-		return;
 	}
 
-	mouseUp(event) {
+	clip(event) {
 		if (!this.mouse.isAlternate) {
 			this.tool.clip(event);
 		}
-		
-		return;
 	}
 
 	keyDown(event) {
@@ -486,7 +468,7 @@ export default class {
 	
 					break;
 				}
-	
+
 				break;
 		}
 	}

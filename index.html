@@ -11,7 +11,7 @@
         <meta name="image" property="og:image" content="https://calculamatrise.github.io/icons/favicon.png">
         <meta property="og:url" content="https://calculamatrise.github.io/">
         <script type="module" src="https://calculamatrise.github.io/bootstrap.js"></script>
-        <script type="module" src="bootstrap.js"></script>
+        <script type="module" src="bootstrap.js" defer></script>
     </head>
     <body onload="
         document.querySelector('#primary').parentElement.style.setProperty('background-color', (document.querySelector('#primary').value = canvas.storage.styles.primary) + '40');
@@ -53,8 +53,8 @@
                         </div>
                     </top-left-nav>
                     <top-right-nav>
-                        <button class="secondary" onclick="document.querySelector('#layers').style.display = document.querySelector('#layers').style.display === 'flex' ? 'none' : 'flex';">Layers</button>
-                        <button class="secondary" onclick="document.querySelector('#settings').style.display = document.querySelector('#settings').style.display === 'flex' ? 'none' : 'flex';">Settings</button>
+                        <button class="secondary" onclick="document.querySelector('#settings').style.setProperty('display', 'none'), document.querySelector('#layers').style.setProperty('display', document.querySelector('#layers').style.display === 'flex' ? 'none' : 'flex')">Layers</button>
+                        <button class="secondary" onclick="document.querySelector('#layers').style.setProperty('display', 'none'), document.querySelector('#settings').style.setProperty('display', document.querySelector('#settings').style.display === 'flex' ? 'none' : 'flex')">Settings</button>
                     </top-right-nav>
                     <bottom-left-nav>
                         <div class="option ripple" onclick="this.firstElementChild.click();">
@@ -210,31 +210,41 @@
                 </div>
                 <!-- Settings Overlay -->
                 <div class="overlay" id="settings" style="display: none;">
-                    <input type="file" id="import" accept="image/svg+xml" style="display: none;" onchange="
-                        this.classList.add('loading');
-                        this.files[0].text().then((text) => {
-                            if (this.classList.contains('loading')) {
-                                this.classList.remove('loading');
-                            }
-
-                            canvas.import(text);
-                        });
+                    <div class="tabs" onclick="
+                        let target = this.parentElement.querySelector('div.tab-content[data-id=' + event.target.dataset.target + ']');
+                        target !== null && (this.parentElement.querySelectorAll('div.tab-content').forEach((tab) => {
+                            tab.style.setProperty('display', 'none');
+                        }), target.style.removeProperty('display'));
                     ">
-                    <label for="import" class="button secondary ripple" style="text-align: center; line-height: 350%; font-size: calc(40px / 3);">Import Canvas</label>
-                    <button class="secondary ripple" onclick="
-                        const date = new Date(new Date().setHours(new Date().getHours() - new Date().getTimezoneOffset() / 60)).toISOString().split(/t/i);
-                        const link = document.createElement('a');
-                        const file = new Blob([
-                            canvas.toString()
-                        ], {
-                            type: 'image/svg+xml'
-                        });
-                        link.href = URL.createObjectURL(file);
-                        link.download = 'svg_canvas-' + date[0] + '_' + date[1].replace(/\..+/, '').replace(/:/g, '-');
-                        link.dispatchEvent(new MouseEvent('click'));
-                    ">Export Canvas</button>
+                        <span class="tab button secondary" data-target="file">File</span>
+                        <span class="tab button secondary" data-target="theme">Theme</span>
+                    </div>
+                    <div class="tab-content" data-id="file">
+                        <input type="file" id="import" accept="image/svg+xml" style="display: none;" onchange="
+                            this.classList.add('loading');
+                            this.files[0].text().then((text) => {
+                                if (this.classList.contains('loading')) {
+                                    this.classList.remove('loading');
+                                }
+
+                                canvas.import(text);
+                            });
+                        ">
+                        <label for="import" class="button secondary ripple" style="text-align: center; line-height: 350%; font-size: calc(40px / 3);">Import Canvas</label>
+                        <button class="secondary ripple" onclick="
+                            let date = new Date(new Date().setHours(new Date().getHours() - new Date().getTimezoneOffset() / 60)).toISOString().split(/t/i);
+                            let link = document.createElement('a');
+                            link.href = URL.createObjectURL(
+                                new Blob([ canvas.toString() ], { type: 'image/svg+xml' })
+                            );
+                            link.download = 'svg_canvas-' + date[0] + '_' + date[1].replace(/\..+/, '').replace(/:/g, '-');
+                            link.dispatchEvent(new MouseEvent('click'));
+                        ">Export Canvas</button>
+                    </div>
+                    <div class="tab-content" data-id="theme" style="display: none;">
+                        <button onclick="document.querySelector('line#theme')?.href = (Application.storage.theme = Application.storage.theme !== 'dark' ? 'dark' : 'light') === 'dark' ? '/styles/dark.css' : '/styles/light.css'">Change Theme</button>
+                    </div>
                 </div>
-                <input type="color" id="colour" oninput="canvas.color = this.value;">
             </div>
         </div>
     </body>

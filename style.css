@@ -147,6 +147,29 @@ div#container div#settings {
 	z-index: 40;
 }
 
+div#container div#settings div.tabs {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 40vh;
+    min-width: 10vw;
+}
+
+div#container div#settings div.tabs span.tab {
+    height: calc(100% - 32px);
+    padding: 16px;
+    width: calc(100% - 32px);
+}
+
+div#container div#settings div.tab-content {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    min-height: 40vh;
+    min-width: 40vw;
+}
+
 div#container div#layers {
 	display: none;
 	border-radius: 30px;

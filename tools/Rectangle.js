@@ -31,8 +31,8 @@ export default class extends Tool {
     }
 
     stroke() {
-        this.element.setAttribute("x", this.mouse.position.x - this.mouse.pointA.x > 0 ? this.mouse.pointA.x : this.mouse.position.x);
-        this.element.setAttribute("y", this.mouse.position.y - this.mouse.pointA.y > 0 ? this.mouse.pointA.y : this.mouse.position.y);
+        this.element.setAttribute("x", Math.min(this.mouse.pointA.x, this.mouse.position.x));
+        this.element.setAttribute("y", Math.min(this.mouse.pointA.y, this.mouse.position.y));
         this.element.setAttribute("width", Math.abs(this.mouse.position.x - this.mouse.pointA.x));
         this.element.setAttribute("height", Math.abs(this.mouse.position.y - this.mouse.pointA.y));
     }

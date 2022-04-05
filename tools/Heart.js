@@ -100,7 +100,7 @@ export default class extends Tool {
 
     stroke() {
         this.element.style.setProperty("stroke-width", this.size);
-        this.element.setAttribute("points", this.drawHeart(this.mouse.pointA.x, this.mouse.pointA.y, this.width, this.height));
+        this.element.setAttribute("points", this.drawHeart(this.mouse.pointA.x, Math.min(this.mouse.position.y, this.mouse.pointA.y), this.width, this.height));
     }
     
     clip() {
