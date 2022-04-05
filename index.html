@@ -11,7 +11,7 @@
         <meta name="image" property="og:image" content="https://calculamatrise.github.io/icons/favicon.png">
         <meta property="og:url" content="https://calculamatrise.github.io/">
         <script type="module" src="https://calculamatrise.github.io/bootstrap.js"></script>
-        <script type="module" src="bootstrap.js" defer></script>
+        <script type="module" src="bootstrap.js"></script>
     </head>
     <body onload="
         document.querySelector('#primary').parentElement.style.setProperty('background-color', (document.querySelector('#primary').value = canvas.storage.styles.primary) + '40');
@@ -242,7 +242,7 @@
                         ">Export Canvas</button>
                     </div>
                     <div class="tab-content" data-id="theme" style="display: none;">
-                        <button class="secondary" onclick="document.querySelector('line#theme') && (document.querySelector('line#theme').href = (Application.storage.theme = Application.storage.theme !== 'dark' ? 'dark' : 'light') === 'dark' ? '/styles/dark.css' : '/styles/light.css')">Change Theme</button>
+                        <button class="secondary" onclick="Application.themedStylesheet && (Application.themedStylesheet.href = (Application.storage.theme = Application.storage.theme !== 'dark' ? 'dark' : 'light') === 'dark' ? '/styles/dark.css' : '/styles/light.css')">Change Theme</button>
                     </div>
                 </div>
             </div>
