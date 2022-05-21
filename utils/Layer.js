@@ -155,12 +155,12 @@ export default class {
                     if (layer) {
                         const layer = this.parent.get(layerId);
                         if (layer) {
-                            for (const line of this.lines) {
-                                layer.lines.push(line);
-                                layer.base.appendChild(line);
-                            }
-
+                            const lines = this.lines;
                             this.remove();
+
+                            for (const line of lines) {
+                                layer.push(line);
+                            }
                         }
                     }
                 }
@@ -222,6 +222,7 @@ export default class {
     }
 
     push(object) {
+        console.log(object, this.base)
         this.base.appendChild(object);
         this.lines.push(object);
     }
