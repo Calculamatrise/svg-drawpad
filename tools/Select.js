@@ -59,14 +59,13 @@ export default class extends Tool {
                         break;
 
                     case 3:
-                        line.setAttribute("points", line.getAttribute("points").split(/\u002C/g).map(function(coord) {
-                            coord = coord.split(/\s+/g).map(value => parseInt(value));
-                            
+                        line.setAttribute("points", line.getAttribute("points").split(/\s+/g).map(function(coord) {
+                            coord = coord.split(/\u002C/g).map(value => parseInt(value));
                             coord[0] += event.movementX
                             coord[1] += event.movementY
 
-                            return coord.join(" ");
-                        }).join(","));
+                            return coord.join(",");
+                        }).join(" "));
 
                         break;
                 }
@@ -190,7 +189,6 @@ export default class extends Tool {
 
     paste() {
         clearTimeout(this.parent.this.canvas.text.timeout);
-
 		if (this.constructor.id === "select") {
 			this.parent.this.canvas.text.innerHTML = "Selection pasted!";
 			this.parent.this.canvas.view.appendChild(this.parent.this.canvas.text);
@@ -199,16 +197,13 @@ export default class extends Tool {
 				this.parent.this.canvas.text.remove();
 			}, 2000);
 
-			this.parent.this.canvas.view.querySelector(`g[data-id='${this.parent.this.canvas.layer.id}']`).prepend(...this.clipboard);
-			this.parent.this.canvas.layer.lines.push(...this.clipboard);
+			this.parent.this.canvas.layer.push(...this.clipboard);
 			this.clipboard = []
-
             return;
 		}
 
 		this.parent.this.canvas.text.innerHTML = "Select tool must be active to paste!";
 		this.parent.this.canvas.view.appendChild(this.parent.this.canvas.text);
-
 		this.parent.this.canvas.text.timeout = setTimeout(() => {
 			this.parent.this.canvas.text.remove();
 		}, 2000);

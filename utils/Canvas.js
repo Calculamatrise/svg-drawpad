@@ -1,8 +1,7 @@
-import MouseHandler from "./MouseHandler.js";
-import EventHandler from "./EventHandler.js";
-import ToolHandler from "./ToolHandler.js";
-
-import LayerManager from "./LayerManager.js";
+import EventHandler from "../handlers/Event.js";
+import LayerHandler from "../handlers/Layer.js";
+import MouseHandler from "../handlers/Mouse.js";
+import ToolHandler from "../handlers/Tool.js";
 
 export default class {
 	constructor(view) {
@@ -26,9 +25,9 @@ export default class {
 	zoomIncrementValue = 0.5;
 	#layer = 1;
 	#fill = false;
-	mouse = new MouseHandler(this);
-	layers = new LayerManager();
 	events = new EventHandler();
+    layers = new LayerHandler(this);
+	mouse = new MouseHandler(this);
 	tools = new ToolHandler(this);
 	text = document.createElementNS("http://www.w3.org/2000/svg", "text");
     get storage() {

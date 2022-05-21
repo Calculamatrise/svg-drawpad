@@ -97,11 +97,7 @@ export default class extends Tool {
             });
         }
 
-        if (!this.canvas.layer.hidden) {
-            this.canvas.layer.base.appendChild(rectangle);
-        }
-
-        this.canvas.layer.lines.push(rectangle);
+        this.canvas.layer.push(rectangle);
         this.canvas.events.push({
             action: "add",
             value: rectangle

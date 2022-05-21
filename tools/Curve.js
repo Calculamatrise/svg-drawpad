@@ -89,12 +89,8 @@ export default class extends Tool {
                     return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size && !this.remove();
                 });
             }
-        
-            if (!this.canvas.layer.hidden) {
-                this.canvas.layer.base.appendChild(temp);
-            }
 
-            this.canvas.layer.lines.push(temp);
+            this.canvas.layer.push(temp);
             this.canvas.events.push({
                 action: "add",
                 value: temp

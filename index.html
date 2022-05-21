@@ -24,6 +24,47 @@
                     Sorry, your browser does not support inline SVG.
                 </svg>
                 <user-interface>
+                    <div class="overlay" id="layers">
+                        <button class="secondary ripple" onclick="canvas.layers.create(), canvas.layerDepth = canvas.layerDepth + 1;">New Layer</button>
+                        <div id="layer-container"></div>
+                    </div>
+                    <!-- Settings Overlay -->
+                    <div class="overlay" id="settings" style="display: none;">
+                        <div class="tabs" onclick="
+                            let target = this.parentElement.querySelector('div.tab-content[data-id=' + event.target.dataset.target + ']');
+                            target !== null && (this.parentElement.querySelectorAll('div.tab-content').forEach((tab) => {
+                                tab.style.setProperty('display', 'none');
+                            }), target.style.removeProperty('display'));
+                        ">
+                            <span class="tab button secondary" data-target="file">File</span>
+                            <span class="tab button secondary" data-target="theme">Theme</span>
+                        </div>
+                        <div class="tab-content" data-id="file">
+                            <input type="file" id="import" accept="image/svg+xml" style="display: none;" onchange="
+                                this.classList.add('loading');
+                                this.files[0].text().then((text) => {
+                                    if (this.classList.contains('loading')) {
+                                        this.classList.remove('loading');
+                                    }
+    
+                                    canvas.import(text);
+                                });
+                            ">
+                            <label for="import" class="button secondary ripple" style="text-align: center; line-height: 350%; font-size: calc(40px / 3);">Import Canvas</label>
+                            <button class="secondary ripple" onclick="
+                                let date = new Date(new Date().setHours(new Date().getHours() - new Date().getTimezoneOffset() / 60)).toISOString().split(/t/i);
+                                let link = document.createElement('a');
+                                link.href = window.URL.createObjectURL(
+                                    new Blob([ canvas.toString() ], { type: 'image/svg+xml' })
+                                );
+                                link.download = 'svg_canvas-' + date[0] + '_' + date[1].replace(/\..+/, '').replace(/:/g, '-');
+                                link.dispatchEvent(new MouseEvent('click'));
+                            ">Export Canvas</button>
+                        </div>
+                        <div class="tab-content" data-id="theme" style="display: none;">
+                            <button class="secondary" onclick="Application.themedStylesheet && (Application.themedStylesheet.href = (Application.storage.theme = Application.storage.theme !== 'dark' ? 'dark' : 'light') === 'dark' ? '/styles/dark.css' : '/styles/light.css') && setTheme(Application.storage.theme)">Change Theme</button>
+                        </div>
+                    </div>
                     <top-left-nav>
                         <button class="secondary" onclick="this.innerText = `${(document.querySelector('#toolbar').style.display = document.querySelector('#toolbar').style.display === 'grid' ? 'none' : 'grid') === 'grid' ? 'Hide' : 'Show'} Toolbar`;">Show Toolbar</button>
                         <div id="toolbar">
@@ -203,48 +244,6 @@
                         <button class="secondary" id="patch-notes">Patch Notes</button>
                     </bottom-right-nav>
                 </mobile-user-interface>
-                <!-- Layers Overlay -->
-                <div class="overlay" id="layers">
-                    <button class="secondary ripple" onclick="canvas.layers.create(), canvas.layerDepth = canvas.layerDepth + 1;">New Layer</button>
-                    <div id="layer-container"></div>
-                </div>
-                <!-- Settings Overlay -->
-                <div class="overlay" id="settings" style="display: none;">
-                    <div class="tabs" onclick="
-                        let target = this.parentElement.querySelector('div.tab-content[data-id=' + event.target.dataset.target + ']');
-                        target !== null && (this.parentElement.querySelectorAll('div.tab-content').forEach((tab) => {
-                            tab.style.setProperty('display', 'none');
-                        }), target.style.removeProperty('display'));
-                    ">
-                        <span class="tab button secondary" data-target="file">File</span>
-                        <span class="tab button secondary" data-target="theme">Theme</span>
-                    </div>
-                    <div class="tab-content" data-id="file">
-                        <input type="file" id="import" accept="image/svg+xml" style="display: none;" onchange="
-                            this.classList.add('loading');
-                            this.files[0].text().then((text) => {
-                                if (this.classList.contains('loading')) {
-                                    this.classList.remove('loading');
-                                }
-
-                                canvas.import(text);
-                            });
-                        ">
-                        <label for="import" class="button secondary ripple" style="text-align: center; line-height: 350%; font-size: calc(40px / 3);">Import Canvas</label>
-                        <button class="secondary ripple" onclick="
-                            let date = new Date(new Date().setHours(new Date().getHours() - new Date().getTimezoneOffset() / 60)).toISOString().split(/t/i);
-                            let link = document.createElement('a');
-                            link.href = window.URL.createObjectURL(
-                                new Blob([ canvas.toString() ], { type: 'image/svg+xml' })
-                            );
-                            link.download = 'svg_canvas-' + date[0] + '_' + date[1].replace(/\..+/, '').replace(/:/g, '-');
-                            link.dispatchEvent(new MouseEvent('click'));
-                        ">Export Canvas</button>
-                    </div>
-                    <div class="tab-content" data-id="theme" style="display: none;">
-                        <button class="secondary" onclick="Application.themedStylesheet && (Application.themedStylesheet.href = (Application.storage.theme = Application.storage.theme !== 'dark' ? 'dark' : 'light') === 'dark' ? '/styles/dark.css' : '/styles/light.css') && setTheme(Application.storage.theme)">Change Theme</button>
-                    </div>
-                </div>
             </div>
         </div>
     </body>

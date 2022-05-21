@@ -69,11 +69,7 @@ export default class extends Tool {
             });
         }
 
-        if (!this.canvas.layer.hidden) {
-            this.canvas.layer.base.appendChild(temp);
-        }
-
-        this.canvas.layer.lines.push(temp);
+        this.canvas.layer.push(temp);
         this.canvas.events.push({
             action: "add",
             value: temp

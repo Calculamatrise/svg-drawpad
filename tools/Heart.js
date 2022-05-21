@@ -119,11 +119,7 @@ export default class extends Tool {
             return Math.sqrt(vector.x ** 2 / (+this.getAttribute("rx") + this.style.getPropertyValue("stroke-width") / 2 + window.canvas.tool.size) ** 2 + vector.y ** 2 / (+this.getAttribute("ry") + this.style.getPropertyValue("stroke-width") / 2 + window.canvas.tool.size) ** 2) <= 1 && (Math.sqrt(vector.x ** 2 / (+this.getAttribute("rx") - this.style.getPropertyValue("stroke-width") / 2 - window.canvas.tool.size) ** 2 + vector.y ** 2 / (+this.getAttribute("ry") - this.style.getPropertyValue("stroke-width") / 2 - window.canvas.tool.size) ** 2) >= 1 || this.getAttribute("rx") < window.canvas.tool.size || this.getAttribute("ry") < window.canvas.tool.size) && !this.remove();
         }
 
-        if (!this.canvas.layer.hidden) {
-            this.canvas.layer.base.append(temp);
-        }
-
-        this.canvas.layer.lines.push(temp);
+        this.canvas.layer.push(temp);
         this.canvas.events.push({
             action: "add",
             value: temp

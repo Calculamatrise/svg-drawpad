@@ -38,3 +38,8 @@ window.setTheme = function(theme) {
 }
 
 setTheme(Application.storage.theme);
+
+if (screen.width <= 768) {
+    // fetch mobile HTML/CSS
+    window.location = "https://calculamatrise.github.io";
+}

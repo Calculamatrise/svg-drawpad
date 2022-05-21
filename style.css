@@ -188,6 +188,7 @@ div#container div#layers div#layer-container {
 	align-items: center;
 	flex-direction: row;
 	max-height: 80%;
+    position: relative;
 }
 
 /* Automatic layer counter >>>

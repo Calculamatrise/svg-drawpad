@@ -162,11 +162,7 @@ export default class extends Tool {
             return len - this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size && (window.canvas.tool.size <= len + this.style.getPropertyValue("stroke-width") / 2 || this.getAttribute("r") < window.canvas.tool.size) && !this.remove();
         }
 
-        if (!this.canvas.layer.hidden) {
-            this.canvas.layer.base.append(circle);
-        }
-
-        this.canvas.layer.lines.push(circle);
+        this.canvas.layer.push(circle);
         this.canvas.events.push({
             action: "add",
             value: circle

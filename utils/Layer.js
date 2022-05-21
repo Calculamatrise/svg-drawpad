@@ -1,15 +1,12 @@
 export default class {
     constructor(parent) {
         this.parent = parent;
-
         this.id = this.parent.cache.length + 1;
-        
         this.element = this.parent.createElement("div", {
             className: "layer selected",
             mouseover(event) {
                 if (event.target.className !== this.className) {
                     this.style.cursor = "default";
-    
                     return;
                 }
     
@@ -21,7 +18,7 @@ export default class {
                 }
 
                 window.canvas.layerDepth = this.id;
-                this.parent.cache.forEach(function(layer, index) {
+                this.parent.cache.forEach(function(layer) {
                     layer.element.classList.remove("selected");
                     if (layer.id === window.canvas.layerDepth) {
                         layer.element.classList.add("selected");   
@@ -39,7 +36,7 @@ export default class {
             },
             click: event => {
                 window.canvas.layerDepth = this.id;
-                this.parent.cache.forEach(function(layer, index) {
+                this.parent.cache.forEach(function(layer) {
                     layer.element.classList.remove("selected");
                     if (layer.id === window.canvas.layerDepth) {
                         layer.element.classList.add("selected");   
@@ -65,11 +62,9 @@ export default class {
             input: (event) => {
                 if (parseInt(event.target.value) < 1) {
                     event.target.value = 1;
-
                     return;
                 } else if (parseInt(event.target.value) > this.parent.cache.length) {
                     event.target.value = this.parent.cache.length;
-
                     return;
                 } else if (isNaN(parseInt(event.target.value))) {
                     return;
@@ -84,33 +79,6 @@ export default class {
         });
 
         layerSelectorContainer.append(this.selector);
-
-        /*
-        // Check if the mouse position on the layer container is greater than the next or previous layer. Then use element#after to move it.
-
-        this.element.addEventListener("mousedown", function(event) {
-            this.style.setProperty("position", "absolute");
-            this.style.setProperty("left", event.offsetX + "px");
-            this.style.setProperty("top", event.offsetY + "px");
-        });
-        this.element.addEventListener("mousemove", function(event) {
-            if (!event.button && !event.buttons) {
-                return;
-            }
-
-            this.style.setProperty("left", parseInt(this.style.getPropertyValue("left")) + event.movementX + "px");
-            this.style.setProperty("top", parseInt(this.style.getPropertyValue("top")) + event.movementY + "px");
-            console.log(this.style.getPropertyValue("left"), this.style.getPropertyValue("top"))
-            //console.log(event)
-        });
-        this.element.addEventListener("mouseup", function(event) {
-            this.style.setProperty("position", "unset");
-        });
-        this.element.addEventListener("mouseleave", function(event) {
-            this.style.setProperty("position", "unset");
-        });
-        
-        //*/
 
         const range = this.parent.createElement("input", {
             type: "range",
@@ -169,10 +137,9 @@ export default class {
             click: (event) => {
                 if (this.parent.cache.length <= 1) {
                     alert("There must be more than one layer in order to merge layers!");
-    
                     return;
                 }
-    
+
                 let layerId = prompt(`Which layer would you like to merge Layer ${this.id} with?`);
                 if (layerId !== null) {
                     let layer = this.parent.get(parseInt(layerId));
@@ -181,17 +148,18 @@ export default class {
                         if (layerId === null) {
                             return;
                         }
-    
+
                         layer = this.parent.get(parseInt(layerId));
                     }
-                    
+
                     if (layer) {
                         const layer = this.parent.get(layerId);
                         if (layer) {
-                            layer.lines.push(...this.lines);
-                            
-                            this.lines = []
-    
+                            for (const line of this.lines) {
+                                layer.lines.push(line);
+                                layer.base.appendChild(line);
+                            }
+
                             this.remove();
                         }
                     }
@@ -242,33 +210,28 @@ export default class {
     get opacity() {
         return this.alpha;
     }
+
     set opacity(alpha) {
         this.alpha = alpha;
-
         this.base.style.setProperty("opacity", this.alpha);
     }
-    redraw() {
-        return;
-    }
+
     toggleVisiblity() {
         this.hidden = !this.hidden;
-        if (this.hidden) {
-            for (const line of this.lines) {
-                line.remove();
-            }
-        } else {
-            for (const line of this.lines) {
-                window.canvas.view.prepend(line);
-            }
-        }
+        this.base.style.setProperty("visibility", this.hidden ? "hidden" : "unset");
     }
+
+    push(object) {
+        this.base.appendChild(object);
+        this.lines.push(object);
+    }
+
     move(newIndex) {
         if (typeof newIndex !== "number" || newIndex === void 0 || this.id === newIndex) {
             throw new Error("Invalid index.");
         }
 
         this.parent.remove(this.id);
-
         this.parent.cache.forEach((layer) => {
             if (this.id < newIndex) {
                 if (layer.id === newIndex - 1) {
@@ -284,11 +247,11 @@ export default class {
         });
 
         this.parent.insert(this, newIndex - 1);
-
         this.element.scrollIntoView({
             behavior: "smooth"
         });
     }
+
     clear() {
         for (const line of this.lines) {
             line.remove();
@@ -296,12 +259,12 @@ export default class {
 
         this.lines = []
     }
+
     remove() {
+        this.clear();
         this.element.remove();
         this.base.remove();
-
         this.parent.remove(this.id);
-
         if (this.parent.cache.length < window.canvas.layerDepth) {
             window.canvas.layerDepth = window.canvas.layerDepth === this.id ? this.parent.cache.length : 1;
         }
