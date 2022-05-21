@@ -1,4 +1,11 @@
 import Canvas from "./utils/Canvas.js";
+import Device from "./utils/Device.js";
+
+if (Device.isMobile() && !location.pathname.match(/mobile\/?/gi)) {
+    location.assign(location.href + "mobile");
+} else if (!Device.isMobile() && location.pathname.match(/mobile\/?/gi)) {
+    location.assign(location.href.replace(/mobile\/?/gi, ""));
+}
 
 window.canvas = new Canvas(document.querySelector("#view"));
 
@@ -37,9 +44,4 @@ window.setTheme = function(theme) {
     }
 }
 
-setTheme(Application.storage.theme);
-
-if (screen.width <= 768) {
-    // fetch mobile HTML/CSS
-    window.location = "https://calculamatrise.github.io";
-}
+setTheme(window.canvas.config.theme);

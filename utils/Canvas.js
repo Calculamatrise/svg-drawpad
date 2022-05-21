@@ -30,9 +30,9 @@ export default class {
 	mouse = new MouseHandler(this);
 	tools = new ToolHandler(this);
 	text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    get storage() {
-        let storage; this.storage = {};
-        return storage = new Proxy(JSON.parse(localStorage.getItem("svg-drawpad-settings")), {
+    get config() {
+        let config; this.config = {};
+        return config = new Proxy(JSON.parse(localStorage.getItem("svg-drawpad-settings")), {
             get(target, key) {
                 if (typeof target[key] === "object" && target[key] !== null) {
                     return new Proxy(target[key], this);
@@ -43,12 +43,12 @@ export default class {
             set(object, property, value) {
                 object[property] = value;
 
-                return localStorage.setItem("svg-drawpad-settings", JSON.stringify(storage)), true;
+                return localStorage.setItem("svg-drawpad-settings", JSON.stringify(config)), true;
             }
         });
     }
 
-    set storage(value) {
+    set config(value) {
         localStorage.setItem("svg-drawpad-settings", JSON.stringify(Object.assign({
             randomizeStyle: false,
             styles: {
@@ -68,11 +68,11 @@ export default class {
 	}
 
 	get primary() {
-		if (this.storage.randomizeStyle) {
+		if (this.config.randomizeStyle) {
 			return `rgb(${Math.ceil(Math.random() * 255)}, ${Math.ceil(Math.random() * 255)}, ${Math.ceil(Math.random() * 255)})`;
 		}
 
-		return this.storage.styles.primary;
+		return this.config.styles.primary;
 	}
 
 	get layerDepth() {

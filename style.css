@@ -6,8 +6,11 @@ html {
 	--text: #1B1B1B;
 	--stroke: skyblue;
 	--fill: violet;
-	color: var(--text);
 	border: none;
+}
+
+html, button {
+    color: var(--text);
 }
 
 body {
