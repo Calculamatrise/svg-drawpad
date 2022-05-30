@@ -222,7 +222,6 @@ export default class {
     }
 
     push(object) {
-        console.log(object, this.base)
         this.base.appendChild(object);
         this.lines.push(object);
     }

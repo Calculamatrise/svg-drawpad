@@ -1,6 +1,3 @@
-let lastX;
-let lastY;
-
 export default class {
 	constructor(parent) {
 		this.parent = parent;
@@ -26,19 +23,21 @@ export default class {
 			y: (this.real.y * this.parent.zoom) + this.parent.viewBox.y
 		}
 	}
+
 	init() {
 		document.addEventListener("pointerdown", this.down.bind(this));
 		document.addEventListener("pointermove", this.move.bind(this));
 		document.addEventListener("pointerup", this.up.bind(this));
-		document.addEventListener("wheel", this.wheel.bind(this), { passive: false });
-		// document.addEventListener("touchstart", this.touchStart.bind(this));
-		// document.addEventListener("touchmove", this.touchMove.bind(this));
-		// document.addEventListener("touchend", this.touchEnd.bind(this));
-		// document.addEventListener("touchcancel", this.touchCancel.bind(this));
+		document.addEventListener("wheel", this.wheel.bind(this), {
+            passive: false
+        });
+		document.addEventListener("touchcancel", this.touchCancel.bind(this));
 	}
+
 	on(event, method) {
 		this.#events.set(event, method);
 	}
+
 	emit(event, ...args) {
 		if (!this.#events.has(event)) {
 			return;
@@ -46,6 +45,7 @@ export default class {
 		
 		return this.#events.get(event)(...args);
 	}
+
 	down(event) {
 		if (event.target.id !== "container") {
 			return;
@@ -71,6 +71,7 @@ export default class {
 		
 		return this.emit("down", event);
 	}
+
 	move(event) {
 		if (event.target.id !== "container") {
 			return;
@@ -85,6 +86,7 @@ export default class {
 		
 		return this.emit("move", event);
 	}
+
 	up(event) {
 		if (event.target.id !== "container") {
 			return;
@@ -100,6 +102,7 @@ export default class {
 		
 		return this.emit("up", event);
 	}
+
 	wheel(event) {
 		event.preventDefault();
 		event.stopPropagation();
@@ -142,48 +145,11 @@ export default class {
 
 		// document.documentElement.style.setProperty("--size", zoom + event.deltaY / 1000);
 	}
-	touchStart(event) {
-		event.stopPropagation();
-		for (const touch of event.touches) {
-			const mouseEvent = document.createEvent("MouseEvent");
-			mouseEvent.initMouseEvent("mousedown", true, true, window, event.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
 
-			lastX = touch.clientX;
-			lastY = touch.clientY;
-
-			touch.target.dispatchEvent(mouseEvent);
-		}
-	}
-	touchMove(event) {
-		event.stopPropagation();
-		for (const touch of event.touches) {
-			const mouseEvent = new MouseEvent("mousemove", {
-				movementX: touch.clientX - lastX,
-				movementY: touch.clientY - lastY
-			});
-			mouseEvent.initMouseEvent("mousemove", true, true, window, event.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
-
-			lastX = touch.clientX;
-			lastY = touch.clientY;
-
-			touch.target.dispatchEvent(mouseEvent);
-		}
-	}
-	touchEnd(event) {
-		event.stopPropagation();
-		for (const touch of event.changedTouches) {
-			const mouseEvent = document.createEvent("MouseEvent");
-			mouseEvent.initMouseEvent("mouseup", true, true, window, event.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
-
-			lastX = null;
-			lastY = null;
-
-			touch.target.dispatchEvent(mouseEvent);
-		}
-	}
 	touchCancel(event) {
 		this.isDown = false;
 	}
+
 	close() {
 		document.removeEventListener("mousedown", this.down.bind(this));
 		document.removeEventListener("mousemove", this.move.bind(this));
