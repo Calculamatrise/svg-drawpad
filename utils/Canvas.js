@@ -6,9 +6,10 @@ import ToolHandler from "../handlers/Tool.js";
 export default class {
 	constructor(view) {
 		this.view = view;
+        let computedStyle = getComputedStyle(this.view);
 		this.view.style.setProperty("stroke-linecap", "round");
         this.view.style.setProperty("stroke-linejoin", "round");
-		this.view.setAttribute("viewBox", `0 0 ${this.view.width.baseVal.value} ${this.view.height.baseVal.value}`);
+		this.view.setAttribute("viewBox", `0 0 ${parseInt(computedStyle.width)} ${parseInt(computedStyle.height)}`);
 
 		this.layers.create();
 
