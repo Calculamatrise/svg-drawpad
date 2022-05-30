@@ -6,10 +6,10 @@ import ToolHandler from "../handlers/Tool.js";
 export default class {
 	constructor(view) {
 		this.view = view;
-        let computedStyle = getComputedStyle(this.view);
+        let boundingRect = view.getBoundingClientRect();
 		this.view.style.setProperty("stroke-linecap", "round");
         this.view.style.setProperty("stroke-linejoin", "round");
-		this.view.setAttribute("viewBox", `0 0 ${parseInt(computedStyle.width)} ${parseInt(computedStyle.height)}`);
+		this.view.setAttribute("viewBox", `0 0 ${boundingRect.width} ${boundingRect.height}`);
 
 		this.layers.create();
 
@@ -19,8 +19,7 @@ export default class {
 		this.mouse.on("up", this.clip.bind(this));
 
 		window.addEventListener("resize", this.resize.bind(this));
-
-		document.addEventListener("keydown", this.keyDown.bind(this));
+		document.addEventListener("keydown", this.keydown.bind(this));
 	}
 	zoom = 1;
 	zoomIncrementValue = 0.5;
@@ -331,7 +330,7 @@ export default class {
 		}
 	}
 
-	keyDown(event) {
+	keydown(event) {
 		event.preventDefault();
 		event.stopPropagation();
 		switch(event.key) {
