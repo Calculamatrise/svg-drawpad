@@ -42,7 +42,7 @@ export default class {
 		if (!this.#events.has(event)) {
 			return;
 		}
-		
+
 		return this.#events.get(event)(...args);
 	}
 
@@ -56,7 +56,7 @@ export default class {
 		}
 
 		event.preventDefault();
-		
+
 		this.isAlternate = !!event.button;
 		this.isDown = true;
 		this.real = {
@@ -68,7 +68,7 @@ export default class {
 			x: (event.offsetX * this.parent.zoom) + this.parent.viewBox.x,
 			y: (event.offsetY * this.parent.zoom) + this.parent.viewBox.y
 		}
-		
+
 		return this.emit("down", event);
 	}
 
@@ -78,12 +78,12 @@ export default class {
 		}
 
 		event.preventDefault();
-		
+
 		this.real = {
 			x: event.offsetX,
 			y: event.offsetY
 		}
-		
+
 		return this.emit("move", event);
 	}
 
@@ -91,15 +91,15 @@ export default class {
 		if (event.target.id !== "container") {
 			return;
 		}
-		
+
 		event.preventDefault();
-		
+
 		this.isDown = false;
 		this.pointB = {
 			x: (event.offsetX * this.parent.zoom) + this.parent.viewBox.x,
 			y: (event.offsetY * this.parent.zoom) + this.parent.viewBox.y
 		}
-		
+
 		return this.emit("up", event);
 	}
 
@@ -151,8 +151,8 @@ export default class {
 	}
 
 	close() {
-		document.removeEventListener("mousedown", this.down.bind(this));
-		document.removeEventListener("mousemove", this.move.bind(this));
-		document.removeEventListener("mouseup", this.up.bind(this));
+		document.removeEventListener("pointerdown", this.down.bind(this));
+		document.removeEventListener("pointermove", this.move.bind(this));
+		document.removeEventListener("pointerup", this.up.bind(this));
 	}
 }

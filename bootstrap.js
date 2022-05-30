@@ -16,9 +16,7 @@ container.addEventListener("contextmenu", function(event) {
 document.querySelector("#patch-notes").addEventListener("click", function(event) {
 	if (this.iframe) {
 		this.iframe.remove();
-
 		this.iframe = null;
-
 		return;
 	}
 

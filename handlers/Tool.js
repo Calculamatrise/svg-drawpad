@@ -43,30 +43,17 @@ export default class {
         }
 
         this.selected.close();
-
         this._selected = toolName.toLowerCase();
-
         this.selected.init();
-
-        clearTimeout(this.canvas.text.timeout);
 		
 		this.canvas.view.parentElement.style.cursor = this._selected === "camera" ? "move" : "default";
-
-		this.canvas.text.innerHTML = this._selected.charAt(0).toUpperCase() + this._selected.slice(1);
-		this.canvas.text.setAttribute("x", this.canvas.viewBox.width / 2 + this.canvas.viewBox.x - this.canvas.text.innerHTML.length * 2.5);
-		this.canvas.text.setAttribute("y", 25 + this.canvas.viewBox.y);
-		this.canvas.text.setAttribute("fill", this.canvas.dark ? "#FBFBFB" : "1B1B1B");
-		this.canvas.view.appendChild(this.canvas.text);
+        this.canvas.alert(this._selected.charAt(0).toUpperCase() + this._selected.slice(1));
 
         const primary = this.canvas.container.querySelector("#primary");
         const secondary = this.canvas.container.querySelector("#secondary");
         const display = new Set(["line", "brush", "curve", "circle", "ellipse", "rectangle"]).has(toolName.toLowerCase()) ? "flex" : "none";
         primary.parentElement.style.setProperty("display", display);
         secondary.parentElement.style.setProperty("display", display);
-        
-		this.canvas.text.timeout = setTimeout(() => {
-			this.canvas.text.remove();
-		}, 2000);
     }
 
     select(toolName) {

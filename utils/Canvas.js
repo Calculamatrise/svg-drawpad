@@ -6,10 +6,10 @@ import ToolHandler from "../handlers/Tool.js";
 export default class {
 	constructor(view) {
 		this.view = view;
-        let boundingRect = view.getBoundingClientRect();
+        let { width, height } = view.getBoundingClientRect();
 		this.view.style.setProperty("stroke-linecap", "round");
         this.view.style.setProperty("stroke-linejoin", "round");
-		this.view.setAttribute("viewBox", `0 0 ${boundingRect.width} ${boundingRect.height}`);
+		this.view.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
 		this.layers.create();
 
@@ -21,6 +21,7 @@ export default class {
 		window.addEventListener("resize", this.resize.bind(this));
 		document.addEventListener("keydown", this.keydown.bind(this));
 	}
+    alerts = [];
 	zoom = 1;
 	zoomIncrementValue = 0.5;
 	#layer = 1;
@@ -59,10 +60,6 @@ export default class {
         }, Object.assign(JSON.parse(localStorage.getItem("svg-drawpad-settings")) ?? {}, value ?? {}))));
     }
 
-	get dark() {
-		return JSON.parse(localStorage.getItem("dark")) ?? window.matchMedia('(prefers-color-scheme: dark)').matches;
-	}
-
 	get tool() {
 		return this.tools.selected;
 	}
@@ -80,18 +77,7 @@ export default class {
 	}
 
 	set layerDepth(layer) {
-		clearTimeout(this.text.timeout);
-
-		this.text.innerHTML = "Layer " + layer;
-		this.text.setAttribute("x", this.viewBox.width / 2 + this.viewBox.x - this.text.innerHTML.length * 2.5);
-		this.text.setAttribute("y", 25 + this.viewBox.y);
-		this.text.setAttribute("fill", this.dark ? "#FBFBFB" : "1B1B1B");
-		this.view.appendChild(this.text);
-
-		this.text.timeout = setTimeout(() => {
-			this.text.remove();
-		}, 2000);
-
+        this.alert("Layer" + layer);
 		this.#layer = layer;
 	}
 
@@ -104,8 +90,8 @@ export default class {
 	}
 
 	set fill(boolean) {
-		this.text.setAttribute("fill", boolean ? this.primary : "#FFFFFF00");
-		this.tool.element.setAttribute("fill", boolean ? this.primary : "#FFFFFF00");
+		this.text.setAttribute("fill", boolean ? this.primary : "#ffffff00");
+		this.tool.element.setAttribute("fill", boolean ? this.primary : "#ffffff00");
 
 		this.#fill = boolean;
 	}
@@ -115,21 +101,44 @@ export default class {
 	}
 
 	get viewBox() {
-		const viewBox = this.view.getAttribute("viewBox").split(/\s+/g);
+		let viewBox = this.view.getAttribute("viewBox").split(/\s+/g);
 		return {
-			x: parseFloat(viewBox[0]),
-			y: parseFloat(viewBox[1]),
-			width: parseFloat(viewBox[2]),
-			height: parseFloat(viewBox[3])
+			x: parseFloat(viewBox[0]) || 0,
+			y: parseFloat(viewBox[1]) || 0,
+			width: parseFloat(viewBox[2]) || window.innerWidth,
+			height: parseFloat(viewBox[3]) || window.outerWidth
 		}
 	}
+
+    set viewBox(value) {
+        let viewBox = this.viewBox;
+		this.view.setAttribute("viewBox", `${value.x || viewBox.x} ${value.y || viewBox.y} ${value.width || viewBox.width} ${value.height || viewBox.height}`);
+	}
+
+    alert(text) {
+        // let label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        clearTimeout(this.text.timeout);
+
+		this.text.innerHTML = text;
+		this.text.setAttribute("x", this.viewBox.width / 2 + this.viewBox.x - this.text.innerHTML.length * 2.5);
+		this.text.setAttribute("y", 25 + this.viewBox.y);
+		this.text.setAttribute("fill", this.config.theme == "dark" ? "#fbfbfb" : "#1b1b1b");
+		this.text.timeout = setTimeout(() => {
+			this.text.remove();
+		}, 2000);
+
+        this.view.appendChild(this.text);
+        // this.alerts.push(label);
+
+        return text;
+    }
 
 	import(data) {
 		try {
 			this.close();
 
-			const newView = new DOMParser().parseFromString(data, "text/xml").querySelector("svg");
-
+            let parser = new DOMParser();
+			let newView = parser.parseFromString(data, "text/xml").querySelector("svg");
 			this.view.innerHTML = newView.innerHTML;
 
 			let layerId = 1;
@@ -150,9 +159,8 @@ export default class {
 	}
 
 	resize(event) {
-		const boundingRect = this.view.getBoundingClientRect();
+		let boundingRect = this.view.getBoundingClientRect();
 		this.view.setAttribute("viewBox", `0 0 ${boundingRect.width} ${boundingRect.height}`);
-
 		this.text.setAttribute("x", boundingRect.width / 2 + this.viewBox.x - this.text.innerHTML.length * 2.5);
 		this.text.setAttribute("y", 25 + this.viewBox.y);
 	}
@@ -288,16 +296,7 @@ export default class {
         }
 
         if (event.shiftKey) {
-            clearTimeout(this.text.timeout);
-
-            this.text.innerHTML = "Camera";
-            this.text.setAttribute("x", this.viewBox.width / 2 - this.text.innerHTML.length * 2 + this.viewBox.x);
-            this.text.setAttribute("y", 20 + this.viewBox.y);
-            this.text.timeout = setTimeout(() => {
-                this.text.remove();
-            }, 2000);
-
-            this.view.appendChild(this.text);
+            this.alert("Camera");
             return;
         }
 
