@@ -27,14 +27,14 @@ export default class {
 		}
 	}
 	init() {
-		document.addEventListener("mousedown", this.down.bind(this));
-		document.addEventListener("mousemove", this.move.bind(this));
-		document.addEventListener("mouseup", this.up.bind(this));
+		document.addEventListener("pointerdown", this.down.bind(this));
+		document.addEventListener("pointermove", this.move.bind(this));
+		document.addEventListener("pointerup", this.up.bind(this));
 		document.addEventListener("wheel", this.wheel.bind(this), { passive: false });
-		document.addEventListener("touchstart", this.touchStart.bind(this));
-		document.addEventListener("touchmove", this.touchMove.bind(this));
-		document.addEventListener("touchend", this.touchEnd.bind(this));
-		document.addEventListener("touchcancel", this.touchCancel.bind(this));
+		// document.addEventListener("touchstart", this.touchStart.bind(this));
+		// document.addEventListener("touchmove", this.touchMove.bind(this));
+		// document.addEventListener("touchend", this.touchEnd.bind(this));
+		// document.addEventListener("touchcancel", this.touchCancel.bind(this));
 	}
 	on(event, method) {
 		this.#events.set(event, method);
