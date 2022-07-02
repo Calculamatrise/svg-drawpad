@@ -49,7 +49,9 @@ export default class {
 	down(event) {
 		if (event.target.id !== "container") {
 			return;
-		}
+		} else if (this.isDown) {
+            return;
+        }
 
 		if (layers.style.display !== "none") {
 			layers.style.display = "none";

@@ -1,0 +1,40 @@
+div#container mobile-user-interface :is(top-left-nav, top-right-nav, bottom-left-nav, bottom-right-nav) {
+	margin: 10px;
+	position: absolute;
+	display: inline-block;
+	z-index: 50;
+}
+
+div#container mobile-user-interface {
+	display: block;
+}
+
+div#container mobile-user-interface top-left-nav {
+	top: 0;
+	left: 0;
+}
+
+div#container mobile-user-interface top-right-nav {
+	top: 0;
+	right: 0;
+	max-width: 48vw;
+	flex-wrap: wrap;
+	display: inline-flex;
+	justify-content: flex-end;
+}
+
+div#container mobile-user-interface bottom-left-nav {
+	left: 0;
+	bottom: 0;
+    position: fixed;
+}
+
+div#container mobile-user-interface bottom-right-nav {
+	right: 0;
+	bottom: 0;
+    position: fixed;
+}
+
+div#container mobile-user-interface button, div#container div#layers button {
+	background-color: transparent;
+}

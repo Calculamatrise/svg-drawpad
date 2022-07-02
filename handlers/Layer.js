@@ -5,6 +5,10 @@ export default class {
         this.canvas = parent;
     }
     cache = []
+    get element() {
+        return this.canvas.container.querySelector("user-interface #layers #layer-container");
+    }
+
     create() {
         this.cache.forEach(function(layer) {
             layer.element.classList.remove("selected");
@@ -29,7 +33,6 @@ export default class {
 
     insert(layer, index) {
         this.canvas.layerDepth = index + 1;
-
         this.cache.splice(index, 0, layer);
         this.cache.forEach((layer, index) => {
             layer.element.querySelector("#selector").value = layer.base.dataset.id = layer.id = index + 1;
@@ -50,7 +53,6 @@ export default class {
         const layer = this.cache.splice(this.cache.indexOf(this.get(layerId)), 1);
         this.cache.forEach((layer, index) => {
             layer.element.querySelector("#selector").value = layer.base.dataset.id = layer.id = index + 1;
-
             layer.element.classList.remove("selected");
             if (layer.id === this.canvas.layerDepth) {
                 layer.element.classList.add("selected");
@@ -60,36 +62,28 @@ export default class {
         return layer;
     }
 
-    createElement(element, properties = {}) {
-		if (typeof element !== "string" || element === void 0) {
-			throw new Error("Invalid element! What were you thinking?");
-		} else if (typeof properties !== "object" || properties === void 0) {
-			throw new Error("Invalid property object! What were you thinking?");
-		}
-
-        element = document.createElement(element);
-        for (const property in properties) {
-            if (typeof properties[property] === "function") {
-                element.addEventListener(property, properties[property]);
-
-                continue;
-            } else if (property.toLowerCase() === "style" && typeof properties[property] === "object") {
-                for (const style in properties[property]) {
-                    element.style.setProperty(style, properties[property][style]);
+    createElement(type, options = {}) {
+        let element = document.createElement(type);
+        for (const attribute in options) {
+            if (typeof options[attribute] === "object") {
+                if (attribute === "style") {
+                    for (const property in options[attribute]) {
+                        element.style.setProperty(property, options[attribute][property]);
+                    }
+                } else if (attribute === "children") {
+                    element.append(...options[attribute]);
                 }
-
-                continue;
-            } else if (typeof properties[property] === "object") {
-                for (const childProperty in properties[property]) {
-                    element[property][childProperty] = properties[property][childProperty];
+            } else if (typeof options[attribute] === "function") {
+                element.addEventListener(attribute, options[attribute]);
+            } else {
+                if (attribute.startsWith("inner")) {
+                    element[attribute] = options[attribute];
+                } else {
+                    element.setAttribute(attribute, options[attribute]);
                 }
-
-                continue;
             }
-
-            element[property] = properties[property];
         }
-	
+
 		return element;
 	}
 

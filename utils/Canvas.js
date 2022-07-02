@@ -148,7 +148,6 @@ export default class {
 				}
 
 				this.layers.create();
-
 				layerId++;
 			}
 
@@ -190,7 +189,6 @@ export default class {
 							case 0:
 								line.setAttribute("x", event.data.cache[index].getAttribute("x"));
 								line.setAttribute("y", event.data.cache[index].getAttribute("y"));
-		
 								break;
 		
 							case 1:
@@ -198,18 +196,15 @@ export default class {
 								line.setAttribute("y1", event.data.cache[index].getAttribute("y1"));
 								line.setAttribute("x2", event.data.cache[index].getAttribute("x2"));
 								line.setAttribute("y2", event.data.cache[index].getAttribute("y2"));
-		
 								break;
 		
 							case 2:
 								line.setAttribute("cx", event.data.cache[index].getAttribute("cx"));
 								line.setAttribute("cy", event.data.cache[index].getAttribute("cy"));
-		
 								break;
 
 							case 3:
 								line.setAttribute("points", event.data.cache[index].getAttribute("points"));
-
 								break;
 						}
 					});
@@ -248,7 +243,6 @@ export default class {
 							case 0:
 								line.setAttribute("x", event.data.secondaryCache[index].getAttribute("x"));
 								line.setAttribute("y", event.data.secondaryCache[index].getAttribute("y"));
-		
 								break;
 		
 							case 1:
@@ -256,18 +250,15 @@ export default class {
 								line.setAttribute("y1", event.data.secondaryCache[index].getAttribute("y1"));
 								line.setAttribute("x2", event.data.secondaryCache[index].getAttribute("x2"));
 								line.setAttribute("y2", event.data.secondaryCache[index].getAttribute("y2"));
-		
 								break;
 		
 							case 2:
 								line.setAttribute("cx", event.data.secondaryCache[index].getAttribute("cx"));
 								line.setAttribute("cy", event.data.secondaryCache[index].getAttribute("cy"));
-		
 								break;
 
 							case 3:
 								line.setAttribute("points", event.data.secondaryCache[index].getAttribute("points"));
-
 								break;
 						}
 					});
@@ -282,11 +273,10 @@ export default class {
 	}
 
 	press(event) {
-		const patchNotes = this.container.querySelector("#patch-notes") || {};
-		if (patchNotes.iframe) {
-			patchNotes.iframe.remove();
-			patchNotes.iframe = null;
-		}
+        let ui = this.container.querySelector("user-interface");
+        if (ui !== null) {
+            ui.style.setProperty("pointer-events", "none");
+        }
 
 		if (event.button === 1) {
 			this.tools.select(this.tools._selected === "line" ? "brush" : this.tools._selected === "brush" ? "eraser" : this.tools._selected === "eraser" ? "camera" : "line");
@@ -311,19 +301,23 @@ export default class {
 		if (this.mouse.isDown && !this.mouse.isAlternate) {	
 			if (event.shiftKey) {
 				this.tools.cache.get("camera").stroke(event);
-	
 				return;
 			}
 
 			this.tool.stroke(event);
 		}
 
-		if (new Set(["beziercurve", "curve", "eraser"]).has(this.tools._selected)) {
+		if (this.tools._selected.match(/^eraser|(bezier)?curve$/gi)) {
 			this.tool.stroke(event);
 		}
 	}
 
 	clip(event) {
+        let ui = this.container.querySelector("user-interface");
+        if (ui !== null) {
+            ui.style.removeProperty("pointer-events");
+        }
+
 		if (!this.mouse.isAlternate) {
 			this.tool.clip(event);
 		}
@@ -336,11 +330,10 @@ export default class {
 			case "Escape":
 				if (layers.style.display !== "none") {
 					layers.style.display = "none";
-					
 					break;
 				}
 	
-                const settings = document.querySelector("#settings");
+                let settings = document.querySelector("#settings");
                 if (settings === null) {
                     break;
                 }
@@ -356,12 +349,11 @@ export default class {
 					}
 
 					this.zoom -= this.zoomIncrementValue;
-					
+
 					this.view.setAttribute("viewBox", `${this.viewBox.x + (this.viewBox.width - window.innerWidth * this.zoom) / 2} ${this.viewBox.y + (this.viewBox.height - window.innerHeight * this.zoom) / 2} ${window.innerWidth * this.zoom} ${window.innerHeight * this.zoom}`);
 					this.text.setAttribute("y", 25 + this.viewBox.y);
 
 					this.tool.init();
-
 					break;
 				}
 
@@ -379,50 +371,49 @@ export default class {
 					}
 
 					this.zoom += this.zoomIncrementValue;
-					
+
 					this.view.setAttribute("viewBox", `${this.viewBox.x - (window.innerWidth * this.zoom - this.viewBox.width) / 2} ${this.viewBox.y - (window.innerHeight * this.zoom - this.viewBox.height) / 2} ${window.innerWidth * this.zoom} ${window.innerHeight * this.zoom}`);
 					this.text.setAttribute("y", 25 + this.viewBox.y);
 
 					this.tool.init();
-
 					break;
 				}
 
 				if (this.tool.size <= 2) {
 					break;
 				}
-	
+
 				this.tool.size -= 1;
 				break;
-	
+
 			case "0":
 				this.tools.select("camera");
 				break;
-	
+
 			case "1":
 				this.tools.select("line");
 				break;
-			
+
 			case "2":
 				this.tools.select("brush");
 				break;
-	
+
 			case "3":
 				this.tools.select("circle");
 				break;
-	
+
 			case "4":
 				this.tools.select("rectangle");
 				break;
-	
+
 			case "5":
 				this.tools.select("eraser");
 				break;
-	
+
 			case "f":
 				this.fill = !this.fill;
 				break;
-	
+
 			case "ArrowUp":
 				if (this.layerDepth >= this.layers.cache.length) {
 					if (!event.shiftKey) {
@@ -431,40 +422,36 @@ export default class {
 	
 					this.layers.create();
 				}
-	
+
 				this.layerDepth = this.layerDepth + 1;
 				break;
-	
+
 			case "ArrowDown":
 				if (this.layerDepth <= 1) {
 					break;
 				}
-	
+
 				this.layerDepth = this.layerDepth - 1;
 				break;
-	
+
 			case "z":
 				this.undo();
 				break;
-	
+
 			case "x":
 				this.redo();
 				break;
-	
+
 			case "c":
 				if (this.tools._selected === "select" && event.ctrlKey) {
 					this.tool.copy();
-	
-					break;
 				}
-				
+
 				break;
-	
+
 			case "v":
 				if (this.tools._selected === "select" && event.ctrlKey) {
 					this.tool.paste();
-	
-					break;
 				}
 
 				break;
