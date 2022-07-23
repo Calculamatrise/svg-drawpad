@@ -140,25 +140,7 @@ export default class extends Tool {
         });
 
         for (const line of this.selected) {
-            clearInterval(line.blinkInterval);
-            
-            let old = 1;
-            line.blinkInterval = setInterval(() => {
-                let opacity = parseFloat(line.style.opacity);
-                if (isNaN(opacity)) {
-                    opacity = 1;
-                }
-
-                if (opacity === 0 || opacity > old &&  opacity < 1) {
-                    old = opacity;
-                    line.style.setProperty("opacity", opacity + .1);
-                } else if (opacity === 1 || opacity <= old) {
-                    old = opacity;
-                    line.style.setProperty("opacity", opacity - .1);
-                }
-
-                old = opacity;
-            }, 50);
+            line.classList.add("highlighted");
         }
 
         if (this.selected.length > 0) {
@@ -170,10 +152,7 @@ export default class extends Tool {
         clearTimeout(this.parent.this.canvas.text.timeout);
 
 		this.clipboard.push(...this.selected.map(function(line) {
-			clearInterval(line.blinkInterval);
-
-			line.style.setProperty("opacity", 1);
-
+            line.classList.remove("highlighted");
 			return line.cloneNode();
 		}));
 
@@ -211,9 +190,7 @@ export default class extends Tool {
 
     deselect() {
         for (const line of this.selected) {
-            clearInterval(line.blinkInterval);
-
-            line.style.setProperty("opacity", 1);
+            line.classList.remove("highlighted");
         }
 
         this.active = false;

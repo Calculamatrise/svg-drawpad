@@ -316,3 +316,18 @@ cirlce {
 rect {
 	fill: var(--text);
 }
+
+@keyframes fade {
+    0%, 100% {
+        opacity: 1;
+        stroke-opacity: 1;
+    }
+    50% {
+        color: 0;
+        stroke-opacity: 0;
+    }
+}
+
+.highlighted {
+    animation: fade 2s ease-in-out infinite;
+}
