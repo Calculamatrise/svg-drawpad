@@ -113,7 +113,6 @@ export default class extends Tool {
                 parseInt(line.getAttribute("cx")),
                 ...strokePoints.map(coord => parseInt(coord.split(/\s+/g)[0]))
             ].filter(point => isFinite(point));
-
             if (this.mouse.position.x - this.mouse.pointA.x > 0) {
                 passing = !!points.find((point) => point > this.mouse.pointA.x && point < this.mouse.position.x);
             } else {
@@ -127,7 +126,6 @@ export default class extends Tool {
                 parseInt(line.getAttribute("cy")),
                 ...strokePoints.map(coord => parseInt(coord.split(/\s+/g)[1]))
             ].filter(point => isFinite(point));
-
             if (passing) {
                 if (this.mouse.position.y - this.mouse.pointA.y > 0) {
                     passing = !!points.find((point) => point > this.mouse.pointA.y && point < this.mouse.position.y);
@@ -150,7 +148,6 @@ export default class extends Tool {
 
     copy() {
         clearTimeout(this.parent.this.canvas.text.timeout);
-
 		this.clipboard.push(...this.selected.map(function(line) {
             line.classList.remove("highlighted");
 			return line.cloneNode();

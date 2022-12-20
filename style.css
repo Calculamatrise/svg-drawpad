@@ -1,15 +1,26 @@
-html {
-	--size: .5;
+@keyframes fade {
+    0%, 100% {
+        opacity: 1;
+        stroke-opacity: 1;
+    }
+    50% {
+        color: 0;
+        stroke-opacity: 0;
+    }
+}
+
+:root {
+    --size: .5;
 	--background: #ebebeb;
+    --border-color: #80808020;
 	--hard-background: #ddd;
 	--soft-background: #eee;
 	--text: #1b1b1b;
 	--stroke: skyblue;
 	--fill: violet;
-	border: none;
 }
 
-html, button {
+:root {
     color: var(--text);
 }
 
@@ -19,24 +30,24 @@ body {
 	overflow: hidden;
 }
 
-div#container {
+#container {
 	position: relative;
 	touch-action: none;
 }
 
-div#container user-interface :is(top-left-nav, top-right-nav, bottom-left-nav, bottom-right-nav) {
+#container user-interface :is(top-left-nav, top-right-nav, bottom-left-nav, bottom-right-nav) {
 	margin: 10px;
 	position: absolute;
 	display: inline-block;
 	z-index: 50;
 }
 
-div#container user-interface top-left-nav {
+#container user-interface top-left-nav {
 	top: 0;
 	left: 0;
 }
 
-div#container user-interface top-right-nav {
+#container user-interface top-right-nav {
 	top: 0;
 	right: 0;
 	max-width: 48vw;
@@ -45,30 +56,30 @@ div#container user-interface top-right-nav {
 	justify-content: flex-end;
 }
 
-div#container user-interface bottom-left-nav {
+#container user-interface bottom-left-nav {
 	left: 0;
 	bottom: 0;
     position: fixed;
 }
 
-div#container user-interface bottom-right-nav {
+#container user-interface bottom-right-nav {
 	right: 0;
 	bottom: 0;
     position: fixed;
 }
 
-div#container user-interface top-left-nav #toolbar {
+#container user-interface top-left-nav #toolbar {
 	display: none;
 	overflow: auto;
 	max-height: 43.55vh;
 }
 
-div#container user-interface top-left-nav #toolbar #advanced-tools {
+#container user-interface top-left-nav #toolbar #advanced-tools {
 	display: none;
 	flex-direction: column;
 }
 
-div#container user-interface bottom-left-nav .option {
+#container user-interface bottom-left-nav .option {
 	width: 130px;
 	height: 45px;
 	display: flex;
@@ -79,12 +90,12 @@ div#container user-interface bottom-left-nav .option {
 	justify-content: center;
 }
 
-div#container user-interface bottom-left-nav .option.disabled {
+#container user-interface bottom-left-nav .option.disabled {
 	opacity: .5;
 	pointer-events: none;
 }
 
-div#container user-interface bottom-left-nav .option input {
+#container user-interface bottom-left-nav .option input {
 	top: 0;
 	left: 0;
 	position: absolute;
@@ -92,25 +103,25 @@ div#container user-interface bottom-left-nav .option input {
 	pointer-events: none;
 }
 
-div#container user-interface button, div#container div#layers button {
+#container user-interface button, #container div#layers button {
 	background-color: transparent;
 }
 
-div#container .overlay {
+#container .overlay {
+    bottom: 15vh;
 	top: 15vh;
 	left: 15vw;
-	width: 40vw;
-	height: 40vh;
+    right: 15vw;
 	overflow: hidden;
 	position: absolute;
 	align-items: center;
 	border-radius: 20px;
 	place-content: center;
 	flex-flow: row wrap;
-	box-shadow: inset 0px 5px 8px -10px #ffffff80;
+	box-shadow: inset 0px 5px 8px -10px #80808040;
 }
 
-div#container iframe#patch-notes-iframe {
+#container iframe#patch-notes-iframe {
 	top: 20vh;
 	width: 70vw;
 	height: 60vh;
@@ -123,74 +134,71 @@ div#container iframe#patch-notes-iframe {
 	z-index: 20;
 }
 
-div#container div#settings {
+#container div#settings {
+    bottom: 0;
 	top: 0;
 	left: 0;
-	width: 100%;
-	height: 100%;
+    right: 0;
 	display: none;
     border-radius: 0;
-	background-color: #ffffff30;
+	background-color: #80808008;
 	backdrop-filter: blur(2em);
 	z-index: 40;
 }
 
-div#container div#settings div.tabs {
+#container div#settings > nav {
     align-items: center;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     min-height: 40vh;
     min-width: 10vw;
 }
 
-div#container div#settings div.tabs span.tab {
-    height: calc(100% - 32px);
-    padding: 16px;
-    width: calc(100% - 32px);
+#container div#settings > nav > button {
+    text-align: left;
 }
 
-div#container div#settings div.tab-content {
-    align-items: center;
+#container div#settings > section {
+    align-items: flex-start;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     min-height: 40vh;
     min-width: 40vw;
 }
 
-div#container div#layers {
-	display: none;
+#container div#layers {
+	background-color: #80808008; /* var(--hard-background); */
+    backdrop-filter: blur(1px);
 	border-radius: 30px;
+	display: none;
 	flex-flow: column;
-	padding: 10vh 15vw 20vh;
-	background-color: #ffffff20; /* var(--hard-background); */
+	padding: 2rem 4rem;
 	z-index: 20;
 }
 
-div#container div#layers div#layer-container {
-	display: flex;
-	overflow: auto;
-	flex-wrap: wrap;
-	max-width: 53vw;
-	width: max-content;
+#container div#layers div#layer-container {
 	align-items: center;
-	flex-direction: row;
-	max-height: 80%;
+	display: grid;
+    grid-auto-rows: min-content;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+	overflow: auto;
     position: relative;
+	width: -webkit-fill-available;
 }
 
 /* Automatic layer counter >>>
-div#container div#layers .layer {
+#container div#layers .layer {
 	counter-increment: layer;
 }
 
-div#container div#layers .layer > div:nth-child(1):after {
+#container div#layers .layer > div:nth-child(1):after {
 	content: counter(layer);
 } */
 
-div#container div#layers .layer {
-	margin: 10px;
-	padding: 10px;
+#container div#layers .layer {
+	margin: 0.2rem;
+	padding: 0.4rem;
 	display: flex;
 	overflow: hidden;
 	position: relative;
@@ -201,7 +209,7 @@ div#container div#layers .layer {
     user-select: none;
 }
 
-div#container div#layers .layer:not(div#container div#layers .layer.selected)::before {
+#container div#layers .layer:not(#container div#layers .layer.selected)::before {
 	content: "";
 	opacity: .3;
 	width: 100%;
@@ -217,7 +225,7 @@ div#container div#layers .layer:not(div#container div#layers .layer.selected)::b
 	z-index: -1;
 }
 
-div#container div#layers .layer:not(div#container div#layers .layer.selected):hover::before {
+#container div#layers .layer:not(#container div#layers .layer.selected):hover::before {
 	opacity: .5;
 	pointer-events: none;
 	background-color: var(--hard-background);
@@ -225,7 +233,7 @@ div#container div#layers .layer:not(div#container div#layers .layer.selected):ho
 	z-index: -1;
 }
 
-div#container div#layers .layer.selected::before {
+#container div#layers .layer.selected::before {
 	content: "";
 	opacity: .9;
 	width: 100%;
@@ -241,13 +249,13 @@ div#container div#layers .layer.selected::before {
 	z-index: -1;
 }
 
-div#container div#layers .layer input.selector {
+#container div#layers .layer input.selector {
 	display: inline-block;
 	width: 30px;
 	height: 20px;
 }
 
-div#container div#layers .layer .option {
+#container div#layers .layer .option {
 	width: 130px;
 	height: 45px;
 	display: flex;
@@ -258,20 +266,20 @@ div#container div#layers .layer .option {
 	justify-content: center;
 }
 
-div#container div#layers .layer .option input {
+#container div#layers .layer .option input {
 	margin-right: 8px;
 	pointer-events: none;
 }
 
 
-div#container div#layers .layer .options {
+#container div#layers .layer .options {
 	/*display: none;*/
 	display: flex;
 	flex-direction: column;
 	margin-top: 10px;
 }
 
-div#container span#settings {
+#container span#settings {
 	top: 0;
 	right: 0;
 	margin: 10px;
@@ -315,17 +323,6 @@ cirlce {
 
 rect {
 	fill: var(--text);
-}
-
-@keyframes fade {
-    0%, 100% {
-        opacity: 1;
-        stroke-opacity: 1;
-    }
-    50% {
-        color: 0;
-        stroke-opacity: 0;
-    }
 }
 
 .highlighted {

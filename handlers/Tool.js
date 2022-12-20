@@ -12,23 +12,6 @@ import Camera from "../tools/Camera.js";
 import Select from "../tools/Select.js";
 
 export default class {
-    constructor(parent) {
-        this.canvas = parent;
-        this.cache.set("line", new Line(this));
-        this.cache.set("beziercurve", new BezierCurve(this));
-        this.cache.set("brush", new Brush(this));
-        this.cache.set("curve", new Curve(this));
-        this.cache.set("circle", new Circle(this));
-        this.cache.set("ellipse", new Ellipse(this));
-        this.cache.set("heart", new Heart(this));
-        this.cache.set("rectangle", new Rectangle(this));
-        this.cache.set("text", new Text(this));
-        this.cache.set("eraser", new Eraser(this));
-        this.cache.set("camera", new Camera(this));
-        this.cache.set("select", new Select(this));
-    }
-    cache = new Map();
-    _selected = "line";
     get selected() {
         return this.cache.get(this._selected);
     }
@@ -45,15 +28,33 @@ export default class {
         this.selected.close();
         this._selected = toolName.toLowerCase();
         this.selected.init();
-		
-		this.canvas.view.parentElement.style.cursor = this._selected === "camera" ? "move" : "default";
+
+		this.canvas.view.parentElement.style.cursor = this._selected === 'camera' ? 'move' : 'default';
         this.canvas.alert(this._selected.charAt(0).toUpperCase() + this._selected.slice(1));
 
-        const primary = this.canvas.container.querySelector("#primary");
-        const secondary = this.canvas.container.querySelector("#secondary");
-        const display = new Set(["line", "brush", "curve", "circle", "ellipse", "rectangle"]).has(toolName.toLowerCase()) ? "flex" : "none";
-        primary.parentElement.style.setProperty("display", display);
-        secondary.parentElement.style.setProperty("display", display);
+        const primary = this.canvas.container.querySelector('#primary');
+        const secondary = this.canvas.container.querySelector('#secondary');
+        const display = /^(brush|c(urve|ircle)|ellipse|line|rectangle)$/.test(toolName.toLowerCase()) ? 'flex' : 'none';
+        primary.parentElement.style.setProperty('display', display);
+        secondary.parentElement.style.setProperty('display', display);
+    }
+
+    _selected = 'line';
+    cache = new Map();
+    constructor(parent) {
+        this.canvas = parent;
+        this.cache.set('line', new Line(this));
+        this.cache.set('beziercurve', new BezierCurve(this));
+        this.cache.set('brush', new Brush(this));
+        this.cache.set('curve', new Curve(this));
+        this.cache.set('circle', new Circle(this));
+        this.cache.set('ellipse', new Ellipse(this));
+        this.cache.set('heart', new Heart(this));
+        this.cache.set('rectangle', new Rectangle(this));
+        this.cache.set('text', new Text(this));
+        this.cache.set('eraser', new Eraser(this));
+        this.cache.set('camera', new Camera(this));
+        this.cache.set('select', new Select(this));
     }
 
     select(toolName) {

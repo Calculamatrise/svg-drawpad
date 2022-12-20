@@ -1,17 +1,18 @@
 import Layer from "../utils/Layer.js";
 
 export default class {
-    constructor(parent) {
-        this.canvas = parent;
-    }
-    cache = []
     get element() {
         return this.canvas.container.querySelector("user-interface #layers #layer-container");
     }
 
+    cache = [];
+    constructor(parent) {
+        this.canvas = parent;
+    }
+
     create() {
         this.cache.forEach(function(layer) {
-            layer.element.classList.remove("selected");
+            layer.element.classList.remove('selected');
         });
 
         return new Layer(this);
@@ -35,14 +36,14 @@ export default class {
         this.canvas.layerDepth = index + 1;
         this.cache.splice(index, 0, layer);
         this.cache.forEach((layer, index) => {
-            layer.element.querySelector("#selector").value = layer.base.dataset.id = layer.id = index + 1;
+            layer.element.querySelector('#selector').value = layer.base.dataset.id = layer.id = index + 1;
             if (layer.id > 1) {
                 view.querySelector(`g[data-id='${index}']`).after(layer.base);
             }
 
-            layer.element.classList.remove("selected");
+            layer.element.classList.remove('selected');
             if (layer.id === this.canvas.layerDepth) {
-                layer.element.classList.add("selected");
+                layer.element.classList.add('selected');
             }
         });
 
@@ -65,18 +66,18 @@ export default class {
     createElement(type, options = {}) {
         let element = document.createElement(type);
         for (const attribute in options) {
-            if (typeof options[attribute] === "object") {
-                if (attribute === "style") {
+            if (typeof options[attribute] == 'object') {
+                if (attribute === 'style') {
                     for (const property in options[attribute]) {
                         element.style.setProperty(property, options[attribute][property]);
                     }
-                } else if (attribute === "children") {
+                } else if (attribute === 'children') {
                     element.append(...options[attribute]);
                 }
-            } else if (typeof options[attribute] === "function") {
+            } else if (typeof options[attribute] == 'function') {
                 element.addEventListener(attribute, options[attribute]);
             } else {
-                if (attribute.startsWith("inner")) {
+                if (attribute.startsWith('inner')) {
                     element[attribute] = options[attribute];
                 } else {
                     element.setAttribute(attribute, options[attribute]);
@@ -91,7 +92,6 @@ export default class {
         this.cache.forEach(function(layer) {
             layer.remove();
         });
-
-        this.cache = []
+        this.cache = [];
     }
 }

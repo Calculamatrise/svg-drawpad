@@ -1,16 +1,27 @@
 export default class {
+    get opacity() {
+        return this.alpha;
+    }
+
+    set opacity(alpha) {
+        this.alpha = parseFloat(alpha);
+        this.base.style.setProperty('opacity', this.alpha);
+    }
+
+    alpha = 1;
+    hidden = false;
+    lines = [];
     constructor(parent) {
         this.parent = parent;
         this.id = this.parent.cache.length + 1;
-        this.element = this.parent.createElement("div", {
-            class: "layer selected",
+        this.element = this.parent.createElement('div', {
+            class: 'layer selected',
             mouseover(event) {
                 if (event.target.className !== this.className) {
-                    this.style.cursor = "default";
-                    return;
+                    return void this.style.setProperty('cursor', 'default');
                 }
-    
-                this.style.cursor = "pointer";
+
+                this.style.cursor = 'pointer';
             },
             click: event => {
                 if (event.target.className !== this.element.className) {
@@ -19,45 +30,45 @@ export default class {
 
                 window.canvas.layerDepth = this.id;
                 this.parent.cache.forEach(function(layer) {
-                    layer.element.classList.remove("selected");
+                    layer.element.classList.remove('selected');
                     if (layer.id === window.canvas.layerDepth) {
-                        layer.element.classList.add("selected");   
+                        layer.element.classList.add('selected');   
                     }
                 });
 
-                this.element.querySelector("#selector").focus();
+                this.element.querySelector('#selector').focus();
             },
             children: [
-                this.parent.createElement("div", {
-                    innerText: "Layer ",
-                    mouseover(event) {    
-                        this.style.cursor = "pointer";
+                this.parent.createElement('div', {
+                    innerText: 'Layer ',
+                    mouseover() {    
+                        this.style.cursor = 'pointer';
                     },
-                    click(event) {
+                    click() {
                         window.canvas.layerDepth = this.id;
                         parent.cache.forEach(function(layer) {
-                            layer.element.classList.remove("selected");
+                            layer.element.classList.remove('selected');
                             if (layer.id === window.canvas.layerDepth) {
-                                layer.element.classList.add("selected");   
+                                layer.element.classList.add('selected');   
                             }
                         });
-        
-                        this.querySelector("#selector").focus();
+
+                        this.querySelector('#selector').focus();
                     },
                     children: [
-                        this.selector = this.parent.createElement("input", {
-                            type: "number",
-                            id: "selector",
-                            class: "ripple selector",
-                            step: "1",
+                        this.selector = this.parent.createElement('input', {
+                            type: 'number',
+                            id: 'selector',
+                            class: 'ripple selector',
+                            step: '1',
                             value: this.id,
                             keydown(event) {
                                 event.stopPropagation();
                             },
-                            mouseover(event) {    
-                                this.style.cursor = "pointer";
+                            mouseover() {    
+                                this.style.cursor = 'pointer';
                             },
-                            input: (event) => {
+                            change: event => {
                                 if (parseInt(event.target.value) < 1) {
                                     event.target.value = 1;
                                     return;
@@ -69,72 +80,67 @@ export default class {
                                 } else if (parseInt(event.target.value) === this.id) {
                                     return;
                                 }
-                
+
                                 this.move(parseInt(event.target.value));
-                                
-                                this.element.querySelector("#selector").focus();
+                                this.element.querySelector('#selector').focus();
                             }
                         })
                     ]
                 }),
-                this.parent.createElement("div", {
-                    class: "options",
+                this.parent.createElement('div', {
+                    class: 'options',
                     children: [
-                        this.parent.createElement("div", {
-                            class: "option",
-                            innerText: "Opacity",
+                        this.parent.createElement('div', {
+                            class: 'option',
+                            innerText: 'Opacity',
                             style: {
-                                "flex-direction": "column"
-                            },
-                            mousemove: (event) => {
-                                if (event.buttons !== 1) {
-                                    return;
-                                }
-                                
-                                this.opacity = range.value / 100;
+                                'flex-direction': 'column'
                             },
                             children: [
-                                this.parent.createElement("input", {
-                                    type: "range",
+                                this.parent.createElement('input', {
+                                    type: 'range',
                                     min: 0,
                                     max: 100,
                                     value: 100,
                                     style: {
-                                        width: "100px",
-                                        "pointer-events": "all"
+                                        width: '100px',
+                                        'pointer-events': 'all'
+                                    },
+                                    input: event => {
+                                        this.opacity = event.target.value / 100;
                                     }
                                 })
                             ]
                         }),
-                        this.parent.createElement("div", {
-                            class: "option ripple",
-                            innerText: "Hide",
-                            click: (event) => {
+                        this.parent.createElement('div', {
+                            class: 'option ripple',
+                            innerText: 'Hide',
+                            click: event => {
                                 this.toggleVisiblity();
-                                checkbox.checked = this.hidden;
+                                event.target.firstElementChild.checked = this.hidden;
                             },
                             children: [
-                                this.parent.createElement("input", {
-                                    type: "checkbox"
+                                this.parent.createElement('input', {
+                                    type: 'checkbox'
                                 })
                             ]
                         }),
-                        this.parent.createElement("button", {
-                            innerText: "Clear",
-                            click: (event) => {
+                        this.parent.createElement('button', {
+                            innerText: 'Clear',
+                            click: () => {
                                 if (confirm(`Are you sure you\'d like to clear Layer ${this.id}?`)) {
                                     this.clear();
                                 }
                             }
                         }),
-                        this.parent.createElement("button", {
-                            innerText: "Merge",
-                            click: (event) => {
+                        this.parent.createElement('button', {
+                            innerText: 'Merge',
+                            click: () => {
                                 if (this.parent.cache.length <= 1) {
                                     alert("There must be more than one layer in order to merge layers!");
                                     return;
                                 }
-                
+
                                 let layerId = prompt(`Which layer would you like to merge Layer ${this.id} with?`);
                                 if (layerId !== null) {
                                     let layer = this.parent.get(parseInt(layerId));
@@ -143,16 +149,15 @@ export default class {
                                         if (layerId === null) {
                                             return;
                                         }
-                
+
                                         layer = this.parent.get(parseInt(layerId));
                                     }
-                
+
                                     if (layer) {
                                         const layer = this.parent.get(layerId);
                                         if (layer) {
                                             const lines = this.lines;
                                             this.remove();
-                
                                             for (const line of lines) {
                                                 layer.push(line);
                                             }
@@ -161,16 +166,16 @@ export default class {
                                 }
                             }
                         }),
-                        this.parent.createElement("button", {
-                            innerText: "Delete",
+                        this.parent.createElement('button', {
+                            innerText: 'Delete',
+                            style: {
+                                color: 'crimson'
+                            },
                             click: () => {
                                 if (this.parent.cache.length <= 1) {
                                     alert("You must have at least one layer at all times!");
-                    
                                     return;
-                                }
-                    
-                                if (confirm(`Are you sure you\'d like to delete Layer ${this.id}?`)) {
+                                } else if (confirm(`Are you sure you\'d like to delete Layer ${this.id}?`)) {
                                     this.remove();
                                 }
                             }
@@ -180,14 +185,14 @@ export default class {
             ]
         });
 
-        this.parent.element.append(this.element);
+        this.parent.element.lastElementChild.before(this.element);
         this.element.scrollIntoView({
-            behavior: "smooth"
+            behavior: 'smooth',
+            block: 'nearest'
         });
 
-        this.base = document.querySelector(`g[data-id='${this.id}']`) ?? [...document.querySelectorAll("g:not([data-id])")].filter(element => element.parentElement.id === "view")[0] ?? document.createElementNS("http://www.w3.org/2000/svg", "g");
+        this.base = document.querySelector(`g[data-id='${this.id}']`) ?? [...document.querySelectorAll("g:not([data-id])")].filter(element => element.parentElement.id === 'view')[0] ?? document.createElementNS("http://www.w3.org/2000/svg", 'g');
         this.base.dataset.id = this.id;
-
         if (this.id === 1) {
             view.prepend(this.base);
         } else {
@@ -196,21 +201,10 @@ export default class {
 
         this.parent.cache.push(this);
     }
-    alpha = 1;
-    hidden = false;
-    lines = []
-    get opacity() {
-        return this.alpha;
-    }
-
-    set opacity(alpha) {
-        this.alpha = alpha;
-        this.base.style.setProperty("opacity", this.alpha);
-    }
 
     toggleVisiblity() {
         this.hidden = !this.hidden;
-        this.base.style.setProperty("visibility", this.hidden ? "hidden" : "unset");
+        this.base.style.setProperty('visibility', this.hidden ? 'hidden' : 'unset');
     }
 
     push(object) {
@@ -219,7 +213,7 @@ export default class {
     }
 
     move(newIndex) {
-        if (typeof newIndex !== "number" || newIndex === void 0 || this.id === newIndex) {
+        if (typeof newIndex != 'number' || newIndex === void 0 || this.id === newIndex) {
             throw new Error("Invalid index.");
         }
 
@@ -230,17 +224,15 @@ export default class {
                     layer.base.after(this.base);
                     layer.element.after(this.element);
                 }
-            } else {
-                if (layer.id === newIndex) {
-                    layer.base.before(this.base);
-                    layer.element.before(this.element);
-                }
+            } else if (layer.id === newIndex) {
+                layer.base.before(this.base);
+                layer.element.before(this.element);
             }
         });
 
         this.parent.insert(this, newIndex - 1);
         this.element.scrollIntoView({
-            behavior: "smooth"
+            behavior: 'smooth'
         });
     }
 
@@ -249,7 +241,7 @@ export default class {
             line.remove();
         }
 
-        this.lines = []
+        this.lines = [];
     }
 
     remove() {

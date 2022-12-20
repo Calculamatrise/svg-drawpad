@@ -1,15 +1,10 @@
 export default class {
-    constructor(parent) {
-        this.parent = parent;
-    }
-    _size = null;
-    active = false;
     get canvas() {
         return this.parent.canvas;
     }
 
     get mouse() {
-        return this.canvas.mouse;
+        return this.parent.canvas.mouse;
     }
 
     get size() {
@@ -20,11 +15,17 @@ export default class {
         this._size = size;
 
         this.init();
-        this.canvas.alert(this.parent.canvas.tools._selected.charAt(0).toUpperCase() + this.parent.canvas.tools._selected.slice(1) + " size - " + this.size);
+        this.parent.canvas.alert(this.parent.canvas.tools._selected.charAt(0).toUpperCase() + this.parent.canvas.tools._selected.slice(1) + " size - " + this.size);
+    }
+
+    _size = null;
+    active = false;
+    constructor(parent) {
+        this.parent = parent;
     }
 
     createElementNS(element, properties = {}) {
-        if (typeof element !== "string" || element === void 0) {
+        if (typeof element != 'string' || element === void 0) {
 			throw new Error("Invalid element! What were you thinking?");
 		} else if (typeof properties !== "object" || properties === void 0) {
 			throw new Error("Invalid property object! What were you thinking?");
@@ -32,15 +33,13 @@ export default class {
 
         element = document.createElementNS("http://www.w3.org/2000/svg", element);
         for (const property in properties) {
-            if (typeof properties[property] === "function") {
+            if (typeof properties[property] == 'function') {
                 throw new Error("Haven't gotten to this yet.");
-
-                continue;
-            } else if (property.toLowerCase() === "style" && typeof properties[property] === "object") {
+            } else if (property.toLowerCase() === 'style' && typeof properties[property] == 'object') {
                 for (const style in properties[property]) {
                     element.style.setProperty(style, properties[property][style]);
                 }
-                
+
                 continue;
             }
 

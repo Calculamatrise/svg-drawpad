@@ -11,14 +11,12 @@
     "theme_color": "#2b2b2b",
     "categories": [],
     "screenshots": [],
-    "icons": [
-        {
-            "src": "/favicon.ico"
-        },
-        {
-            "src": "/favicon.ico",
-            "type": "image/x-icon"
-        }
-    ],
+    "icons": [{
+        "src": "/favicon.ico"
+    },
+    {
+        "src": "/favicon.ico",
+        "type": "image/x-icon"
+    }],
     "shortcuts": []
 }
