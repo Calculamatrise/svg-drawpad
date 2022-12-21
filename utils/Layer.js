@@ -16,6 +16,17 @@ export default class {
         this.id = this.parent.cache.length + 1;
         this.element = this.parent.createElement('div', {
             class: 'layer selected',
+            mousemove(event) {
+                if ((event.buttons & 1) != 1) {
+                    // readjust position.
+                    this.style.setProperty('position', 'block');
+                    return;
+                }
+
+                // this.style.setProperty('position', 'absolute');
+                // this.style.setProperty('left', event.clientX + 'px');
+                // this.style.setProperty('top', event.clientY + 'px');
+            },
             mouseover(event) {
                 if (event.target.className !== this.className) {
                     return void this.style.setProperty('cursor', 'default');
