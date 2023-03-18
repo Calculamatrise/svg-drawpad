@@ -72,6 +72,7 @@ user-interface .left {
 
 user-interface .right {
 	right: 0;
+	text-align: right;
 }
 
 user-interface .top {

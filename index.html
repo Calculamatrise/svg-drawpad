@@ -11,7 +11,8 @@
     <meta property="og:description" content="A program that uses scalable vector graphics to create an image of your choosing.">
     <meta property="og:image" content="https://calculamatrise.github.io/icons/favicon.png">
     <meta property="og:url" content="https://calculamatrise.github.io/svg-drawpad/">
-    <script type="module" src="bootstrap.js" defer></script>
+	<meta name="viewport" content="minimal-ui,width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<script type="module" src="bootstrap.js" defer></script>
 </head>
 <body onload="
     primary.parentElement.style.setProperty('background-color', (primary.value = canvas.config.styles.primary) + '40');
@@ -20,7 +21,7 @@
 	container.style.setProperty('height', `calc(100% - ${document.querySelector('window-frame')?.getBoundingClientRect().height}px`);
 	window.dispatchEvent(new Event('resize'));
 ">
-    <window-frame>
+    <!-- <window-frame>
         <div data-position="left">
             <img src="favicon.ico">
             <label>SVG Drawpad</label>
@@ -30,7 +31,7 @@
             <button id="maximize" title="Maximize">▢</button>
             <button id="close" title="Close">⨉</button>
         </div>
-    </window-frame>
+    </window-frame> -->
     <main id="container">
         <svg id="view" xmlns="http://www.w3.org/2000/svg">Sorry, your browser does not support inline SVG.</svg>
         <user-interface>
