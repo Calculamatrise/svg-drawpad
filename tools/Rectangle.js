@@ -2,7 +2,7 @@ import Tool from "./Tool.js";
 
 export default class extends Tool {
     _size = 4;
-    element = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    element = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
     arc(anchorA, anchorB) {
         let points = []
         for (let i = 0; i < 1; i += this.segmentLength / 100) {
@@ -18,14 +18,14 @@ export default class extends Tool {
     roundedRect() {}
 
     press() {
-        this.element.style.setProperty("stroke", this.canvas.primary);
-        this.element.style.setProperty("fill", this.canvas.fill ? this.canvas.primary : "#FFFFFF00");
-        this.element.style.setProperty("stroke-width", this.size);
-        this.element.setAttribute("x", this.mouse.pointA.x);
-        this.element.setAttribute("y", this.mouse.pointA.y);
-        this.element.setAttribute("width", 1);
-        this.element.setAttribute("height", 1);
-        this.element.setAttribute("rx", .5);
+        this.element.style.setProperty('stroke', this.canvas.primary);
+        this.element.style.setProperty('fill', this.canvas.fill ? this.canvas.primary : "#FFFFFF00");
+        this.element.style.setProperty('stroke-width', this.size);
+        this.element.setAttribute('x', this.mouse.pointA.x);
+        this.element.setAttribute('y', this.mouse.pointA.y);
+        this.element.setAttribute('width', 1);
+        this.element.setAttribute('height', 1);
+        this.element.setAttribute('rx', .5);
 
         this.canvas.layer.base.appendChild(this.element);
     }
@@ -45,30 +45,21 @@ export default class extends Tool {
 
         const rectangle = this.element.cloneNode();
         rectangle.erase = function(event) {
-            const points = [
-                {
-                    x: +this.getAttribute("x"),
-                    y: +this.getAttribute("y")
-                },
-                {
-                    x: +this.getAttribute("x"),
-                    y: +this.getAttribute("y") + +this.getAttribute("height")
-                },
-                {
-                    x: +this.getAttribute("x") + +this.getAttribute("width"),
-                    y: +this.getAttribute("y") + +this.getAttribute("height")
-                },
-                {
-                    x: +this.getAttribute("x") + +this.getAttribute("width"),
-                    y: +this.getAttribute("y")
-                },
-                {
-                    x: +this.getAttribute("x"),
-                    y: +this.getAttribute("y")
-                }
-            ];
+            const points = [{
+                x: +this.getAttribute('x'),
+                y: +this.getAttribute('y')
+            }, {
+                x: +this.getAttribute('x'),
+                y: +this.getAttribute('y') + +this.getAttribute('height')
+            }, {
+                x: +this.getAttribute('x') + +this.getAttribute('width'),
+                y: +this.getAttribute('y') + +this.getAttribute('height')
+            }, {
+                x: +this.getAttribute('x') + +this.getAttribute('width'),
+                y: +this.getAttribute('y')
+            }];
 
-            return !!points.find((point, index, points) => {
+            return !!points.concat(points[0]).find((point, index, points) => {
                 if (!points[index - 1]) {
                     return false;
                 }
@@ -93,13 +84,13 @@ export default class extends Tool {
                     }
                 }
 
-                return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size && !this.remove();
+                return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 <= window.canvas.tool.size && !this.remove();
             });
         }
 
         this.canvas.layer.push(rectangle);
         this.canvas.events.push({
-            action: "add",
+            action: 'add',
             value: rectangle
         });
     }

@@ -3,15 +3,14 @@ import Tool from "./Tool.js";
 export default class extends Tool {
     _size = 4;
     segmentLength = 1;
-    element = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    element = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
     get polyline() {
-        const temp = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-        temp.style.setProperty("stroke", this.canvas.primary);
-        temp.style.setProperty("stroke-width", this.size);
+        const temp = document.createElementNS("http://www.w3.org/2000/svg", 'polyline');
+        temp.style.setProperty('stroke', this.canvas.primary);
+        temp.style.setProperty('stroke-width', this.size);
         temp.erase = function(event) {
-            const points = this.getAttribute("points").split(",").map(function(point) {
+            const points = this.getAttribute('points').split(',').map(function(point) {
                 const xAndY = point.split(/\s+/g);
-
                 return {
                     x: parseInt(xAndY[0]),
                     y: parseInt(xAndY[1])
@@ -54,7 +53,6 @@ export default class extends Tool {
                 len = Math.sqrt(res.x ** 2 + res.y ** 2);
                 if (len <= window.canvas.tool.size) {
                     this.remove();
-
                     return true;
                 }
 
@@ -70,44 +68,42 @@ export default class extends Tool {
             ]);
         }
 
-        temp.setAttribute("points", points.map(point => point.join(",")).join(" "));
-
+        temp.setAttribute('points', points.map(point => point.join(',')).join(' '));
         return temp;
     }
     
     get lines() {
         const lines = [];
         for (let i = 0; i <= 360; i += this.segmentLength) {
-            const temp = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            temp.style.setProperty("stroke", this.canvas.primary);
-            temp.style.setProperty("stroke-width", this.size);
-            temp.setAttribute("x1", this.mouse.pointA.x + this.radius * Math.cos(i * Math.PI / 180));
-            temp.setAttribute("y1", this.mouse.pointA.y + this.radius * Math.sin(i * Math.PI / 180));
-            temp.setAttribute("x2", this.mouse.pointA.x + this.radius * Math.cos((i + this.segmentLength) * Math.PI / 180));
-            temp.setAttribute("y2", this.mouse.pointA.y + this.radius * Math.sin((i + this.segmentLength) * Math.PI / 180));
+            const temp = document.createElementNS("http://www.w3.org/2000/svg", 'line');
+            temp.style.setProperty('stroke', this.canvas.primary);
+            temp.style.setProperty('stroke-width', this.size);
+            temp.setAttribute('x1', this.mouse.pointA.x + this.radius * Math.cos(i * Math.PI / 180));
+            temp.setAttribute('y1', this.mouse.pointA.y + this.radius * Math.sin(i * Math.PI / 180));
+            temp.setAttribute('x2', this.mouse.pointA.x + this.radius * Math.cos((i + this.segmentLength) * Math.PI / 180));
+            temp.setAttribute('y2', this.mouse.pointA.y + this.radius * Math.sin((i + this.segmentLength) * Math.PI / 180));
             temp.erase = function(event) {
                 let vector = {
-                    x: (+this.getAttribute("x2") - window.canvas.viewBox.x) - (+this.getAttribute("x1") - window.canvas.viewBox.x),
-                    y: (+this.getAttribute("y2") - window.canvas.viewBox.y) - (+this.getAttribute("y1") - window.canvas.viewBox.y)
+                    x: (+this.getAttribute('x2') - window.canvas.viewBox.x) - (+this.getAttribute('x1') - window.canvas.viewBox.x),
+                    y: (+this.getAttribute('y2') - window.canvas.viewBox.y) - (+this.getAttribute('y1') - window.canvas.viewBox.y)
                 }
-    
+
                 let len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
-                let b = (event.offsetX - (this.getAttribute("x1") - window.canvas.viewBox.x)) * (vector.x / len) + (event.offsetY - (this.getAttribute("y1") - window.canvas.viewBox.y)) * (vector.y / len);
+                let b = (event.offsetX - (this.getAttribute('x1') - window.canvas.viewBox.x)) * (vector.x / len) + (event.offsetY - (this.getAttribute('y1') - window.canvas.viewBox.y)) * (vector.y / len);
                 if (b >= len) {
-                    vector.x = event.offsetX - (this.getAttribute("x2") - window.canvas.viewBox.x);
-                    vector.y = event.offsetY - (this.getAttribute("y2") - window.canvas.viewBox.y);
+                    vector.x = event.offsetX - (this.getAttribute('x2') - window.canvas.viewBox.x);
+                    vector.y = event.offsetY - (this.getAttribute('y2') - window.canvas.viewBox.y);
                 } else {
                     let { x, y } = window.structuredClone(vector);
-                    vector.x = event.offsetX - (this.getAttribute("x1") - window.canvas.viewBox.x);
-                    vector.y = event.offsetY - (this.getAttribute("y1") - window.canvas.viewBox.y);
+                    vector.x = event.offsetX - (this.getAttribute('x1') - window.canvas.viewBox.x);
+                    vector.y = event.offsetY - (this.getAttribute('y1') - window.canvas.viewBox.y);
                     if (b > 0) {
                         vector.x -= x / len * b;
                         vector.y -= y / len * b;
                     }
                 }
-    
+
                 len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
-                
                 return len - +this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size && !this.remove();
             }
 
@@ -122,27 +118,26 @@ export default class extends Tool {
     }
 
     init() {
-        this.element.style.setProperty("stroke", this.canvas.primary);
-        this.element.style.setProperty("fill", this.canvas.fill ? this.canvas.primary : "#FFFFFF00");
-        this.element.style.setProperty("stroke-width", this.size);
-        this.element.setAttribute("r", this.radius);
-        this.element.setAttribute("cx", this.mouse.pointA.x);
-        this.element.setAttribute("cy", this.mouse.pointA.y);
+        this.element.style.setProperty('stroke', this.canvas.primary);
+        this.element.style.setProperty('fill', this.canvas.fill ? this.canvas.primary : '#FFFFFF00');
+        this.element.style.setProperty('stroke-width', this.size);
+        this.element.setAttribute('r', this.radius);
+        this.element.setAttribute('cx', this.mouse.pointA.x);
+        this.element.setAttribute('cy', this.mouse.pointA.y);
     }
 
     press() {
-        this.element.style.setProperty("stroke", this.canvas.primary);
-        this.element.style.setProperty("fill", this.canvas.fill ? this.canvas.primary : "#FFFFFF00");
-        this.element.style.setProperty("stroke-width", this.size);
-        this.element.setAttribute("cx", this.mouse.pointA.x);
-        this.element.setAttribute("cy", this.mouse.pointA.y);
-        this.element.setAttribute("r", 1);
-        
+        this.element.style.setProperty('stroke', this.canvas.primary);
+        this.element.style.setProperty('fill', this.canvas.fill ? this.canvas.primary : '#FFFFFF00');
+        this.element.style.setProperty('stroke-width', this.size);
+        this.element.setAttribute('cx', this.mouse.pointA.x);
+        this.element.setAttribute('cy', this.mouse.pointA.y);
+        this.element.setAttribute('r', 1);
         this.canvas.layer.base.appendChild(this.element);
     }
 
     stroke() {
-        this.element.setAttribute("r", this.radius);
+        this.element.setAttribute('r', this.radius);
     }
 
     clip() {
@@ -154,12 +149,12 @@ export default class extends Tool {
         const circle = this.element.cloneNode();
         circle.erase = function(event) {
             let vector = {
-                x: this.getAttribute("cx") - window.canvas.viewBox.x - event.offsetX,
-                y: this.getAttribute("cy") - window.canvas.viewBox.y - event.offsetY
+                x: this.getAttribute('cx') - window.canvas.viewBox.x - event.offsetX,
+                y: this.getAttribute('cy') - window.canvas.viewBox.y - event.offsetY
             }
 
-            let len = Math.abs(Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.getAttribute("r"));
-            return len - this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size && (window.canvas.tool.size <= len + this.style.getPropertyValue("stroke-width") / 2 || this.getAttribute("r") < window.canvas.tool.size) && !this.remove();
+            let len = Math.abs(Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.getAttribute('r'));
+            return len - this.style.getPropertyValue('stroke-width') / 2 <= window.canvas.tool.size && (window.canvas.tool.size <= len + this.style.getPropertyValue('stroke-width') / 2 || this.getAttribute("r") < window.canvas.tool.size) && !this.remove();
         }
 
         this.canvas.layer.push(circle);

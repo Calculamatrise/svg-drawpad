@@ -1,10 +1,7 @@
-export default class {
-	constructor(parent) {
-		this.parent = parent;
-	}
-	isDown = false;
-	isAlternate = false;
-	#events = new Map();
+import EventEmitter from "../utils/EventEmitter.js";
+
+export default class extends EventEmitter {
+	down = false;
 	pointA = {
 		x: -50,
 		y: -50
@@ -17,92 +14,82 @@ export default class {
 		x: -50,
 		y: -50
 	}
+	constructor(parent) {
+		super();
+		this.parent = parent;
+	}
+
+	get isAlternate() {
+		return this.down && (event.buttons & 1) != 1;
+	}
+
+	get locked() {
+		return document.pointerLockElement === this.canvas;
+	}
+
 	get position() {
+		return this.getPosition({
+			offsetX: this.real.x,
+			offsetY: this.real.y
+		});
+	}
+
+	getPosition(event = event) {
 		return {
-			x: (this.real.x * this.parent.zoom) + this.parent.viewBox.x,
-			y: (this.real.y * this.parent.zoom) + this.parent.viewBox.y
+			x: ((event.offsetX * this.parent.zoom) + this.parent.viewBox.x),
+			y: ((event.offsetY * this.parent.zoom) + this.parent.viewBox.y)
 		}
 	}
 
 	init() {
-		document.addEventListener("pointerdown", this.down.bind(this));
-		document.addEventListener("pointermove", this.move.bind(this));
-		document.addEventListener("pointerup", this.up.bind(this));
-		document.addEventListener("wheel", this.wheel.bind(this), {
-            passive: false
-        });
-		document.addEventListener("touchcancel", this.touchCancel.bind(this));
+		document.addEventListener('pointerdown', this.pointerdown = this.pointerdown.bind(this));
+		document.addEventListener('pointermove', this.move = this.move.bind(this));
+		document.addEventListener('pointerup', this.up = this.up.bind(this));
+		document.addEventListener('touchcancel', this.touchcancel = this.touchcancel.bind(this));
+		document.addEventListener('wheel', this.wheel = this.wheel.bind(this), { passive: false });
 	}
 
-	on(event, method) {
-		this.#events.set(event, method);
-	}
-
-	emit(event, ...args) {
-		if (!this.#events.has(event)) {
-			return;
-		}
-
-		return this.#events.get(event)(...args);
-	}
-
-	down(event) {
-		if (event.target.id !== "container") {
-			return;
-		} else if (this.isDown) {
-            return;
-        }
-
-		if (layers.style.display !== "none") {
-			layers.style.display = "none";
-		}
-
+	pointerdown(event) {
 		event.preventDefault();
-
-		this.isAlternate = !!event.button;
-		this.isDown = true;
-		this.real = {
-			x: event.offsetX,
-			y: event.offsetY
+		if (event.target.id !== 'container') return;
+		if (layers.style.display !== 'none') {
+			layers.style.display = 'none';
 		}
 
-		this.pointA = {
-			x: (event.offsetX * this.parent.zoom) + this.parent.viewBox.x,
-			y: (event.offsetY * this.parent.zoom) + this.parent.viewBox.y
+		this.down = true;
+		if (!this.locked) {
+			this.pointA = this.getPosition(event);
+			this.real = {
+				x: event.offsetX,
+				y: event.offsetY
+			}
+
+			this.parent.view.setPointerCapture(event.pointerId);
 		}
 
-		return this.emit("down", event);
+		return this.emit('down', event);
 	}
 
 	move(event) {
-		if (event.target.id !== "container") {
-			return;
-		}
-
 		event.preventDefault();
-
 		this.real = {
 			x: event.offsetX,
 			y: event.offsetY
 		}
 
-		return this.emit("move", event);
+		return this.emit('move', event);
 	}
 
 	up(event) {
-		if (event.target.id !== "container") {
-			return;
-		}
-
 		event.preventDefault();
-
-		this.isDown = false;
-		this.pointB = {
-			x: (event.offsetX * this.parent.zoom) + this.parent.viewBox.x,
-			y: (event.offsetY * this.parent.zoom) + this.parent.viewBox.y
+		if (event.target.id !== 'view') return;
+		this.down = false;
+		if (!this.locked) {
+			this.pointB = this.getPosition(event);
+			this.parent.view.releasePointerCapture(event.pointerId);
 		}
 
-		return this.emit("up", event);
+		return this.emit('up', event);
 	}
 
 	wheel(event) {
@@ -110,25 +97,14 @@ export default class {
 		event.stopPropagation();
 		if (event.ctrlKey) {
 			if (event.deltaY < 0) {
-				if (this.parent.zoom <= 1) {
-					return;
+				if (this.parent.zoom > 1) {
+					this.parent.zoom -= this.parent.zoomIncrementValue;
 				}
-
-				this.parent.zoom -= this.parent.zoomIncrementValue;
-
-				this.parent.view.setAttribute("viewBox", `${this.parent.viewBox.x + (this.parent.viewBox.width - window.innerWidth * this.parent.zoom) / 2} ${this.parent.viewBox.y + (this.parent.viewBox.height - window.innerHeight * this.parent.zoom) / 2} ${window.innerWidth * this.parent.zoom} ${window.innerHeight * this.parent.zoom}`);
-				this.parent.text.setAttribute("y", 25 + this.parent.viewBox.y);
-			} else {
-				if (this.parent.zoom >= 10) {
-					return;
-				}
-
+			} else if (this.parent.zoom < 10) {
 				this.parent.zoom += this.parent.zoomIncrementValue;
-
-				this.parent.view.setAttribute("viewBox", `${this.parent.viewBox.x - (window.innerWidth * this.parent.zoom - this.parent.viewBox.width) / 2} ${this.parent.viewBox.y - (window.innerHeight * this.parent.zoom - this.parent.viewBox.height) / 2} ${window.innerWidth * this.parent.zoom} ${window.innerHeight * this.parent.zoom}`);
-				this.parent.text.setAttribute("y", 25 + this.parent.viewBox.y);
 			}
 
+			window.dispatchEvent(new Event('resize'));
 			return;
 		}
 
@@ -139,7 +115,6 @@ export default class {
 		}
 
 		this.parent.tool.size -= event.deltaY / 100;
-
 		// const zoom = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--size"));
 		// if (event.deltaY > 0 && zoom >= 100 || event.deltaY < 0 && zoom < 1) {
 		// 	return;
@@ -148,13 +123,15 @@ export default class {
 		// document.documentElement.style.setProperty("--size", zoom + event.deltaY / 1000);
 	}
 
-	touchCancel(event) {
-		this.isDown = false;
+	touchcancel(event) {
+		this.down = false;
 	}
 
 	close() {
-		document.removeEventListener("pointerdown", this.down.bind(this));
-		document.removeEventListener("pointermove", this.move.bind(this));
-		document.removeEventListener("pointerup", this.up.bind(this));
+		document.removeEventListener('pointerdown', this.pointerdown);
+		document.removeEventListener('pointermove', this.move);
+		document.removeEventListener('pointerup', this.up);
+		document.removeEventListener('touchcancel', this.touchcancel);
+		document.removeEventListener('wheel', this.wheel);
 	}
 }

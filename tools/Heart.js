@@ -4,28 +4,26 @@ export default class extends Tool {
     _size = 4;
     color = null;
     segmentLength = 5;
-    element = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    element = document.createElementNS("http://www.w3.org/2000/svg", 'polyline');
     get width() {        
         return Math.sqrt((this.mouse.position.x - this.mouse.pointA.x) ** 2);
     }
 
-    get height() {        
+    get height() {
         return Math.sqrt((this.mouse.position.y - this.mouse.pointA.y) ** 2);
     }
 
     init() {
-        this.element.style.setProperty("stroke", this.color = this.canvas.primary);
-        this.element.style.setProperty("fill", this.canvas.fill ? this.canvas.primary : "#FFFFFF00");
-        this.element.style.setProperty("stroke-width", this.size);
+        this.element.style.setProperty('stroke', this.color = this.canvas.primary);
+        this.element.style.setProperty('fill', this.canvas.fill ? this.canvas.primary : "#FFFFFF00");
+        this.element.style.setProperty('stroke-width', this.size);
     }
 
     bezier(t, p0, p1, p2, p3) {
         let cX = 3 * (p1.x - p0.x);
         let bX = 3 * (p2.x - p1.x) - cX;
-      
         let cY = 3 * (p1.y - p0.y);
         let bY = 3 * (p2.y - p1.y) - cY;
-
         return [
             ((p3.x - p0.x - cX - bX) * Math.pow(t, 3)) + (bX * Math.pow(t, 2)) + (cX * t) + p0.x,
             ((p3.y - p0.y - cY - bY) * Math.pow(t, 3)) + (bY * Math.pow(t, 2)) + (cY * t) + p0.y
@@ -85,43 +83,70 @@ export default class extends Tool {
         }
 
         points.push(points[0]);
-
         return points;
     }
 
     press() {
-        this.element.style.setProperty("stroke", this.canvas.primary);
-        this.element.style.setProperty("fill", this.canvas.fill ? this.canvas.primary : "#FFFFFF00");
-        this.element.style.setProperty("stroke-width", this.size);
-        this.element.setAttribute("points", `${this.mouse.pointA.x},${this.mouse.pointA.y}`);
-
+        this.element.style.setProperty('stroke', this.canvas.primary);
+        this.element.style.setProperty('fill', this.canvas.fill ? this.canvas.primary : "#FFFFFF00");
+        this.element.style.setProperty('stroke-width', this.size);
+        this.element.setAttribute('points', `${this.mouse.pointA.x},${this.mouse.pointA.y}`);
         this.canvas.layer.base.appendChild(this.element);
     }
 
     stroke() {
-        this.element.style.setProperty("stroke-width", this.size);
-        this.element.setAttribute("points", this.drawHeart(this.mouse.pointA.x, Math.min(this.mouse.position.y, this.mouse.pointA.y), this.width, this.height));
+        this.element.style.setProperty('stroke-width', this.size);
+        this.element.setAttribute('points', this.drawHeart(this.mouse.pointA.x, Math.min(this.mouse.position.y, this.mouse.pointA.y), this.width, this.height));
     }
-    
+
     clip() {
         this.element.remove();
         if (this.mouse.pointA.x === this.mouse.pointB.x && this.mouse.pointA.y === this.mouse.pointB.y) {
             return;
         }
-        
+
         const temp = this.element.cloneNode();
         temp.erase = function(event) {
-            let vector = {
-                x: this.getAttribute("cx") - window.canvas.viewBox.x - event.offsetX,
-                y: this.getAttribute("cy") - window.canvas.viewBox.y - event.offsetY
-            }
+            const points = this.getAttribute('points').split(/\s+/g).map(function(point) {
+                const [x, y] = point.split(',').map(value => +value);
+                return {
+                    x,
+                    y
+                }
+            });
 
-            return Math.sqrt(vector.x ** 2 / (+this.getAttribute("rx") + this.style.getPropertyValue("stroke-width") / 2 + window.canvas.tool.size) ** 2 + vector.y ** 2 / (+this.getAttribute("ry") + this.style.getPropertyValue("stroke-width") / 2 + window.canvas.tool.size) ** 2) <= 1 && (Math.sqrt(vector.x ** 2 / (+this.getAttribute("rx") - this.style.getPropertyValue("stroke-width") / 2 - window.canvas.tool.size) ** 2 + vector.y ** 2 / (+this.getAttribute("ry") - this.style.getPropertyValue("stroke-width") / 2 - window.canvas.tool.size) ** 2) >= 1 || this.getAttribute("rx") < window.canvas.tool.size || this.getAttribute("ry") < window.canvas.tool.size) && !this.remove();
+            return !!points.find((point, index, points) => {
+                if (!points[index - 1]) {
+                    return false;
+                }
+
+                let vector = {
+                    x: points[index - 1].x - window.canvas.viewBox.x - point.x - window.canvas.viewBox.x,
+                    y: points[index - 1].y - window.canvas.viewBox.y - point.y - window.canvas.viewBox.y
+                }
+
+                let len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
+                let b = -(point.x - window.canvas.viewBox.x - event.offsetX) * (vector.x / len) - (point.y - window.canvas.viewBox.y - event.offsetY) * (vector.y / len);
+                if (b >= len) {
+                    vector.x = points[index - 1].x - window.canvas.viewBox.x - event.offsetX;
+                    vector.y = points[index - 1].y - window.canvas.viewBox.y - event.offsetY;
+                } else {
+                    let { x, y } = window.structuredClone(vector);
+                    vector.x = point.x - window.canvas.viewBox.x - event.offsetX;
+                    vector.y = point.y - window.canvas.viewBox.y - event.offsetY;
+                    if (b > 0) {
+                        vector.x += x / len * b;
+                        vector.y += y / len * b;
+                    }
+                }
+
+                return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 <= window.canvas.tool.size && !this.remove();
+            });
         }
 
         this.canvas.layer.push(temp);
         this.canvas.events.push({
-            action: "add",
+            action: 'add',
             value: temp
         });
     }

@@ -13,7 +13,6 @@ export default class {
 
     set size(size) {
         this._size = size;
-
         this.init();
         this.parent.canvas.alert(this.parent.canvas.tools._selected.charAt(0).toUpperCase() + this.parent.canvas.tools._selected.slice(1) + " size - " + this.size);
     }

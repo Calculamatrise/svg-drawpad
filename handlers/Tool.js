@@ -32,11 +32,8 @@ export default class {
 		this.canvas.view.parentElement.style.cursor = this._selected === 'camera' ? 'move' : 'default';
         this.canvas.alert(this._selected.charAt(0).toUpperCase() + this._selected.slice(1));
 
-        const primary = this.canvas.container.querySelector('#primary');
-        const secondary = this.canvas.container.querySelector('#secondary');
-        const display = /^(brush|c(urve|ircle)|ellipse|line|rectangle)$/.test(toolName.toLowerCase()) ? 'flex' : 'none';
-        primary.parentElement.style.setProperty('display', display);
-        secondary.parentElement.style.setProperty('display', display);
+        const colours = this.canvas.container.querySelector('section.bottom.left');
+        colours !== null && colours.style[(/^(brush|c(urve|ircle)|ellipse|line|rectangle)$/.test(toolName.toLowerCase()) ? 'remove' : 'set') + 'Property']('display', 'none');
     }
 
     _selected = 'line';

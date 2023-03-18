@@ -5,11 +5,11 @@ import ToolHandler from "../handlers/Tool.js";
 
 let parser = new DOMParser();
 export default class {
-    get container() {
+	get container() {
 		return this.view.parentElement || document.querySelector('#container');
 	}
 
-    get fill() {
+	get fill() {
 		return this.#fill;
 	}
 
@@ -19,7 +19,7 @@ export default class {
 		this.#fill = boolean;
 	}
 
-    get layer() {
+	get layer() {
 		return this.layers.get(this.#layer);
 	}
 
@@ -28,7 +28,7 @@ export default class {
 	}
 
 	set layerDepth(layer) {
-        this.alert('Layer' + layer);
+		this.alert('Layer' + layer);
 		this.#layer = layer;
 	}
 
@@ -40,7 +40,7 @@ export default class {
 		return this.config.styles.primary;
 	}
 
-    get tool() {
+	get tool() {
 		return this.tools.selected;
 	}
 
@@ -54,92 +54,85 @@ export default class {
 		}
 	}
 
-    set viewBox(value) {
-        let viewBox = this.viewBox;
-		this.view.setAttribute("viewBox", `${value.x || viewBox.x} ${value.y || viewBox.y} ${value.width || viewBox.width} ${value.height || viewBox.height}`);
+	set viewBox(value) {
+		let viewBox = this.viewBox;
+		this.view.setAttribute('viewBox', `${value.x || viewBox.x} ${value.y || viewBox.y} ${value.width || viewBox.width} ${value.height || viewBox.height}`);
 	}
 
-    alerts = [];
+	#fill = false;
+	#layer = 1;
+	alerts = [];
+	config = new Proxy(Object.assign({
+		randomizeStyle: false,
+		styles: {
+			primary: '#87Ceeb',
+			secondary: '#967bb6'
+		},
+		theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+	}, JSON.parse(localStorage.getItem('svg-drawpad-settings'))), {
+		get(target, key) {
+			if (typeof target[key] == 'object' && target[key] !== null) {
+				return new Proxy(target[key], this);
+			}
+
+			return target[key];
+		},
+		set: (...args) => {
+			Reflect.set(...args);
+			localStorage.setItem('svg-drawpad-settings', JSON.stringify(this.config));
+			return true;
+		},
+		deleteProperty: (...args) => {
+			Reflect.deleteProperty(...args);
+			localStorage.setItem('svg-drawpad-settings', JSON.stringify(this.config));
+			return true;
+		}
+	});
+	events = new EventHandler();
+	layers = new LayerHandler(this);
+	mouse = new MouseHandler(this);
+	text = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+	tools = new ToolHandler(this);
 	zoom = 1;
 	zoomIncrementValue = 0.5;
-	#layer = 1;
-	#fill = false;
-	events = new EventHandler();
-    layers = new LayerHandler(this);
-	mouse = new MouseHandler(this);
-	tools = new ToolHandler(this);
-	text = document.createElementNS("http://www.w3.org/2000/svg", 'text');
-    config = new Proxy(Object.assign({
-        randomizeStyle: false,
-        styles: {
-            primary: '#87Ceeb',
-            secondary: '#967bb6'
-        },
-        theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    }, JSON.parse(localStorage.getItem('svg-drawpad-settings'))), {
-        get(target, key) {
-            if (typeof target[key] == 'object' && target[key] !== null) {
-                return new Proxy(target[key], this);
-            }
-
-            return target[key];
-        },
-        set: (...args) => {
-            Reflect.set(...args);
-            localStorage.setItem('svg-drawpad-settings', JSON.stringify(this.config));
-            return true;
-        },
-        deleteProperty: (...args) =>  {
-            Reflect.deleteProperty(...args);
-            localStorage.setItem('svg-drawpad-settings', JSON.stringify(this.config));
-            return true;
-        }
-    });
-
 	constructor(view) {
 		this.view = view;
-        let { width, height } = view.getBoundingClientRect();
+		let { width, height } = view.getBoundingClientRect();
 		this.view.style.setProperty('stroke-linecap', 'round');
-        this.view.style.setProperty('stroke-linejoin', 'round');
+		this.view.style.setProperty('stroke-linejoin', 'round');
 		this.view.setAttribute('viewBox', `0 0 ${width} ${height}`);
 
 		this.layers.create();
-
-		this.mouse.init();
+		this.mouse.init(this.view);
 		this.mouse.on('down', this.press.bind(this));
 		this.mouse.on('move', this.stroke.bind(this));
 		this.mouse.on('up', this.clip.bind(this));
 
-		window.addEventListener('resize', this.resize.bind(this));
 		document.addEventListener('keydown', this.keydown.bind(this));
+		window.addEventListener('resize', this.resize.bind(this));
 	}
 
-    alert(text, timeout) {
-        // let label = document.createElementNS("http://www.w3.org/2000/svg", 'text');
-        clearTimeout(this.text.timeout);
-
+	alert(text, timeout) {
+		// let label = document.createElementNS("http://www.w3.org/2000/svg", 'text');
+		clearTimeout(this.text.timeout);
 		this.text.innerHTML = text;
 		this.text.setAttribute('x', this.viewBox.width / 2 + this.viewBox.x - this.text.innerHTML.length * 2.5);
 		this.text.setAttribute('y', 25 + this.viewBox.y);
-		this.text.setAttribute('fill', '#' + (this.config.theme == 'dark' ? 'fbfbfb': '1b1b1b'));
+		this.text.setAttribute('fill', '#' + (this.config.theme == 'dark' ? 'fbfbfb' : '1b1b1b'));
 		this.text.timeout = setTimeout(() => this.text.remove(), timeout ?? 2e3);
+		this.view.appendChild(this.text);
+		// this.alerts.push(label);
 
-        this.view.appendChild(this.text);
-        // this.alerts.push(label);
-
-        return text;
-    }
+		return text;
+	}
 
 	import(data) {
+		this.close();
 		try {
-			this.close();
-
-			let newView = parser.parseFromString(data, 'text/xml').querySelector('svg');
-			this.view.innerHTML = newView.innerHTML;
-
+			this.view.innerHTML = parser.parseFromString(data, 'text/xml').querySelector('svg').innerHTML;
 			let layerId = 1;
-			while(true) {
-				if ([...document.querySelectorAll("g:not([data-id])")].filter(element => element.parentElement.id === 'view').length < 1) {
+			while (true) {
+				if ([...document.querySelectorAll('g:not([data-id])')].filter(element => element.parentElement.id === 'view').length < 1) {
 					break;
 				}
 
@@ -148,22 +141,25 @@ export default class {
 			}
 
 			this.layerDepth = this.layers.cache.length;
-		} catch(error) {
+		} catch (error) {
 			console.error(error);
 		}
 	}
 
 	resize(event) {
-		let boundingRect = this.view.getBoundingClientRect();
-		this.view.setAttribute('viewBox', `0 0 ${boundingRect.width} ${boundingRect.height}`);
-		this.text.setAttribute('x', boundingRect.width / 2 + this.viewBox.x - this.text.innerHTML.length * 2.5);
+		let { width, height } = this.view.getBoundingClientRect();
+		height *= this.zoom;
+		width *= this.zoom;
+		this.view.setAttribute('viewBox', `${this.viewBox.x + (this.viewBox.width - width) / 2} ${this.viewBox.y + (this.viewBox.height - height) / 2} ${width} ${height}`);
+		// this.view.setAttribute('viewBox', `0 0 ${boundingRect.width} ${boundingRect.height}`);
+		this.text.setAttribute('x', this.viewBox.width / 2 + this.viewBox.x - this.text.innerHTML.length * 2.5);
 		this.text.setAttribute('y', 25 + this.viewBox.y);
 	}
 
 	undo() {
 		const event = this.events.pop();
 		if (event) {
-			switch(event.action) {
+			switch (event.action) {
 				case 'add':
 					event.value.remove();
 					break;
@@ -173,25 +169,25 @@ export default class {
 					break;
 
 				case 'move_selected':
-					event.data.selected.map(function(line, index) {
+					event.data.selected.map(function (line, index) {
 						let type = parseInt(line.getAttribute('x')) ? 0 : parseInt(line.getAttribute('x1')) ? 1 : parseInt(line.getAttribute('cx')) ? 2 : parseInt(line.getAttribute('points')) ? 3 : NaN;
 						if (isNaN(type)) {
 							return;
 						}
 
-						switch(type) {
+						switch (type) {
 							case 0:
 								line.setAttribute('x', event.data.cache[index].getAttribute('x'));
 								line.setAttribute('y', event.data.cache[index].getAttribute('y'));
 								break;
-		
+
 							case 1:
 								line.setAttribute('x1', event.data.cache[index].getAttribute('x1'));
 								line.setAttribute('y1', event.data.cache[index].getAttribute('y1'));
 								line.setAttribute('x2', event.data.cache[index].getAttribute('x2'));
 								line.setAttribute('y2', event.data.cache[index].getAttribute('y2'));
 								break;
-		
+
 							case 2:
 								line.setAttribute('cx', event.data.cache[index].getAttribute('cx'));
 								line.setAttribute('cy', event.data.cache[index].getAttribute('cy'));
@@ -214,7 +210,7 @@ export default class {
 	redo() {
 		const event = this.events.cache.pop();
 		if (event) {
-			switch(event.action) {
+			switch (event.action) {
 				case 'add':
 					this.view.prepend(event.value);
 					break;
@@ -224,25 +220,25 @@ export default class {
 					break;
 
 				case 'move_selected':
-					event.data.selected.map(function(line, index) {
+					event.data.selected.map(function (line, index) {
 						let type = parseInt(line.getAttribute('x')) ? 0 : parseInt(line.getAttribute('x1')) ? 1 : parseInt(line.getAttribute('cx')) ? 2 : parseInt(line.getAttribute('points')) ? 3 : NaN;
 						if (isNaN(type)) {
 							return;
 						}
-		
-						switch(type) {
+
+						switch (type) {
 							case 0:
 								line.setAttribute('x', event.data.secondaryCache[index].getAttribute('x'));
 								line.setAttribute('y', event.data.secondaryCache[index].getAttribute('y'));
 								break;
-		
+
 							case 1:
 								line.setAttribute('x1', event.data.secondaryCache[index].getAttribute('x1'));
 								line.setAttribute('y1', event.data.secondaryCache[index].getAttribute('y1'));
 								line.setAttribute('x2', event.data.secondaryCache[index].getAttribute('x2'));
 								line.setAttribute('y2', event.data.secondaryCache[index].getAttribute('y2'));
 								break;
-		
+
 							case 2:
 								line.setAttribute('cx', event.data.secondaryCache[index].getAttribute('cx'));
 								line.setAttribute('cy', event.data.secondaryCache[index].getAttribute('cy'));
@@ -263,31 +259,26 @@ export default class {
 	}
 
 	press(event) {
-        let ui = this.container.querySelector('user-interface');
-        if (ui !== null) {
-            ui.style.setProperty('pointer-events', 'none');
-        }
-
 		if (event.button === 1) {
-            let arr = Array.from(this.tools.cache.keys());
-            let index = (arr.indexOf(this.tools._selected) ?? -1) + 1;
-            let select = arr[index >= arr.length ? 0 : index];
-            return void this.tools.select(select);
+			let arr = Array.from(this.tools.cache.keys());
+			let index = (arr.indexOf(this.tools._selected) ?? -1) + 1;
+			let select = arr[index >= arr.length ? 0 : index];
+			return void this.tools.select(select);
 		} else if (event.button === 2 || this.mouse.isAlternate) {
-            return;
-        } else if (event.shiftKey) {
-            return void this.alert('Camera');
-        }
+			return;
+		} else if (event.shiftKey) {
+			return void this.alert('Camera');
+		}
 
-        if (event.ctrlKey) {
-            this.tools.select('select');
-        }
+		if (event.ctrlKey) {
+			this.tools.select('select');
+		}
 
-        this.tools.selected.press(event);
+		this.tools.selected.press(event);
 	}
 
 	stroke(event) {
-		if (this.mouse.isDown && !this.mouse.isAlternate) {	
+		if (this.mouse.down && !this.mouse.isAlternate) {
 			if (event.shiftKey) {
 				this.tools.cache.get('camera').stroke(event);
 				return;
@@ -302,11 +293,6 @@ export default class {
 	}
 
 	clip(event) {
-        let ui = this.container.querySelector('user-interface');
-        if (ui !== null) {
-            ui.style.removeProperty('pointer-events');
-        }
-
 		if (!this.mouse.isAlternate) {
 			this.tools.selected.clip(event);
 		}
@@ -315,21 +301,21 @@ export default class {
 	keydown(event) {
 		event.preventDefault();
 		event.stopPropagation();
-		switch(event.key) {
+		switch (event.key) {
 			case 'Escape':
 				if (layers.style.display !== 'none') {
 					layers.style.setProperty('display', 'none');
 					break;
 				}
-	
-                let settings = document.querySelector('#settings');
-                if (settings === null) {
-                    break;
-                }
+
+				let settings = document.querySelector('#settings');
+				if (settings === null) {
+					break;
+				}
 
 				settings.style.setProperty('display', settings.style.display === 'flex' ? 'none' : 'flex');
 				break;
-			
+
 			case '+':
 			case '=':
 				if (this.tools._selected === 'camera' || event.ctrlKey) {
@@ -338,19 +324,16 @@ export default class {
 					}
 
 					this.zoom -= this.zoomIncrementValue;
-
-					this.view.setAttribute('viewBox', `${this.viewBox.x + (this.viewBox.width - window.innerWidth * this.zoom) / 2} ${this.viewBox.y + (this.viewBox.height - window.innerHeight * this.zoom) / 2} ${window.innerWidth * this.zoom} ${window.innerHeight * this.zoom}`);
-					this.text.setAttribute('y', 25 + this.viewBox.y);
-
+					window.dispatchEvent(new Event('resize'));
 					this.tools.selected.init();
 					break;
 				}
 
 				if (this.tools.selected.size < 100) {
-                    this.tools.selected.size += 1;
+					this.tools.selected.size += 1;
 				}
 				break;
-				
+
 			case "-":
 				if (this.tools._selected === 'camera' || event.ctrlKey) {
 					if (this.zoom >= 10) {
@@ -358,10 +341,7 @@ export default class {
 					}
 
 					this.zoom += this.zoomIncrementValue;
-
-					this.view.setAttribute('viewBox', `${this.viewBox.x - (window.innerWidth * this.zoom - this.viewBox.width) / 2} ${this.viewBox.y - (window.innerHeight * this.zoom - this.viewBox.height) / 2} ${window.innerWidth * this.zoom} ${window.innerHeight * this.zoom}`);
-					this.text.setAttribute('y', 25 + this.viewBox.y);
-
+					window.dispatchEvent(new Event('resize'));
 					this.tools.selected.init();
 					break;
 				}
@@ -404,7 +384,7 @@ export default class {
 					if (!event.shiftKey) {
 						break;
 					}
-	
+
 					this.layers.create();
 				}
 
