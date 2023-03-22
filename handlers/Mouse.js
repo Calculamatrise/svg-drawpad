@@ -2,23 +2,17 @@ import EventEmitter from "../utils/EventEmitter.js";
 
 export default class extends EventEmitter {
 	down = false;
-	pointA = {
-		x: -50,
-		y: -50
+	position = {
+		x: 0,
+		y: 0,
+		toCanvas(canvas) {
+			return {
+				x: (this.x + canvas.viewBox.x) / canvas.zoom,
+				y: (this.y + canvas.viewBox.y) / canvas.zoom
+			}
+		}
 	}
-	pointB = {
-		x: -50,
-		y: -50
-	}
-	real = {
-		x: -50,
-		y: -50
-	}
-	constructor(parent) {
-		super();
-		this.parent = parent;
-	}
-
+	old = Object.assign({}, this.position);
 	get isAlternate() {
 		return this.down && (event.buttons & 1) != 1;
 	}
@@ -27,72 +21,42 @@ export default class extends EventEmitter {
 		return document.pointerLockElement === this.canvas;
 	}
 
-	get position() {
-		return this.getPosition({
-			offsetX: this.real.x,
-			offsetY: this.real.y
-		});
+	init(target = document) {
+		target.addEventListener('pointerdown', this.pointerdown = this.pointerdown.bind(this, target));
+		target.addEventListener('pointermove', this.move = this.move.bind(this, target));
+		target.addEventListener('pointerup', this.up = this.up.bind(this, target));
+		target.addEventListener('touchcancel', this.touchcancel = this.touchcancel.bind(this, target));
+		target.addEventListener('wheel', this.wheel = this.wheel.bind(this, target), { passive: false });
+		this.close = this.close.bind(this, target);
 	}
 
-	getPosition(event = event) {
-		return {
-			x: ((event.offsetX * this.parent.zoom) + this.parent.viewBox.x),
-			y: ((event.offsetY * this.parent.zoom) + this.parent.viewBox.y)
-		}
-	}
-
-	init() {
-		document.addEventListener('pointerdown', this.pointerdown = this.pointerdown.bind(this));
-		document.addEventListener('pointermove', this.move = this.move.bind(this));
-		document.addEventListener('pointerup', this.up = this.up.bind(this));
-		document.addEventListener('touchcancel', this.touchcancel = this.touchcancel.bind(this));
-		document.addEventListener('wheel', this.wheel = this.wheel.bind(this), { passive: false });
-	}
-
-	pointerdown(event) {
+	pointerdown(target, event) {
 		event.preventDefault();
-		if (event.target.id !== 'container') return;
-		if (layers.style.display !== 'none') {
-			layers.style.display = 'none';
-		}
-
+		layers.style.display !== 'none' && layers.style.setProperty('display', 'none');
 		this.down = true;
-		if (!this.locked) {
-			this.pointA = this.getPosition(event);
-			this.real = {
-				x: event.offsetX,
-				y: event.offsetY
-			}
-
-			this.parent.view.setPointerCapture(event.pointerId);
-		}
-
-		return this.emit('down', event);
+		this.locked || (this.position.x = event.offsetX,
+		this.position.y = event.offsetY,
+		this.old = Object.assign({}, this.position),
+		target.setPointerCapture(event.pointerId));
+		this.emit('down', event);
 	}
 
-	move(event) {
+	move(target, event) {
 		event.preventDefault();
-		this.real = {
-			x: event.offsetX,
-			y: event.offsetY
-		}
-
-		return this.emit('move', event);
+		this.position.x = event.offsetX;
+		this.position.y = event.offsetY;
+		this.emit('move', event);
 	}
 
-	up(event) {
+	up(target, event) {
 		event.preventDefault();
 		if (event.target.id !== 'view') return;
 		this.down = false;
-		if (!this.locked) {
-			this.pointB = this.getPosition(event);
-			this.parent.view.releasePointerCapture(event.pointerId);
-		}
-
-		return this.emit('up', event);
+		this.locked || (target.releasePointerCapture(event.pointerId));
+		this.emit('up', event);
 	}
 
-	wheel(event) {
+	wheel(target, event) {
 		event.preventDefault();
 		event.stopPropagation();
 		if (event.ctrlKey) {
@@ -123,15 +87,15 @@ export default class extends EventEmitter {
 		// document.documentElement.style.setProperty("--size", zoom + event.deltaY / 1000);
 	}
 
-	touchcancel(event) {
+	touchcancel(target, event) {
 		this.down = false;
 	}
 
-	close() {
-		document.removeEventListener('pointerdown', this.pointerdown);
-		document.removeEventListener('pointermove', this.move);
-		document.removeEventListener('pointerup', this.up);
-		document.removeEventListener('touchcancel', this.touchcancel);
-		document.removeEventListener('wheel', this.wheel);
+	close(target) {
+		target.removeEventListener('pointerdown', this.pointerdown);
+		target.removeEventListener('pointermove', this.move);
+		target.removeEventListener('pointerup', this.up);
+		target.removeEventListener('touchcancel', this.touchcancel);
+		target.removeEventListener('wheel', this.wheel);
 	}
 }

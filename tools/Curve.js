@@ -12,11 +12,8 @@ export default class extends Tool {
 	}
 
 	press() {
-		if (this.active) {
-			return;
-		}
-
-		this.anchorA = Object.assign({}, this.mouse.pointA);
+		if (this.active) return;
+		this.anchorA = this.mouse.position.toCanvas(this.canvas);
 		this.element.style.setProperty('stroke', this.canvas.primary);
 		this.element.style.setProperty('stroke-width', this.size);
 		this.element.setAttribute('points', `${this.anchorA.x},${this.anchorA.y}`);
@@ -24,23 +21,25 @@ export default class extends Tool {
 	}
 
 	stroke() {
+		const position = this.mouse.position.toCanvas(this.canvas);
 		if (this.active) {
 			const points = [];
 			for (let i = 0; i < 1; i += this.segmentLength / 100) {
 				points.push([
-					Math.pow((1 - i), 2) * this.anchorA.x + 2 * (1 - i) * i * this.mouse.position.x + Math.pow(i, 2) * this.anchorB.x,
-					Math.pow((1 - i), 2) * this.anchorA.y + 2 * (1 - i) * i * this.mouse.position.y + Math.pow(i, 2) * this.anchorB.y
+					Math.pow((1 - i), 2) * this.anchorA.x + 2 * (1 - i) * i * position.x + Math.pow(i, 2) * this.anchorB.x,
+					Math.pow((1 - i), 2) * this.anchorA.y + 2 * (1 - i) * i * position.y + Math.pow(i, 2) * this.anchorB.y
 				]);
 			}
 
 			this.element.setAttribute('points', `${this.anchorA.x},${this.anchorA.y} ${points.map(point => point.join(',')).join(' ')} ${this.anchorB.x},${this.anchorB.y}`);
-			return;
 		} else if (this.mouse.down && !this.mouse.isAlternate) {
-			this.element.setAttribute('points', `${this.anchorA.x},${this.anchorA.y} ${this.mouse.position.x},${this.mouse.position.y}`);
+			this.element.setAttribute('points', `${this.anchorA.x},${this.anchorA.y} ${position.x},${position.y}`);
 		}
 	}
 
 	clip() {
+		const old = this.mouse.old.toCanvas(this.canvas);
+		const position = this.mouse.position.toCanvas(this.canvas);
 		if (this.active) {
 			this.active = false;
 			this.anchorA = null;
@@ -92,12 +91,12 @@ export default class extends Tool {
 				value: temp
 			});
 			return;
-		} else if (this.mouse.pointA.x === this.mouse.pointB.x && this.mouse.pointA.y === this.mouse.pointB.y) {
+		} else if (old.x === position.x && old.y === position.y) {
 			return this.element.remove();
 		}
 
 		this.active = true;
-		this.anchorB = this.mouse.pointB;
+		this.anchorB = this.mouse.position.toCanvas(this.canvas);
 		this.element.setAttribute('points', `${this.anchorA.x},${this.anchorA.y} ${this.anchorB.x},${this.anchorB.y}`);
 	}
 }

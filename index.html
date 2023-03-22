@@ -21,7 +21,7 @@
 	container.style.setProperty('height', `calc(100% - ${document.querySelector('window-frame')?.getBoundingClientRect().height}px`);
 	window.dispatchEvent(new Event('resize'));
 ">
-    <!-- <window-frame>
+    <window-frame>
         <div data-position="left">
             <img src="favicon.ico">
             <label>SVG Drawpad</label>
@@ -31,7 +31,7 @@
             <button id="maximize" title="Maximize">▢</button>
             <button id="close" title="Close">⨉</button>
         </div>
-    </window-frame> -->
+    </window-frame>
     <main id="container">
         <svg id="view" xmlns="http://www.w3.org/2000/svg">Sorry, your browser does not support inline SVG.</svg>
         <user-interface>
@@ -66,20 +66,8 @@
                 <button class="secondary" onclick="document.querySelector('#layers').style.setProperty('display', 'none'), document.querySelector('#settings').style.setProperty('display', document.querySelector('#settings').style.display === 'flex' ? 'none' : 'flex')">Settings</button>
             </section>
             <section class="bottom left" style="border-radius: 4px;">
-                <div class="option ripple" onclick="this.firstElementChild.click();">
-                    <input type="color" id="primary" oninput="
-                        this.parentElement.style.setProperty('background-color', (canvas.config.styles.primary = this.value) + '40');
-                        canvas.config.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
-                    ">
-                    Primary Colour
-                </div>
-                <div class="option ripple disabled" onclick="this.firstElementChild.click();">
-                    <input type="color" id="secondary" oninput="
-                        this.parentElement.style.setProperty('background-color', (canvas.config.styles.secondary = this.value) + '40');
-                        canvas.config.randomizeStyle = false; document.querySelector('#randomColors').innerText = 'Enable Random Colours';
-                    ">
-                    Secondary Colour
-                </div>
+                <label class="button option ripple" style="border-radius: 0;"><input type="color" id="primary" oninput="this.parentElement.style.setProperty('background-color', (canvas.config.styles.primary = this.value) + '40');canvas.config.randomizeStyle = false;randomColors.innerText = 'Enable Random Colours';">Primary Colour</label>
+                <label class="button option ripple disabled" style="border-radius: 0;"><input type="color" id="secondary" oninput="this.parentElement.style.setProperty('background-color', (canvas.config.styles.secondary = this.value) + '40');canvas.config.randomizeStyle = false;randomColors.innerText = 'Enable Random Colours';">Secondary Colour</label>
             </section>
 			<div class="overlay" id="layers">
                 <div id="layer-container">

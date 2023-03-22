@@ -90,7 +90,7 @@ export default class {
 	});
 	events = new EventHandler();
 	layers = new LayerHandler(this);
-	mouse = new MouseHandler(this);
+	mouse = new MouseHandler();
 	text = document.createElementNS("http://www.w3.org/2000/svg", 'text');
 	tools = new ToolHandler(this);
 	zoom = 1;
@@ -116,7 +116,8 @@ export default class {
 		// let label = document.createElementNS("http://www.w3.org/2000/svg", 'text');
 		clearTimeout(this.text.timeout);
 		this.text.innerHTML = text;
-		this.text.setAttribute('x', this.viewBox.width / 2 + this.viewBox.x - this.text.innerHTML.length * 2.5);
+		const { width } = this.text.getBoundingClientRect();
+		this.text.setAttribute('x', this.viewBox.width / 2 - width / 2 + this.viewBox.x);
 		this.text.setAttribute('y', 25 + this.viewBox.y);
 		this.text.setAttribute('fill', '#' + (this.config.theme == 'dark' ? 'fbfbfb' : '1b1b1b'));
 		this.text.timeout = setTimeout(() => this.text.remove(), timeout ?? 2e3);
@@ -152,7 +153,8 @@ export default class {
 		width *= this.zoom;
 		this.view.setAttribute('viewBox', `${this.viewBox.x + (this.viewBox.width - width) / 2} ${this.viewBox.y + (this.viewBox.height - height) / 2} ${width} ${height}`);
 		// this.view.setAttribute('viewBox', `0 0 ${boundingRect.width} ${boundingRect.height}`);
-		this.text.setAttribute('x', this.viewBox.width / 2 + this.viewBox.x - this.text.innerHTML.length * 2.5);
+		const text = this.text.getBoundingClientRect();
+		this.text.setAttribute('x', this.viewBox.width / 2 - text.width / 2 + this.viewBox.x);
 		this.text.setAttribute('y', 25 + this.viewBox.y);
 	}
 
@@ -293,9 +295,7 @@ export default class {
 	}
 
 	clip(event) {
-		if (!this.mouse.isAlternate) {
-			this.tools.selected.clip(event);
-		}
+		!this.mouse.isAlternate && !event.shiftKey && this.tools.selected.clip(event);
 	}
 
 	keydown(event) {

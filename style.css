@@ -36,7 +36,7 @@ svg#view {
 	display: block;
 	width: 100vw;
 	height: 100%;
-	pointer-events: none;
+	touch-action: none;
 }
 
 :not(label):has(> input:is([type="checkbox"],[type="radio"]):not(:checked)) {
@@ -50,7 +50,6 @@ svg#view {
 #container {
 	height: 100%;
 	position: relative;
-	touch-action: none;
 }
 
 user-interface > section {
@@ -104,6 +103,7 @@ label.button {
 
 #container user-interface section.bottom.left .option {
 	-webkit-user-select: none;
+	display: block;
 	font-size: smaller;
 	height: 3rem;
 	line-height: 3rem;
