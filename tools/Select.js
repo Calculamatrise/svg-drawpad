@@ -95,7 +95,7 @@ export default class extends Tool {
 
 		const old = this.mouse.old.toCanvas(this.canvas);
 		const position = this.mouse.position.toCanvas(this.canvas);
-		this.selected = this.canvas.layer.lines.filter(line => !!line.parentElement).filter((line) => {
+		this.selected = this.canvas.layers.selected.lines.filter(line => !!line.parentElement).filter((line) => {
 			let strokePoints = (line.getAttribute('points') || '').split(/\u002C/g);
 			let passing = false;
 			let points = [
@@ -157,7 +157,7 @@ export default class extends Tool {
 			this.parent.this.canvas.text.innerHTML = "Selection pasted!";
 			this.parent.this.canvas.view.appendChild(this.parent.this.canvas.text);
 			this.parent.this.canvas.text.timeout = setTimeout(() => this.parent.this.canvas.text.remove(), 2e3);
-			this.parent.this.canvas.layer.push(...this.clipboard);
+			this.parent.this.canvas.layers.selected.push(...this.clipboard);
 			this.clipboard = [];
 			return;
 		}

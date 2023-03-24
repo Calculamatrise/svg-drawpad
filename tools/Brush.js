@@ -13,7 +13,7 @@ export default class extends Tool {
 		this.element.style.setProperty('stroke-width', this.size);
 		const position = this.mouse.position.toCanvas(this.canvas);
 		this.element.setAttribute('points', `${position.x},${position.y}`);
-		this.canvas.layer.base.appendChild(this.element);
+		this.canvas.layers.selected.base.appendChild(this.element);
 	}
 
 	stroke() {
@@ -29,6 +29,7 @@ export default class extends Tool {
 			return;
 		}
 
+		const toolSize = this.size;
 		const temp = this.element.cloneNode();
 		temp.erase = function (event) {
 			const points = this.getAttribute('points').split(/\s+/g).map(function (point) {
@@ -64,11 +65,11 @@ export default class extends Tool {
 					}
 				}
 
-				return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 <= window.canvas.tool.size && !this.remove();
+				return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 <= toolSize && !this.remove();
 			});
 		}
 
-		this.canvas.layer.push(temp);
+		this.canvas.layers.selected.push(temp);
 		this.canvas.events.push({
 			action: 'add',
 			value: temp

@@ -36,7 +36,7 @@ export default class extends Tool {
 					}
 				}
 
-				return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 <= window.canvas.tool.size && !this.remove();
+				return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 <= window.canvas.tools.selected.size && !this.remove();
 			}
 
 			lines.push(temp);
@@ -72,7 +72,7 @@ export default class extends Tool {
 		this.element.setAttribute('cy', position.y);
 		this.element.setAttribute('rx', 1);
 		this.element.setAttribute('ry', 1);
-		this.canvas.layer.base.appendChild(this.element);
+		this.canvas.layers.selected.base.appendChild(this.element);
 	}
 
 	stroke() {
@@ -106,10 +106,10 @@ export default class extends Tool {
 				y: this.getAttribute('cy') - window.canvas.viewBox.y - event.offsetY
 			}
 
-			return Math.sqrt(vector.x ** 2 / (~~this.getAttribute('rx') + this.style.getPropertyValue('stroke-width') / 2 + window.canvas.tool.size) ** 2 + vector.y ** 2 / (~~this.getAttribute('ry') + this.style.getPropertyValue('stroke-width') / 2 + window.canvas.tool.size) ** 2) <= 1 && (Math.sqrt(vector.x ** 2 / (+this.getAttribute('rx') - this.style.getPropertyValue('stroke-width') / 2 - window.canvas.tool.size) ** 2 + vector.y ** 2 / (+this.getAttribute('ry') - this.style.getPropertyValue('stroke-width') / 2 - window.canvas.tool.size) ** 2) >= 1 || this.getAttribute('rx') < window.canvas.tool.size || this.getAttribute('ry') < window.canvas.tool.size) && !this.remove();
+			return Math.sqrt(vector.x ** 2 / (~~this.getAttribute('rx') + this.style.getPropertyValue('stroke-width') / 2 + window.canvas.tools.selected.size) ** 2 + vector.y ** 2 / (~~this.getAttribute('ry') + this.style.getPropertyValue('stroke-width') / 2 + window.canvas.tools.selected.size) ** 2) <= 1 && (Math.sqrt(vector.x ** 2 / (+this.getAttribute('rx') - this.style.getPropertyValue('stroke-width') / 2 - window.canvas.tools.selected.size) ** 2 + vector.y ** 2 / (+this.getAttribute('ry') - this.style.getPropertyValue('stroke-width') / 2 - window.canvas.tools.selected.size) ** 2) >= 1 || this.getAttribute('rx') < window.canvas.tools.selected.size || this.getAttribute('ry') < window.canvas.tools.selected.size) && !this.remove();
 		}
 
-		this.canvas.layer.push(ellipse);
+		this.canvas.layers.selected.push(ellipse);
 		this.canvas.events.push({
 			action: 'add',
 			value: ellipse

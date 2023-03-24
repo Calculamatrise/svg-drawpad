@@ -51,7 +51,7 @@ export default class extends Tool {
 				}
 
 				len = Math.sqrt(res.x ** 2 + res.y ** 2);
-				if (len <= window.canvas.tool.size) {
+				if (len <= window.canvas.tools.selected.size) {
 					this.remove();
 					return true;
 				}
@@ -106,7 +106,7 @@ export default class extends Tool {
 				}
 
 				len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
-				return len - +this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tool.size && !this.remove();
+				return len - +this.style.getPropertyValue("stroke-width") / 2 <= window.canvas.tools.selected.size && !this.remove();
 			}
 
 			lines.push(temp);
@@ -139,7 +139,7 @@ export default class extends Tool {
 		this.element.setAttribute('cx', position.x);
 		this.element.setAttribute('cy', position.y);
 		this.element.setAttribute('r', 1);
-		this.canvas.layer.base.appendChild(this.element);
+		this.canvas.layers.selected.base.appendChild(this.element);
 	}
 
 	stroke() {
@@ -162,10 +162,10 @@ export default class extends Tool {
 			}
 
 			let len = Math.abs(Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.getAttribute('r'));
-			return len - this.style.getPropertyValue('stroke-width') / 2 <= window.canvas.tool.size && (window.canvas.tool.size <= len + this.style.getPropertyValue('stroke-width') / 2 || this.getAttribute("r") < window.canvas.tool.size) && !this.remove();
+			return len - this.style.getPropertyValue('stroke-width') / 2 <= window.canvas.tools.selected.size && (window.canvas.tools.selected.size <= len + this.style.getPropertyValue('stroke-width') / 2 || this.getAttribute("r") < window.canvas.tools.selected.size) && !this.remove();
 		}
 
-		this.canvas.layer.push(circle);
+		this.canvas.layers.selected.push(circle);
 		this.canvas.events.push({
 			action: "add",
 			value: circle

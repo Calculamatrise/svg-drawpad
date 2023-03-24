@@ -18,8 +18,8 @@
     primary.parentElement.style.setProperty('background-color', (primary.value = canvas.config.styles.primary) + '40');
     secondary.parentElement.style.setProperty('background-color', (secondary.value = canvas.config.styles.secondary) + '40');
    	randomColors.innerText = canvas.config.randomizeStyle ? 'Disable Random Colours' : 'Enable Random Colours';
-	container.style.setProperty('height', `calc(100% - ${document.querySelector('window-frame')?.getBoundingClientRect().height}px`);
-	window.dispatchEvent(new Event('resize'));
+	// container.style.setProperty('height', `calc(100% - ${document.querySelector('window-frame')?.getBoundingClientRect().height}px`);
+	// window.dispatchEvent(new Event('resize'));
 ">
     <!-- <window-frame>
         <div data-position="left">
@@ -62,20 +62,22 @@
                 </div>
             </section>
             <section class="right top" style="z-index: 50;">
-                <button class="secondary" onclick="document.querySelector('#settings').style.setProperty('display', 'none'), document.querySelector('#layers').style.setProperty('display', document.querySelector('#layers').style.display === 'flex' ? 'none' : 'flex')">Layers</button>
-                <button class="secondary" onclick="document.querySelector('#layers').style.setProperty('display', 'none'), document.querySelector('#settings').style.setProperty('display', document.querySelector('#settings').style.display === 'flex' ? 'none' : 'flex')">Settings</button>
+                <label for="layerschkbx" class="button secondary">Layers</label>
+                <label for="settingschkbx" class="button secondary">Settings</label>
             </section>
             <section class="bottom left" style="border-radius: 4px;">
                 <label class="button option ripple" style="border-radius: 0;"><input type="color" id="primary" oninput="this.parentElement.style.setProperty('background-color', (canvas.config.styles.primary = this.value) + '40');canvas.config.randomizeStyle = false;randomColors.innerText = 'Enable Random Colours';">Primary Colour</label>
                 <label class="button option ripple disabled" style="border-radius: 0;"><input type="color" id="secondary" oninput="this.parentElement.style.setProperty('background-color', (canvas.config.styles.secondary = this.value) + '40');canvas.config.randomizeStyle = false;randomColors.innerText = 'Enable Random Colours';">Secondary Colour</label>
             </section>
 			<div class="overlay" id="layers">
+				<input type="checkbox" name="overlay" id="layerschkbx" style="display: none;" onchange="this.checked && (settingschkbx.checked = false)">
                 <div id="layer-container">
                     <button class="secondary ripple" onclick="canvas.layers.create(), canvas.layerDepth = canvas.layerDepth + 1;" style="aspect-ratio: unset;height: 100%;">New Layer</button>
                 </div>
             </div>
             <!-- Settings Overlay -->
-            <div class="overlay" id="settings" style="display: none;">
+            <div class="overlay" id="settings">
+				<input type="checkbox" name="overlay" id="settingschkbx" style="display: none;" onchange="this.checked && (layerschkbx.checked = false)">
 				<!-- Add radio to layer and settings since they cannot be open at the same time -->
                 <nav>
                     <label for="file" class="tab button secondary">General</label>
@@ -83,25 +85,13 @@
                 </nav>
                 <section>
 					<input type="radio" name="settings-overlay-nav" id="file" style="display: none;" checked>
-                    <input type="file" id="import" accept="image/svg+xml" style="display: none;" onchange="
-                        this.classList.add('loading');
-                        this.files[0].text().then(text => {
-                            if (this.classList.contains('loading')) {
-                                this.classList.remove('loading');
-                            }
-
-                            canvas.import(text);
-                        });
-                    ">
+                    <input type="file" id="import" accept="image/svg+xml" style="display: none;" onchange="this.classList.add('loading'),this.files[0].text().then(text => (this.classList.remove('loading'),canvas.import(text)));">
                     <label for="import" class="button secondary ripple" style="text-align: center; line-height: 350%; font-size: calc(40px / 3);">Import Canvas</label>
                     <button class="secondary ripple" onclick="
-                        let date = new Date(new Date().setHours(new Date().getHours() - new Date().getTimezoneOffset() / 60)).toISOString().split(/t/i);
-                        let link = document.createElement('a');
-                        link.href = window.URL.createObjectURL(
-                            new Blob([canvas.toString()], { type: 'image/svg+xml' })
-                        );
-                        link.download = 'svg_canvas-' + date[0] + '_' + date[1].replace(/\..+/, '').replace(/:/g, '-');
-                        link.dispatchEvent(new MouseEvent('click'));
+						Object.assign(document.createElement('a'), {
+							download: 'svg_canvas-' + new Intl.DateTimeFormat('en-CA', { dateStyle: 'short', timeStyle: 'medium' }).format().replace(/[/:]/g, '-').replace(/,+\s*/, '_').replace(/\s+.*$/, ''),
+							href: window.URL.createObjectURL(new Blob([canvas.toString()], { type: 'image/svg+xml' }))
+						}).dispatchEvent(new MouseEvent('click'));
                     ">Export Canvas</button>
                 </section>
                 <section>

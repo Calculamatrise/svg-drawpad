@@ -1,74 +1,33 @@
 export default class {
-	get opacity() {
-		return this.alpha;
-	}
-
-	set opacity(alpha) {
-		this.alpha = parseFloat(alpha);
-		this.base.style.setProperty('opacity', this.alpha);
-	}
-
 	alpha = 1;
-	hidden = false;
 	lines = [];
 	constructor(parent) {
 		this.parent = parent;
-		this.id = this.parent.cache.length + 1;
-		this.element = this.parent.createElement('div', {
+		const id = this.parent.cache.length + 1;
+		this.element = this.parent.constructor.createElement('div', {
 			children: [
-				this.parent.createElement('div', {
+				this.parent.constructor.createElement('label', {
 					children: [
-						this.selector = this.parent.createElement('input', {
-							type: 'number',
-							id: 'selector',
+						this.selector = this.parent.constructor.createElement('input', {
 							className: 'ripple selector',
-							step: '1',
-							value: this.id,
-							onchange: event => {
-								if (parseInt(event.target.value) < 1) {
-									event.target.value = 1;
-									return;
-								} else if (parseInt(event.target.value) > this.parent.cache.length) {
-									event.target.value = this.parent.cache.length;
-									return;
-								} else if (isNaN(event.target.value) || parseInt(event.target.value) === this.id) {
-									return;
-								}
-
-								this.move(parseInt(event.target.value));
-								this.selector.focus();
-							},
-							onkeydown(event) {
-								event.stopPropagation();
-							},
-							onmouseover() {
-								this.style.cursor = 'pointer';
-							},
-							style: {
-								padding: 0,
-								width: '2rem'
-							}
+							id: 'selector',
+							min: 1,
+							step: 1,
+							type: 'number',
+							value: id,
+							onchange: event => isFinite(event.target.valueAsNumber) && this.move(Math.min(Math.max(event.target.valueAsNumber, 1), this.parent.cache.length)),
+							onkeydown: event => event.stopPropagation()
 						})
 					],
 					innerText: 'Layer ',
-					onclick() {
-						window.canvas.layerDepth = this.id;
-						parent.cache.forEach(function (layer) {
-							layer.element.classList.remove('selected');
-							if (layer.id === window.canvas.layerDepth) {
-								layer.element.classList.add('selected');
-							}
-						});
-
-						this.querySelector('#selector').focus();
-					}
+					onclick: () => this.parent.select(this.id)
 				}),
-				this.parent.createElement('div', {
+				this.parent.constructor.createElement('div', {
 					className: 'options',
 					children: [
-						this.parent.createElement('div', {
+						this.parent.constructor.createElement('div', {
 							children: [
-								this.parent.createElement('input', {
+								this.parent.constructor.createElement('input', {
 									max: 100,
 									min: 0,
 									type: 'range',
@@ -88,58 +47,72 @@ export default class {
 								flexDirection: 'column'
 							}
 						}),
-						this.parent.createElement('label', {
+						this.parent.constructor.createElement('label', {
 							children: [
-								this.parent.createElement('input', {
+								this.parent.constructor.createElement('input', {
+									type: 'checkbox',
 									onchange: this.toggleVisiblity.bind(this),
-									type: 'checkbox'
 								})
 							],
 							className: 'button option ripple',
-							innerText: 'Hide'
+							innerText: 'Hide',
+							onclick() {
+								this.firstElementChild.checked = !this.firstElementChild.checked;
+								this.firstElementChild.dispatchEvent(new Event('change'));
+							}
 						}),
-						this.parent.createElement('button', {
+						this.parent.constructor.createElement('button', {
 							innerText: 'Clear',
-							onclick: this.clear.bind(this)
+							onclick: () => confirm(`Are you sure you\'d like to clear Layer ${this.id}?`) && this.clear()
 						}),
-						this.parent.createElement('button', {
+						this.parent.constructor.createElement('button', {
 							innerText: 'Merge',
-							onclick: this.merge.bind(this)
+							onclick: () => {
+								if (this.parent.cache.length <= 1) {
+									alert("There must be more than one layer in order to merge layers!");
+									return;
+								}
+
+								let layerId = prompt(`Which layer would you like to merge Layer ${this.id} with?`);
+								if (layerId !== null) {
+									let layer = this.parent.get(parseInt(layerId));
+									while (layer === void 0) {
+										layerId = prompt(`That is not a valid option. Try again or cancel; which layer would you like to merge Layer ${this.id} with?`);
+										if (layerId === null) {
+											return;
+										}
+
+										layer = this.parent.get(parseInt(layerId));
+									}
+
+									layer && this.merge(layerId);
+								}
+							}
 						}),
-						this.parent.createElement('button', {
+						this.parent.constructor.createElement('button', {
 							innerText: 'Delete',
-							onclick: this.remove.bind(this),
 							style: {
 								color: 'crimson'
+							},
+							onclick: () => {
+								if (this.parent.cache.length <= 1) {
+									alert("You must have at least one layer at all times!");
+									return;
+								}
+
+								confirm(`Are you sure you\'d like to delete Layer ${this.id}?`) && this.remove()
 							}
 						})
 					]
 				})
 			],
 			className: 'layer selected',
-			onclick: event => {
-				if (event.target.className !== this.element.className) {
-					return;
-				}
-
-				window.canvas.layerDepth = this.id;
-				this.parent.cache.forEach(function (layer) {
-					layer.element.classList.remove('selected');
-					if (layer.id === window.canvas.layerDepth) {
-						layer.element.classList.add('selected');
-					}
-				});
-
-				this.selector.focus();
-			},
+			onclick: event => event.target === this.element && this.parent.select(this.id),
 			onpointerdown(event) {
-				if (event.target != this) {
-					return;
-				}
-
-				this.setPointerCapture(event.pointerId);
+				event.target === this && this.setPointerCapture(event.pointerId);
 			},
 			ongotpointercapture(event) {
+				if (event.target != this) return;
 				this.onpointermove = function slide({ movementX }) {
 					// move after element it passes
 					const { left: leftBoundary, right: rightBoundary } = this.parentElement.getBoundingClientRect();
@@ -150,71 +123,65 @@ export default class {
 
 					this.style.setProperty('translate', parseInt(this.style.getPropertyValue('translate').padEnd(1, '0')) + movementX + 'px');
 				}
+
 				this.style.setProperty('z-index', '1004');
 			},
-			// onpointermove(event) {
-			// 	console.dir(this)
-			// 	if (event.button != -1) {
-			// 		// // readjust position.
-			// 		// this.style.removeProperty('position');
-			// 		// this.parentElement.style.removeProperty('height');
-			// 		// this.parentElement.style.removeProperty('width');
-			// 		return;
-			// 	}
-
-			// 	const { left: leftBoundary, right: rightBoundary } = this.parentElement.getBoundingClientRect();
-			// 	const { left, right } = this.getBoundingClientRect();
-			// 	const translation = parseInt(this.style.getPropertyValue('translate').padEnd(1, '0')) + movementX;
-			// 	if ((left + translation < leftBoundary) || (right + translation > rightBoundary)) {
-			// 		return;
-			// 	}
-
-			// 	console.log(rightBoundary, right + translation)
-			// 	this.style.setProperty('translate', translation + 'px');
-			// },
-			onlostpointercapture: () => {
+			onlostpointercapture: event => {
+				if (event.target != this.element) return;
 				this.element.onpointermove = null;
 				this.element.style.removeProperty('z-index');
-				const { x } = this.element.getBoundingClientRect();
-				const nextSibling = parent.cache.filter(({ element }) => element.getBoundingClientRect().x < x);
+				const sorted = parent.cache.filter(({ element }) => element.getBoundingClientRect().y == this.element.getBoundingClientRect().y).sort(({ element: a }, { element: b }) => a.getBoundingClientRect().x - b.getBoundingClientRect().x);
 				this.element.style.removeProperty('translate');
-				nextSibling.selector && this.move(nextSibling.id);
-				// let nextSibling = this.element.nextElementSibling;
-				// while (nextSibling && nextSibling.getBoundingClientRect().x < x) {
-				// 	if (!nextSibling.nextElementSibling) break;
-				// 	nextSibling = nextSibling.nextElementSibling;
-				// }
-
-				// console.log(nextSibling, parent.cache.filter(({ element }) => element.getBoundingClientRect().x < x))
-				// this.style.removeProperty('translate');
-				// nextSibling.after(this.element)
+				this.move(sorted.indexOf(this) + 1);
 			},
 			onpointerup(event) {
-				this.releasePointerCapture(event.pointerId);
+				event.target === this && this.releasePointerCapture(event.pointerId);
 			}
 		});
 
-		this.parent.element.lastElementChild.before(this.element);
+		layers.querySelector('#layer-container').lastElementChild.before(this.element);
 		this.element.scrollIntoView({
 			behavior: 'smooth',
-			block: 'nearest',
-			// inline: 'center'
+			block: 'end',
+			inline: 'center'
 		});
 
-		this.base = document.querySelector(`g[data-id='${this.id}']`) ?? [...document.querySelectorAll("g:not([data-id])")].filter(element => element.parentElement.id === 'view')[0] ?? document.createElementNS("http://www.w3.org/2000/svg", 'g');
-		this.base.dataset.id = this.id;
-		if (this.id === 1) {
+		this.base = document.querySelector(`g[data-id='${id}']`) ?? [...document.querySelectorAll('g:not([data-id])')].filter(element => element.parentElement.id === 'view')[0] ?? document.createElementNS("http://www.w3.org/2000/svg", 'g');
+		this.base.dataset.id = id;
+		if (id == 1) {
 			view.prepend(this.base);
 		} else {
-			view.querySelector(`g[data-id='${this.id - 1}']`).after(this.base);
+			view.querySelector(`g[data-id='${id - 1}']`).after(this.base);
 		}
-
-		this.parent.cache.push(this);
 	}
 
-	toggleVisiblity() {
-		this.hidden = !this.hidden;
-		this.base.style.setProperty('visibility', this.hidden ? 'hidden' : 'unset');
+	get hidden() {
+		return 'hidden' === this.base.style.getPropertyValue('visibility');
+	}
+
+	set hidden(value) {
+		this.base.style[(value ? 'set' : 'remove') + 'Property']('visibility', 'hidden');
+	}
+
+	get id() {
+		return 1 + this.parent.cache.indexOf(this);
+	}
+
+	get opacity() {
+		return this.alpha;
+	}
+
+	set opacity(alpha) {
+		this.alpha = parseFloat(alpha);
+		this.base.style.setProperty('opacity', this.alpha);
+	}
+
+	clear() {
+		for (const line of this.lines) {
+			line.remove();
+		}
+
+		this.lines = [];
 	}
 
 	push(object) {
@@ -223,88 +190,35 @@ export default class {
 	}
 
 	move(newIndex) {
-		if (typeof newIndex != 'number' || newIndex === void 0 || this.id === newIndex) {
-			throw new Error("Invalid index.");
-		}
-
-		this.parent.remove(this.id);
-		this.parent.cache.forEach((layer) => {
-			if (this.id < newIndex) {
-				if (layer.id === newIndex - 1) {
-					layer.base.after(this.base);
-					layer.element.after(this.element);
-				}
-			} else if (layer.id === newIndex) {
-				layer.base.before(this.base);
-				layer.element.before(this.element);
-			}
-		});
-
-		this.parent.insert(this, newIndex - 1);
+		const removed = this.parent.remove(this);
+		this.parent.insert(removed, newIndex);
 		this.element.scrollIntoView({
 			behavior: 'smooth',
-			block: 'nearest',
-			// inline: 'center'
+			block: 'end',
+			inline: 'center'
 		});
+		this.selector.focus();
 	}
 
-	clear(bypass) {
-		if (bypass !== true && confirm(`Are you sure you\'d like to clear Layer ${this.id}?`)) {
-			for (const line of this.lines) {
-				line.remove();
-			}
-
-			this.lines = [];
-		}
+	toggleVisiblity() {
+		this.hidden = !this.hidden;
 	}
 
-	merge() {
-		if (this.parent.cache.length <= 1) {
-			alert("There must be more than one layer in order to merge layers!");
-			return;
-		}
-
-		let layerId = prompt(`Which layer would you like to merge Layer ${this.id} with?`);
-		if (layerId !== null) {
-			let layer = this.parent.get(parseInt(layerId));
-			while (layer === void 0) {
-				layerId = prompt(`That is not a valid option. Try again or cancel; which layer would you like to merge Layer ${this.id} with?`);
-				if (layerId === null) {
-					return;
-				}
-
-				layer = this.parent.get(parseInt(layerId));
-			}
-
-			if (layer) {
-				const layer = this.parent.get(layerId);
-				if (layer) {
-					const lines = this.lines;
-					this.remove();
-					for (const line of lines) {
-						layer.push(line);
-					}
-				}
+	merge(layerId) {
+		const layer = this.parent.get(layerId);
+		if (layer) {
+			const lines = this.lines;
+			this.remove();
+			for (const line of lines) {
+				layer.push(line);
 			}
 		}
 	}
 
 	remove() {
-		if (this.parent.cache.length <= 1) {
-			alert("You must have at least one layer at all times!");
-			return;
-		} else if (!confirm(`Are you sure you\'d like to delete Layer ${this.id}?`)) {
-			return;
-		}
-
-		this.clear(true);
+		this.clear();
 		this.element.remove();
 		this.base.remove();
 		this.parent.remove(this.id);
-		if (this.parent.cache.length < window.canvas.layerDepth) {
-			window.canvas.layerDepth = window.canvas.layerDepth === this.id ? this.parent.cache.length : 1;
-		}
-
-		return this;
 	}
 }

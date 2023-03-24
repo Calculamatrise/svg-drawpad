@@ -11,17 +11,15 @@
 
 :root {
     --size: .5;
-	--background: #ebebeb;
-    --border-color: #80808020;
-	--hard-background: #ddd;
-	--soft-background: #eee;
-	--text: #1b1b1b;
+	--background: #1B1B1B;
+	--hard-background: #111111;
+	--text-color: #FBFBFB;
 	--stroke: skyblue;
 	--fill: violet;
 }
 
 html, a {
-    color: var(--text);
+    color: var(--text-color);
 	max-height: 100vh;
 }
 
@@ -34,9 +32,16 @@ body {
 svg#view {
 	background-color: var(--background);
 	display: block;
-	width: 100vw;
-	height: 100%;
+	fill: var(--text-color);
+	height: 100vh;
+	stroke: var(--text-color);
+	stroke-width: calc(8 * var(--size));
 	touch-action: none;
+	width: 100vw;
+}
+
+text {
+	stroke: none;
 }
 
 :not(label):has(> input:is([type="checkbox"],[type="radio"]):not(:checked)) {
@@ -142,9 +147,9 @@ label.button {
 }
 
 #container div#settings {
-	display: none;
+	display: flex;
     border-radius: 0;
-	background-color: #80808008;
+	background-color: hsl(0deg 0% 50% / 4%);
 	backdrop-filter: blur(2em) brightness(0.8);
 	z-index: 40;
 }
@@ -171,10 +176,10 @@ label.button {
 }
 
 #container div#layers {
-	background-color: #80808008; /* var(--hard-background); */
-    backdrop-filter: blur(1px);
-	display: none;
-	flex-flow: column;
+	background-color: hsl(0deg 0% 50% / 4%);
+    backdrop-filter: blur(4px);
+	display: flex;
+	flex-direction: column;
 	inset: 15%;
 	padding: 2rem;
 	z-index: 20;
@@ -185,7 +190,7 @@ label.button {
 	display: grid;
     grid-auto-rows: min-content;
 	grid-gap: 0.4rem;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 	overflow: auto;
     position: relative;
 	width: -webkit-fill-available;
@@ -201,72 +206,52 @@ label.button {
 } */
 
 #container div#layers .layer {
+	-webkit-user-select: none;
 	align-items: center;
 	border-radius: 10px;
 	display: flex;
-	flex-flow: column wrap;
+	flex-direction: column;
 	overflow: hidden;
 	padding: 0.75rem 1rem;
 	place-content: center;
 	position: relative;
     user-select: none;
-	width: fit-content;
 }
 
-#container div#layers .layer:not(#container div#layers .layer.selected)::before {
+#container div#layers .layer::before {
 	content: "";
 	opacity: .3;
-	width: 100%;
-	height: 100%;
-	top: inherit;
-	left: inherit;
+	inset: 0;
 	display: flex;
 	overflow: hidden;
 	position: absolute;
 	pointer-events: none;
-	border-radius: inherit;
 	background-color: var(--hard-background);
 	z-index: -1;
 }
 
-#container div#layers .layer:not(#container div#layers .layer.selected):hover::before {
+#container div#layers .layer:not(.selected):hover::before {
 	opacity: .5;
-	pointer-events: none;
-	background-color: var(--hard-background);
 	transition: background-color 100ms;
-	z-index: -1;
 }
 
 #container div#layers .layer.selected::before {
-	content: "";
 	opacity: .9;
-	width: 100%;
-	height: 100%;
-	top: inherit;
-	left: inherit;
-	display: flex;
-	overflow: hidden;
-	position: absolute;
-	border-radius: inherit;
-	pointer-events: none;
-	background-color: var(--hard-background);
-	z-index: -1;
 }
 
 #container div#layers .layer input.selector {
-	display: inline-block;
 	height: 1rem;
 	padding: 0;
 	width: 2rem;
 }
 
 #container div#layers .layer .option {
+	align-items: center;
 	display: flex;
 	font-size: small;
+	justify-content: center;
 	overflow: hidden;
 	position: relative;
-	align-items: center;
-	justify-content: center;
 }
 
 #container div#layers .layer .option input {
@@ -278,45 +263,6 @@ label.button {
 	display: flex;
 	flex-direction: column;
 	margin-top: 10px;
-}
-
-#container span#settings {
-	top: 0;
-	right: 0;
-	margin: 10px;
-	position: absolute;
-}
-
-input[type="color"]#colour {
-	visibility: hidden;
-	position: absolute;
-}
-
-line {
-	stroke: var(--text);
-	stroke-width: calc(8 * var(--size));
-	stroke-linecap: round;
-	stroke-linejoin: round;
-}
-
-path {
-	stroke: none;
-	fill: var(--text);
-}
-
-polyline {
-	fill: none;
-	stroke: var(--text);
-	stroke-linecap: round;
-	stroke-linejoin: round;
-}
-
-cirlce {
-	fill: var(--text);
-}
-
-rect {
-	fill: var(--text);
 }
 
 .highlighted {
@@ -368,7 +314,7 @@ window-frame button {
 
 window-frame button:hover {
     background-color: #80808030;
-    color: var(--text);
+    color: var(--text-color);
 }
 
 window-frame button:hover:active {

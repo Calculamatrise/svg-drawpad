@@ -11,22 +11,6 @@ document.documentElement.addEventListener('pointerdown', function (event) {
 	this.style.setProperty('--offsetY', event.offsetY);
 });
 
-window.setTheme = function (theme) {
-	if (theme === 'dark') {
-		document.documentElement.style.setProperty('--background', '#1b1b1b');
-		document.documentElement.style.setProperty('--hard-background', '#111');
-		document.documentElement.style.setProperty('--soft-background', '#333');
-		document.documentElement.style.setProperty('--text', '#fbfbfb');
-	} else {
-		document.documentElement.style.setProperty('--background', '#ebebeb');
-		document.documentElement.style.setProperty('--hard-background', '#eee');
-		document.documentElement.style.setProperty('--soft-background', '#ccc');
-		document.documentElement.style.setProperty('--text', '#1b1b1b');
-	}
-}
-
-setTheme(window.canvas.config.theme);
-
 if (!window.hasOwnProperty('api')) {
 	window.api = window.api || {};
 	window.api.receive = window.api.receive || (() => { });

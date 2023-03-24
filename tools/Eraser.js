@@ -20,7 +20,7 @@ export default class extends Tool {
 	}
 
 	press(event) {
-		this.canvas.layer.lines.filter(line => !!line.parentElement).forEach(line => {
+		this.canvas.layers.selected.lines.filter(line => !!line.parentElement).forEach(line => {
 			if (line.erase(event)) {
 				this.canvas.events.push({
 					action: 'remove',
@@ -36,7 +36,7 @@ export default class extends Tool {
 		this.element.setAttribute('cx', position.x);
 		this.element.setAttribute('cy', position.y);
 		if (this.mouse.down && !this.mouse.isAlternate) {
-			this.canvas.layer.lines.filter(line => !!line.parentElement).forEach(line => {
+			this.canvas.layers.selected.lines.filter(line => !!line.parentElement).forEach(line => {
 				if (line.erase(event)) {
 					this.canvas.events.push({
 						action: 'remove',

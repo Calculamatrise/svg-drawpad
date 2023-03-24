@@ -17,7 +17,7 @@ export default class extends Tool {
 		this.element.style.setProperty('stroke', this.canvas.primary);
 		this.element.style.setProperty('stroke-width', this.size);
 		this.element.setAttribute('points', `${this.anchorA.x},${this.anchorA.y}`);
-		this.canvas.layer.base.appendChild(this.element);
+		this.canvas.layers.selected.base.appendChild(this.element);
 	}
 
 	stroke() {
@@ -81,11 +81,11 @@ export default class extends Tool {
 						}
 					}
 
-					return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 <= window.canvas.tool.size && !this.remove();
+					return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 <= window.canvas.tools.selected.size && !this.remove();
 				});
 			}
 
-			this.canvas.layer.push(temp);
+			this.canvas.layers.selected.push(temp);
 			this.canvas.events.push({
 				action: 'add',
 				value: temp

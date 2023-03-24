@@ -32,7 +32,7 @@ export default class extends EventEmitter {
 
 	pointerdown(target, event) {
 		event.preventDefault();
-		layers.style.display !== 'none' && layers.style.setProperty('display', 'none');
+		layerschkbx.checked = false;
 		this.down = true;
 		this.locked || (this.position.x = event.offsetX,
 		this.position.y = event.offsetY,
@@ -59,32 +59,7 @@ export default class extends EventEmitter {
 	wheel(target, event) {
 		event.preventDefault();
 		event.stopPropagation();
-		if (event.ctrlKey) {
-			if (event.deltaY < 0) {
-				if (this.parent.zoom > 1) {
-					this.parent.zoom -= this.parent.zoomIncrementValue;
-				}
-			} else if (this.parent.zoom < 10) {
-				this.parent.zoom += this.parent.zoomIncrementValue;
-			}
-
-			window.dispatchEvent(new Event('resize'));
-			return;
-		}
-
-		if (event.deltaY > 0 && this.parent.tool.size <= 2) {
-			return;
-		} else if (event.deltaY < 0 && this.parent.tool.size >= 100) {
-			return;
-		}
-
-		this.parent.tool.size -= event.deltaY / 100;
-		// const zoom = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--size"));
-		// if (event.deltaY > 0 && zoom >= 100 || event.deltaY < 0 && zoom < 1) {
-		// 	return;
-		// }
-
-		// document.documentElement.style.setProperty("--size", zoom + event.deltaY / 1000);
+		this.emit('wheel', event);
 	}
 
 	touchcancel(target, event) {

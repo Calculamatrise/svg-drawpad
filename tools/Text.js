@@ -7,7 +7,7 @@ export default class extends Tool {
 		if (this.active) return;
 		this.active = true;
 		this.element.remove();
-		this.canvas.layer.base.appendChild(this.element.cloneNode());
+		this.canvas.layers.selected.base.appendChild(this.element.cloneNode());
 	}
 
 	stroke() {
@@ -16,7 +16,7 @@ export default class extends Tool {
 		this.element.style.setProperty('fill', this.canvas.fill ? this.canvas.primary : '#FFFFFF00');
 		this.element.setAttribute('x', position.x);
 		this.element.setAttribute('y', position.y);
-		this.canvas.layer.base.appendChild(this.element);
+		this.canvas.layers.selected.base.appendChild(this.element);
 	}
 
 	clip() {

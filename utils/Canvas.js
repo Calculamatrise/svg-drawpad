@@ -1,67 +1,12 @@
+import EventEmitter from "./EventEmitter.js";
 import EventHandler from "../handlers/Event.js";
 import LayerHandler from "../handlers/Layer.js";
 import MouseHandler from "../handlers/Mouse.js";
 import ToolHandler from "../handlers/Tool.js";
 
-let parser = new DOMParser();
-export default class {
-	get container() {
-		return this.view.parentElement || document.querySelector('#container');
-	}
-
-	get fill() {
-		return this.#fill;
-	}
-
-	set fill(boolean) {
-		this.text.setAttribute('fill', boolean ? this.primary : '#ffffff00');
-		this.tools.selected.element.setAttribute('fill', boolean ? this.primary : '#ffffff00');
-		this.#fill = boolean;
-	}
-
-	get layer() {
-		return this.layers.get(this.#layer);
-	}
-
-	get layerDepth() {
-		return this.#layer;
-	}
-
-	set layerDepth(layer) {
-		this.alert('Layer' + layer);
-		this.#layer = layer;
-	}
-
-	get primary() {
-		if (this.config.randomizeStyle) {
-			return `rgb(${Math.ceil(Math.random() * 255)}, ${Math.ceil(Math.random() * 255)}, ${Math.ceil(Math.random() * 255)})`;
-		}
-
-		return this.config.styles.primary;
-	}
-
-	get tool() {
-		return this.tools.selected;
-	}
-
-	get viewBox() {
-		let viewBox = this.view.getAttribute('viewBox').split(/\s+/g);
-		return {
-			x: parseFloat(viewBox[0]) || 0,
-			y: parseFloat(viewBox[1]) || 0,
-			width: parseFloat(viewBox[2]) || window.innerWidth,
-			height: parseFloat(viewBox[3]) || window.outerWidth
-		}
-	}
-
-	set viewBox(value) {
-		let viewBox = this.viewBox;
-		this.view.setAttribute('viewBox', `${value.x || viewBox.x} ${value.y || viewBox.y} ${value.width || viewBox.width} ${value.height || viewBox.height}`);
-	}
-
-	#fill = false;
-	#layer = 1;
-	alerts = [];
+const parser = new DOMParser();
+export default class extends EventEmitter {
+	alerts = []
 	config = new Proxy(Object.assign({
 		randomizeStyle: false,
 		styles: {
@@ -80,6 +25,7 @@ export default class {
 		set: (...args) => {
 			Reflect.set(...args);
 			localStorage.setItem('svg-drawpad-settings', JSON.stringify(this.config));
+			this.emit('settingsChange', this.config);
 			return true;
 		},
 		deleteProperty: (...args) => {
@@ -89,15 +35,16 @@ export default class {
 		}
 	});
 	events = new EventHandler();
+	fill = false;
 	layers = new LayerHandler(this);
 	mouse = new MouseHandler();
 	text = document.createElementNS("http://www.w3.org/2000/svg", 'text');
 	tools = new ToolHandler(this);
 	zoom = 1;
-	zoomIncrementValue = 0.5;
 	constructor(view) {
+		super();
 		this.view = view;
-		let { width, height } = view.getBoundingClientRect();
+		const { width, height } = view.getBoundingClientRect();
 		this.view.style.setProperty('stroke-linecap', 'round');
 		this.view.style.setProperty('stroke-linejoin', 'round');
 		this.view.setAttribute('viewBox', `0 0 ${width} ${height}`);
@@ -107,9 +54,51 @@ export default class {
 		this.mouse.on('down', this.press.bind(this));
 		this.mouse.on('move', this.stroke.bind(this));
 		this.mouse.on('up', this.clip.bind(this));
+		this.mouse.on('wheel', this.wheel.bind(this));
+		this.text.style.setProperty('text-anchor', 'middle');
+
+		this.on('settingsChange', this.setColorScheme);
+		this.setColorScheme();
 
 		document.addEventListener('keydown', this.keydown.bind(this));
 		window.addEventListener('resize', this.resize.bind(this));
+	}
+
+	get container() {
+		return this.view.parentElement || document.querySelector('#container');
+	}
+
+	get primary() {
+		if (this.config.randomizeStyle) {
+			return `rgb(${Math.ceil(Math.random() * 255)}, ${Math.ceil(Math.random() * 255)}, ${Math.ceil(Math.random() * 255)})`;
+		}
+
+		return this.config.styles.primary;
+	}
+
+	get viewBox() {
+		let viewBox = this.view.getAttribute('viewBox').split(/\s+/g);
+		return {
+			x: parseFloat(viewBox[0]) || 0,
+			y: parseFloat(viewBox[1]) || 0,
+			width: parseFloat(viewBox[2]) || window.innerWidth,
+			height: parseFloat(viewBox[3]) || window.outerWidth
+		}
+	}
+
+	set viewBox(value) {
+		let viewBox = this.viewBox;
+		this.view.setAttribute('viewBox', `${value.x || viewBox.x} ${value.y || viewBox.y} ${value.width || viewBox.width} ${value.height || viewBox.height}`);
+	}
+
+	setColorScheme({ theme } = this.config) {
+		if (theme == 'dark') {
+			document.documentElement.attributeStyleMap.clear();
+		} else {
+			document.documentElement.style.setProperty('--background', '#EBEBEB');
+			document.documentElement.style.setProperty('--hard-background', '#EEEEEE');
+			document.documentElement.style.setProperty('--text-color', '#1B1B1B');
+		}
 	}
 
 	alert(text, timeout) {
@@ -119,11 +108,10 @@ export default class {
 		const { width } = this.text.getBoundingClientRect();
 		this.text.setAttribute('x', this.viewBox.width / 2 - width / 2 + this.viewBox.x);
 		this.text.setAttribute('y', 25 + this.viewBox.y);
-		this.text.setAttribute('fill', '#' + (this.config.theme == 'dark' ? 'fbfbfb' : '1b1b1b'));
+		this.text.setAttribute('fill', '#'.padEnd(7, this.config.theme == 'dark' ? 'FB' : '1B'));
 		this.text.timeout = setTimeout(() => this.text.remove(), timeout ?? 2e3);
 		this.view.appendChild(this.text);
 		// this.alerts.push(label);
-
 		return text;
 	}
 
@@ -131,31 +119,28 @@ export default class {
 		this.close();
 		try {
 			this.view.innerHTML = parser.parseFromString(data, 'text/xml').querySelector('svg').innerHTML;
-			let layerId = 1;
 			while (true) {
 				if ([...document.querySelectorAll('g:not([data-id])')].filter(element => element.parentElement.id === 'view').length < 1) {
 					break;
 				}
 
 				this.layers.create();
-				layerId++;
 			}
 
-			this.layerDepth = this.layers.cache.length;
+			this.layers.select(this.layers.cache.length);
 		} catch (error) {
 			console.error(error);
 		}
 	}
 
-	resize(event) {
+	resize() {
 		let { width, height } = this.view.getBoundingClientRect();
-		height *= this.zoom;
-		width *= this.zoom;
+		height /= this.zoom;
+		width /= this.zoom;
 		this.view.setAttribute('viewBox', `${this.viewBox.x + (this.viewBox.width - width) / 2} ${this.viewBox.y + (this.viewBox.height - height) / 2} ${width} ${height}`);
-		// this.view.setAttribute('viewBox', `0 0 ${boundingRect.width} ${boundingRect.height}`);
-		const text = this.text.getBoundingClientRect();
-		this.text.setAttribute('x', this.viewBox.width / 2 - text.width / 2 + this.viewBox.x);
-		this.text.setAttribute('y', 25 + this.viewBox.y);
+		this.text.style.setProperty('font-size', 16 / this.zoom);
+		this.text.setAttribute('x', this.viewBox.width / 2 + this.viewBox.x);
+		this.text.setAttribute('y', 25 / this.zoom + this.viewBox.y);
 	}
 
 	undo() {
@@ -268,14 +253,9 @@ export default class {
 			return void this.tools.select(select);
 		} else if (event.button === 2 || this.mouse.isAlternate) {
 			return;
-		} else if (event.shiftKey) {
-			return void this.alert('Camera');
 		}
 
-		if (event.ctrlKey) {
-			this.tools.select('select');
-		}
-
+		event.ctrlKey && this.tools.select('select');
 		this.tools.selected.press(event);
 	}
 
@@ -298,32 +278,40 @@ export default class {
 		!this.mouse.isAlternate && !event.shiftKey && this.tools.selected.clip(event);
 	}
 
+	wheel(event) {
+		if (event.ctrlKey) {
+			if (event.deltaY < 0) {
+				this.zoom = Math.min(this.zoom * window.devicePixelRatio + .25, window.devicePixelRatio * 4);
+			} else {
+				this.zoom = Math.max(this.zoom / window.devicePixelRatio - .25, window.devicePixelRatio / 5);
+			}
+
+			window.dispatchEvent(new Event('resize'));
+			return;
+		}
+
+		if (event.deltaY > 0 && this.tools.selected.size <= 2) {
+			return;
+		} else if (event.deltaY < 0 && this.tools.selected.size >= 100) {
+			return;
+		}
+
+		this.tools.selected.size -= event.deltaY / 100;
+	}
+
 	keydown(event) {
 		event.preventDefault();
 		event.stopPropagation();
 		switch (event.key) {
 			case 'Escape':
-				if (layers.style.display !== 'none') {
-					layers.style.setProperty('display', 'none');
-					break;
-				}
-
-				let settings = document.querySelector('#settings');
-				if (settings === null) {
-					break;
-				}
-
-				settings.style.setProperty('display', settings.style.display === 'flex' ? 'none' : 'flex');
+				settingschkbx.checked = !settingschkbx.checked;
+				settingschkbx.dispatchEvent(new Event('change'));
 				break;
 
 			case '+':
 			case '=':
-				if (this.tools._selected === 'camera' || event.ctrlKey) {
-					if (this.zoom <= 1) {
-						break;
-					}
-
-					this.zoom -= this.zoomIncrementValue;
+				if (event.ctrlKey || this.tools._selected === 'camera') {
+					this.zoom = Math.min(this.zoom * window.devicePixelRatio + .25, window.devicePixelRatio * 4);
 					window.dispatchEvent(new Event('resize'));
 					this.tools.selected.init();
 					break;
@@ -334,13 +322,9 @@ export default class {
 				}
 				break;
 
-			case "-":
-				if (this.tools._selected === 'camera' || event.ctrlKey) {
-					if (this.zoom >= 10) {
-						break;
-					}
-
-					this.zoom += this.zoomIncrementValue;
+			case '-':
+				if (event.ctrlKey || this.tools._selected === 'camera') {
+					this.zoom = Math.max(this.zoom / window.devicePixelRatio - .25, window.devicePixelRatio / 5);
 					window.dispatchEvent(new Event('resize'));
 					this.tools.selected.init();
 					break;
@@ -354,33 +338,27 @@ export default class {
 			case '0':
 				this.tools.select('camera');
 				break;
-
 			case '1':
 				this.tools.select('line');
 				break;
-
 			case '2':
 				this.tools.select('brush');
 				break;
-
 			case '3':
 				this.tools.select('circle');
 				break;
-
 			case '4':
 				this.tools.select('rectangle');
 				break;
-
 			case '5':
 				this.tools.select('eraser');
 				break;
-
 			case 'f':
 				this.fill = !this.fill;
 				break;
 
 			case 'ArrowUp':
-				if (this.layerDepth >= this.layers.cache.length) {
+				if (this.layers.selected.id >= this.layers.cache.length) {
 					if (!event.shiftKey) {
 						break;
 					}
@@ -388,12 +366,12 @@ export default class {
 					this.layers.create();
 				}
 
-				this.layerDepth = this.layerDepth + 1;
+				this.layers.select(this.layers.selected.id + 1);
 				break;
 
 			case 'ArrowDown':
-				if (this.layerDepth > 1) {
-					this.layerDepth = this.layerDepth - 1;
+				if (this.layers.selected.id > 1) {
+					this.layers.select(this.layers.selected.id - 1);
 				}
 				break;
 
