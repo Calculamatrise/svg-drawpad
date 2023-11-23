@@ -29,18 +29,26 @@ body {
 	overflow: hidden;
 }
 
+body > nav {
+	display: none;
+	translate: 0 -100%;
+}
+
 svg#view {
 	background-color: var(--background);
 	display: block;
 	fill: var(--text-color);
+	fill: none;
 	height: 100vh;
 	stroke: var(--text-color);
+	stroke: none;
 	stroke-width: calc(8 * var(--size));
 	touch-action: none;
 	width: 100vw;
 }
 
 text {
+	fill: var(--text-color);
 	stroke: none;
 }
 

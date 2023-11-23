@@ -1,21 +1,21 @@
 {
-    "background_color": "#1b1b1b",
-    "description": "A program that uses scalable vector graphics to create an image of your choosing.",
-    "dir": "ltr",
-    "display": "minimal-ui",
-    "name": "SVG Drawpad",
-    "orientation": "portrait",
-    "scope": "/",
-    "short_name": "Drawpad",
-    "start_url": "/",
-    "theme_color": "#2b2b2b",
-    "categories": [],
-    "screenshots": [],
-    "icons": [{
-        "src": "/favicon.ico"
-    }, {
-        "src": "/favicon.ico",
-        "type": "image/x-icon"
-    }],
-    "shortcuts": []
+	"background_color": "#1b1b1b",
+	"description": "A program that uses scalable vector graphics to create an image of your choosing.",
+	"dir": "ltr",
+	"display": "minimal-ui",
+	"name": "SVG Drawpad",
+	"orientation": "portrait",
+	"scope": "/",
+	"short_name": "Drawpad",
+	"start_url": "/",
+	"theme_color": "#2b2b2b",
+	"categories": [],
+	"screenshots": [],
+	"icons": [{
+		"src": "/favicon.ico"
+	}, {
+		"src": "/favicon.ico",
+		"type": "image/x-icon"
+	}],
+	"shortcuts": []
 }

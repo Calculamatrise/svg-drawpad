@@ -1,94 +1,94 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>SVG Drawpad - Calculamatrise</title>
-    <link rel="icon" href="favicon.ico">
-    <link rel="stylesheet" href="https://calculamatrise.github.io/styles/default.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="author" content="Calculamatrise">
-    <meta property="og:title" content="Calculamatrise">
-    <meta property="og:description" content="A program that uses scalable vector graphics to create an image of your choosing.">
-    <meta property="og:image" content="https://calculamatrise.github.io/icons/favicon.png">
-    <meta property="og:url" content="https://calculamatrise.github.io/svg-drawpad/">
-    <meta name="viewport" content="minimal-ui,width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
-    <script type="module" src="bootstrap.js" defer></script>
+	<title>SVG Drawpad - Calculamatrise</title>
+	<link rel="icon" href="favicon.ico">
+	<link rel="stylesheet" href="https://calculamatrise.github.io/styles/default.css">
+	<link rel="stylesheet" href="style.css">
+	<link rel="manifest" href="/manifest.json">
+	<meta name="author" content="Calculamatrise">
+	<meta property="og:title" content="Calculamatrise">
+	<meta property="og:description" content="A program that uses scalable vector graphics to create an image of your choosing.">
+	<meta property="og:image" content="https://calculamatrise.github.io/icons/favicon.png">
+	<meta property="og:url" content="https://calculamatrise.github.io/svg-drawpad/">
+	<meta name="viewport" content="minimal-ui,width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<script type="module" src="bootstrap.js" defer></script>
 </head>
 <body onload="
-    primary.parentElement.style.setProperty('background-color', (primary.value = canvas.config.styles.primary) + '40');
-    secondary.parentElement.style.setProperty('background-color', (secondary.value = canvas.config.styles.secondary) + '40');
-    randomColors.innerText = canvas.config.randomizeStyle ? 'Disable Random Colours' : 'Enable Random Colours';
-    // container.style.setProperty('height', `calc(100% - ${document.querySelector('window-frame')?.getBoundingClientRect().height}px`);
-    // window.dispatchEvent(new Event('resize'));
+	primary.parentElement.style.setProperty('background-color', (primary.value = canvas.config.styles.primary) + '40');
+	secondary.parentElement.style.setProperty('background-color', (secondary.value = canvas.config.styles.secondary) + '40');
+	randomColors.innerText = canvas.config.randomizeStyle ? 'Disable Random Colours' : 'Enable Random Colours';
+	// container.style.setProperty('height', `calc(100% - ${document.querySelector('window-frame')?.getBoundingClientRect().height}px`);
+	// window.dispatchEvent(new Event('resize'));
 ">
-    <main id="container">
-        <svg id="view" xmlns="http://www.w3.org/2000/svg">Sorry, your browser does not support inline SVG.</svg>
-        <user-interface>
-            <section class="left top">
-                <label for="toolbar-dropdown" class="button secondary">Toolbar</label>
-                <div class="toolbar">
-                    <input type="checkbox" id="toolbar-dropdown" style="display: none;">
-                    <button class="ripple" onclick="canvas.tools.select('line');">Line</button>
-                    <button class="ripple" onclick="canvas.tools.select('brush');">Brush</button>
-                    <button class="ripple" onclick="canvas.tools.select('curve');">Curve</button>
-                    <button class="ripple" onclick="canvas.tools.select('circle');">Circle</button>
-                    <button class="ripple" onclick="canvas.tools.select('rectangle');">Rectangle</button>
-                    <button class="ripple" onclick="canvas.tools.select('eraser');">Eraser</button>
-                    <button class="ripple" onclick="canvas.tools.select('camera');">Camera</button>
-                    <button class="ripple" onclick="canvas.tools.select('select');">Select</button>
-                    <label for="advanced-tools" class="button secondary">Advanced Tools</label>
-                    <div style="display: contents;">
-                        <input type="checkbox" id="advanced-tools" style="display: none;" onchange="this.parentElement.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'center' });">
-                        <button onclick="canvas.tools.select('beziercurve');">Bezier Curve</button>
-                        <button onclick="canvas.tools.select('ellipse');">Ellipse</button>
-                        <button class="option ripple rainbow" id="randomColors" onclick="
-                            canvas.config.randomizeStyle = !canvas.config.randomizeStyle;
-                            this.innerText = canvas.config.randomizeStyle ? 'Disable Random Colours' : 'Enable Random Colours';
-                        ">
-                            Enable Random Colours
-                        </button>
-                    </div>
-                </div>
-            </section>
-            <section class="right top" style="z-index: 50;">
-                <label for="layerschkbx" class="button secondary">Layers</label>
-                <label for="settingschkbx" class="button secondary">Settings</label>
-            </section>
-            <section class="bottom left" style="border-radius: 4px;">
-                <label class="button option ripple" style="border-radius: 0;"><input type="color" id="primary" oninput="this.parentElement.style.setProperty('background-color', (canvas.config.styles.primary = this.value) + '40');canvas.config.randomizeStyle = false;randomColors.innerText = 'Enable Random Colours';">Primary Colour</label>
-                <label class="button option ripple disabled" style="border-radius: 0;"><input type="color" id="secondary" oninput="this.parentElement.style.setProperty('background-color', (canvas.config.styles.secondary = this.value) + '40');canvas.config.randomizeStyle = false;randomColors.innerText = 'Enable Random Colours';">Secondary Colour</label>
-            </section>
-            <div class="overlay" id="layers">
-                <input type="checkbox" name="overlay" id="layerschkbx" style="display: none;" onchange="this.checked && (settingschkbx.checked = false)">
-                <div id="layer-container">
-                    <button class="secondary ripple" onclick="canvas.layers.create(), canvas.layerDepth = canvas.layerDepth + 1;" style="aspect-ratio: unset;height: 100%;">New Layer</button>
-                </div>
-            </div>
-            <!-- Settings Overlay -->
-            <div class="overlay" id="settings">
-                <input type="checkbox" name="overlay" id="settingschkbx" style="display: none;" onchange="this.checked && (layerschkbx.checked = false)">
-                <!-- Add radio to layer and settings since they cannot be open at the same time -->
-                <nav>
-                    <label for="file" class="tab button secondary">General</label>
-                    <label for="theme" class="tab button secondary">Appearance</label>
-                </nav>
-                <section>
-                    <input type="radio" name="settings-overlay-nav" id="file" style="display: none;" checked>
-                    <input type="file" id="import" accept="image/svg+xml" style="display: none;" onchange="this.classList.add('loading'),this.files[0].text().then(text => (this.classList.remove('loading'),canvas.import(text)));">
-                    <label for="import" class="button secondary ripple" style="text-align: center; line-height: 350%; font-size: calc(40px / 3);">Import Canvas</label>
-                    <button class="secondary ripple" onclick="
-                        Object.assign(document.createElement('a'), {
-                            download: 'svg_canvas-' + new Intl.DateTimeFormat('en-CA', { dateStyle: 'short', timeStyle: 'medium' }).format().replace(/[/:]/g, '-').replace(/,+\s*/, '_').replace(/\s+.*$/, ''),
-                            href: window.URL.createObjectURL(new Blob([canvas.toString()], { type: 'image/svg+xml' }))
-                        }).dispatchEvent(new MouseEvent('click'));
-                    ">Export Canvas</button>
-                </section>
-                <section>
-                    <input type="radio" name="settings-overlay-nav" id="theme" style="display: none;">
-                    <button class="secondary" onclick="(window.canvas.config.theme = window.canvas.config.theme !== 'dark' ? 'dark' : 'light') && setTheme(window.canvas.config.theme)">Change Theme</button>
-                </section>
-            </div>
-        </user-interface>
-    </main>
+	<main id="container">
+		<svg id="view" xmlns="http://www.w3.org/2000/svg">Sorry, your browser does not support inline SVG.</svg>
+		<user-interface>
+			<section class="left top">
+				<label for="toolbar-dropdown" class="button secondary">Toolbar</label>
+				<div class="toolbar">
+					<input type="checkbox" id="toolbar-dropdown" style="display: none;">
+					<button class="ripple" onclick="canvas.tools.select('line');">Line</button>
+					<button class="ripple" onclick="canvas.tools.select('brush');">Brush</button>
+					<button class="ripple" onclick="canvas.tools.select('curve');">Curve</button>
+					<button class="ripple" onclick="canvas.tools.select('circle');">Circle</button>
+					<button class="ripple" onclick="canvas.tools.select('rectangle');">Rectangle</button>
+					<button class="ripple" onclick="canvas.tools.select('eraser');">Eraser</button>
+					<button class="ripple" onclick="canvas.tools.select('camera');">Camera</button>
+					<button class="ripple" onclick="canvas.tools.select('select');">Select</button>
+					<label for="advanced-tools" class="button secondary">Advanced Tools</label>
+					<div style="display: contents;">
+						<input type="checkbox" id="advanced-tools" style="display: none;" onchange="this.parentElement.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'center' });">
+						<button onclick="canvas.tools.select('beziercurve');">Bezier Curve</button>
+						<button onclick="canvas.tools.select('ellipse');">Ellipse</button>
+						<button class="option ripple rainbow" id="randomColors" onclick="
+							canvas.config.randomizeStyle = !canvas.config.randomizeStyle;
+							this.innerText = canvas.config.randomizeStyle ? 'Disable Random Colours' : 'Enable Random Colours';
+						">
+							Enable Random Colours
+						</button>
+					</div>
+				</div>
+			</section>
+			<section class="right top" style="z-index: 50;">
+				<label for="layerschkbx" class="button secondary">Layers</label>
+				<label for="settingschkbx" class="button secondary">Settings</label>
+			</section>
+			<section class="bottom left" style="border-radius: 4px;">
+				<label class="button option ripple" style="border-radius: 0;"><input type="color" id="primary" oninput="this.parentElement.style.setProperty('background-color', (canvas.config.styles.primary = this.value) + '40');canvas.config.randomizeStyle = false;randomColors.innerText = 'Enable Random Colours';">Primary Colour</label>
+				<label class="button option ripple disabled" style="border-radius: 0;"><input type="color" id="secondary" oninput="this.parentElement.style.setProperty('background-color', (canvas.config.styles.secondary = this.value) + '40');canvas.config.randomizeStyle = false;randomColors.innerText = 'Enable Random Colours';">Secondary Colour</label>
+			</section>
+			<div class="overlay" id="layers">
+				<input type="checkbox" name="overlay" id="layerschkbx" style="display: none;" onchange="this.checked && (settingschkbx.checked = false)">
+				<div id="layer-container">
+					<button class="secondary ripple" onclick="canvas.layers.create(), canvas.layerDepth = canvas.layerDepth + 1;" style="aspect-ratio: unset;height: 100%;">New Layer</button>
+				</div>
+			</div>
+			<!-- Settings Overlay -->
+			<div class="overlay" id="settings">
+				<input type="checkbox" name="overlay" id="settingschkbx" style="display: none;" onchange="this.checked && (layerschkbx.checked = false)">
+				<!-- Add radio to layer and settings since they cannot be open at the same time -->
+				<nav>
+					<label for="file" class="tab button secondary">General</label>
+					<label for="theme" class="tab button secondary">Appearance</label>
+				</nav>
+				<section>
+					<input type="radio" name="settings-overlay-nav" id="file" style="display: none;" checked>
+					<input type="file" id="import" accept="image/svg+xml" style="display: none;" onchange="this.classList.add('loading'),this.files[0].text().then(text => (this.classList.remove('loading'),canvas.import(text)));">
+					<label for="import" class="button secondary ripple" style="text-align: center; line-height: 350%; font-size: calc(40px / 3);">Import Canvas</label>
+					<button class="secondary ripple" onclick="
+						Object.assign(document.createElement('a'), {
+							download: 'svg_canvas-' + new Intl.DateTimeFormat('en-CA', { dateStyle: 'short', timeStyle: 'medium' }).format().replace(/[/:]/g, '-').replace(/,+\s*/, '_').replace(/\s+.*$/, ''),
+							href: window.URL.createObjectURL(new Blob([canvas.toString()], { type: 'image/svg+xml' }))
+						}).dispatchEvent(new MouseEvent('click'));
+					">Export Canvas</button>
+				</section>
+				<section>
+					<input type="radio" name="settings-overlay-nav" id="theme" style="display: none;">
+					<button class="secondary" onclick="(window.canvas.config.theme = window.canvas.config.theme !== 'dark' ? 'dark' : 'light') && setTheme(window.canvas.config.theme)">Change Theme</button>
+				</section>
+			</div>
+		</user-interface>
+	</main>
 </body>
 </html>
