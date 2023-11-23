@@ -1,16 +1,16 @@
 @keyframes fade {
-    0%, 100% {
-        opacity: 1;
-        stroke-opacity: 1;
-    }
-    50% {
-        color: 0;
-        stroke-opacity: 0;
-    }
+	0%, 100% {
+		opacity: 1;
+		stroke-opacity: 1;
+	}
+	50% {
+		color: 0;
+		stroke-opacity: 0;
+	}
 }
 
 :root {
-    --size: .5;
+	--size: .5;
 	--background: #1B1B1B;
 	--hard-background: #111111;
 	--text-color: #FBFBFB;
@@ -19,7 +19,7 @@
 }
 
 html, a {
-    color: var(--text-color);
+	color: var(--text-color);
 	max-height: 100vh;
 }
 

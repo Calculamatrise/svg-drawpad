@@ -12,9 +12,9 @@ document.documentElement.addEventListener('pointerdown', function (event) {
 });
 
 if (!window.hasOwnProperty('api')) {
-	window.api = window.api || {};
-	window.api.receive = window.api.receive || (() => { });
-	window.api.send = window.api.send || (() => { });
+	window.api ||= {};
+	window.api.receive ||= (() => { });
+	window.api.send ||= (() => { });
 }
 
 window.api.receive('openFile', function () {
@@ -62,19 +62,15 @@ if (maximize !== null) {
 }
 
 const close = document.querySelector("window-frame button#close");
-if (close !== null) {
-	close.addEventListener('click', function () {
-		window.api.send('closeWindow');
-	});
-}
+close !== null && close.addEventListener('click', function () {
+	window.api.send('closeWindow');
+});
 
 const label = document.querySelector("window-frame label");
-if (label !== null) {
-	label.addEventListener('click', function () {
-		let rect = label.getBoundingClientRect();
-		window.api.send('displayAppMenu', {
-			x: rect.x,
-			y: rect.bottom
-		})
-	});
-}
+label !== null && label.addEventListener('click', function () {
+	let rect = label.getBoundingClientRect();
+	window.api.send('displayAppMenu', {
+		x: rect.x,
+		y: rect.bottom
+	})
+});
