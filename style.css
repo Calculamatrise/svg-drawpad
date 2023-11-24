@@ -20,6 +20,7 @@
 
 html, a {
 	color: var(--text-color);
+	font-size: clamp(11px, 2.5vw, 15px);
 	max-height: 100vh;
 }
 
@@ -53,11 +54,11 @@ text {
 }
 
 :not(label):has(> input:is([type="checkbox"],[type="radio"]):not(:checked)) {
-    display: none !important;
+	display: none !important;
 }
 
 /* :not(label):has(> :checked) {
-    display: revert-layer !important;
+	display: revert-layer !important;
 } */
 
 #container {
@@ -74,38 +75,28 @@ user-interface > section {
 	z-index: 0;
 }
 
-user-interface .bottom {
-	bottom: 0;
+user-interface .bottom { bottom: 0; }
+user-interface .left { left: 0; }
+user-interface .right { right: 0; text-align: right; }
+user-interface .top { top: 0; }
+
+details[name="toolbar"] > .toolbar {
+	display: grid;
+	overflow: auto;
+	max-height: 50vmin;
 }
 
-user-interface .left {
-	left: 0;
-}
-
-user-interface .right {
-	right: 0;
-	text-align: right;
-}
-
-user-interface .top {
-	top: 0;
-}
-
-#container user-interface section.left.top label[for]::before {
-	content: "Show "
-}
-
-#container user-interface section.left.top:has(#toolbar-dropdown:checked) > label[for=toolbar-dropdown]::before,
-#container user-interface section.left.top:has(#advanced-tools:checked) label[for=advanced-tools]::before {
-	content: "Hide "
-}
-
-/* #container user-interface section.left.top :has(> :checked) ~ label[for]::before {
-	content: "Hide "
-} */
-
-label.button {
+details > summary.button, label.button {
 	line-height: 3rem;
+}
+
+details > summary.show-prefix::before { content: "Show " }
+details[open] > summary.show-prefix::before { content: "Hide " }
+details > summary.show-suffix::after { content: " (open)" }
+details[open] > summary.show-suffix::after { content: " (close)" }
+
+select > option {
+	background-color: var(--background);
 }
 
 #container user-interface section.left.top .toolbar {
@@ -127,7 +118,7 @@ label.button {
 	user-select: none;
 }
 
-#container user-interface section.bottom.left .option.disabled {
+#container user-interface section.bottom.left .option.disabled, .disabled, :disabled, [disabled] {
 	opacity: .5;
 	pointer-events: none;
 }
@@ -148,44 +139,64 @@ label.button {
 	align-items: center;
 	border-radius: 1rem;
 	box-shadow: inset 0px 5px 8px -10px #80808040;
-    inset: 0;
+	inset: 0;
 	overflow: hidden;
 	place-content: center;
 	position: absolute;
 }
 
+#container div#appearance-overlay {
+	background-color: hsl(0deg 0% 50% / 4%);
+    backdrop-filter: blur(4px);
+	display: flex;
+	flex-direction: column;
+	inset: 15%;
+	padding: 2rem;
+	z-index: 20;
+}
+
 #container div#settings {
 	display: flex;
-    border-radius: 0;
+	border-radius: 0;
 	background-color: hsl(0deg 0% 50% / 4%);
 	backdrop-filter: blur(2em) brightness(0.8);
 	z-index: 40;
 }
 
 #container div#settings > nav {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    min-height: 40%;
-    min-width: 10%;
+	align-items: center;
+	border-right: 1px solid hsl(0 0% 50% / 5%);
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	margin-right: 2rem;
+	min-height: 40%;
+	min-width: 10%;
 }
 
 #container div#settings > nav > label {
-    text-align: left;
+	text-align: left;
 }
 
 #container div#settings > section {
-    align-items: flex-start;
-    display: flex;
-    justify-content: flex-start;
-    min-height: 40%;
-    min-width: 40%;
+	align-items: flex-start;
+	display: flex;
+	justify-content: flex-start;
+	min-height: 40%;
+	min-width: 40%;
+}
+
+#container div#settings > footer {
+	bottom: 1rem;
+	color: hsl(0 0% 50% / 50%);
+	font-size: 0.75rem;
+	pointer-events: none;
+	position: fixed;
 }
 
 #container div#layers {
 	background-color: hsl(0deg 0% 50% / 4%);
-    backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
 	display: flex;
 	flex-direction: column;
 	inset: 15%;
@@ -196,11 +207,11 @@ label.button {
 #container div#layers div#layer-container {
 	align-items: center;
 	display: grid;
-    grid-auto-rows: min-content;
+	grid-auto-rows: min-content;
 	grid-gap: 0.4rem;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
 	overflow: auto;
-    position: relative;
+	position: relative;
 	width: -webkit-fill-available;
 }
 
@@ -223,7 +234,7 @@ label.button {
 	padding: 0.75rem 1rem;
 	place-content: center;
 	position: relative;
-    user-select: none;
+	user-select: none;
 }
 
 #container div#layers .layer::before {
@@ -273,73 +284,27 @@ label.button {
 	margin-top: 10px;
 }
 
+.button {
+	font-size: clamp(11px, 2.5vmin, 13px);
+	max-width: 100%;
+	max-width: -webkit-fill-available;
+}
+
 .highlighted {
-    animation: fade 2s ease-in-out infinite;
+	animation: fade 2s ease-in-out infinite;
 }
 
-window-frame {
-    background-color: var(--background);
-    color: #80808080;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    position: relative;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-app-region: drag;
+#changes {
+	backdrop-filter: blur(0.5rem) brightness(0.5);
+	height: fit-content;
+	padding: 0.5rem 2rem;
+	margin: auto;
+	width: fit-content;
 }
 
-window-frame label {
-    font-size: 10px;
-    padding: 0 4px;
-    position: relative;
-    -webkit-app-region: no-drag;
-}
-
-window-frame label:hover {
-    color: #808080ad;
-}
-
-window-frame div[data-position="left"] > * {
-    max-height: 1.25rem;
-    padding: 0.25rem;
-    vertical-align: middle;
-}
-
-window-frame div[data-position="right"] {
-    display: flex;
-    -webkit-app-region: no-drag;
-}
-
-window-frame button {
-    aspect-ratio: auto;
-    background-color: transparent;
-    border-radius: 0;
-    height: -webkit-fill-available;
-    padding: 0.25rem 1rem;
-    position: relative;
-    vertical-align: middle;
-}
-
-window-frame button:hover {
-    background-color: #80808030;
-    color: var(--text-color);
-}
-
-window-frame button:hover:active {
-    background-color: #80808050;
-}
-
-window-frame button#maximize[title="Restore"]::before {
-    content: "▢";
-    position: absolute;
-    top: 6px;
-    left: 14px;
-}
-
-window-frame button#close:hover {
-    background-color: hsla(0, 100%, 50%, 0.867);
-}
-
-window-frame button#close:hover:active {
-    background-color: hsla(0, 100%, 50%, 0.565);
+context-menu {
+	display: flex;
+	padding: 1rem;
+	position: absolute;
+	z-index: 1000;
 }

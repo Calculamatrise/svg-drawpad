@@ -46,17 +46,18 @@ export default class extends Tool {
 			this.anchorB = null;
 			this.element.remove();
 
+			// const canvas = this.canvas;
+			const eraser = this.canvas.tools.cache.get('eraser');
+			const eraserSize = eraser && eraser.size | 0;
 			const temp = this.element.cloneNode();
 			temp.erase = function (event) {
-				const points = this.getAttribute('points').split(/\s+/g).map(function (point) {
+				const points = this.getAttribute('points').split(/\s+/g).map(point => {
 					// Object.fromEntries
 					const [x, y] = point.split(',').map(value => +value);
-					return {
-						x, y
-					}
+					return { x, y }
 				});
 
-				return !!points.find((point, index, points) => {
+				return Boolean(points.find((point, index, points) => {
 					if (!points[index - 1]) {
 						return false;
 					}
@@ -81,8 +82,8 @@ export default class extends Tool {
 						}
 					}
 
-					return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 <= window.canvas.tools.selected.size && !this.remove();
-				});
+					return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 <= eraserSize && !this.remove();
+				}));
 			}
 
 			this.canvas.layers.selected.push(temp);

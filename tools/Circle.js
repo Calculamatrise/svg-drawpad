@@ -154,21 +154,23 @@ export default class extends Tool {
 			return;
 		}
 
-		const circle = this.element.cloneNode();
-		circle.erase = function (event) {
+		const eraser = this.canvas.tools.cache.get('eraser');
+		const eraserSize = eraser && eraser.size | 0;
+		const temp = this.element.cloneNode();
+		temp.erase = function (event) {
 			let vector = {
 				x: this.getAttribute('cx') - window.canvas.viewBox.x - event.offsetX,
 				y: this.getAttribute('cy') - window.canvas.viewBox.y - event.offsetY
 			}
 
 			let len = Math.abs(Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.getAttribute('r'));
-			return len - this.style.getPropertyValue('stroke-width') / 2 <= window.canvas.tools.selected.size && (window.canvas.tools.selected.size <= len + this.style.getPropertyValue('stroke-width') / 2 || this.getAttribute("r") < window.canvas.tools.selected.size) && !this.remove();
+			return len - this.style.getPropertyValue('stroke-width') / 2 <= eraserSize && (eraserSize <= len + this.style.getPropertyValue('stroke-width') / 2 || this.getAttribute("r") < eraserSize) && !this.remove();
 		}
 
-		this.canvas.layers.selected.push(circle);
+		this.canvas.layers.selected.push(temp);
 		this.canvas.events.push({
-			action: "add",
-			value: circle
+			action: 'add',
+			value: temp
 		});
 	}
 }

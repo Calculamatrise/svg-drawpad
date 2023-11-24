@@ -12,7 +12,7 @@ export default class extends Tool {
 		this.element.style.setProperty('fill', "transparent");
 		this.element.style.setProperty('stroke-width', this.size);
 		const position = this.mouse.position.toCanvas(this.canvas);
-		this.element.setAttribute('points', `${position.x},${position.y}`);
+		this.element.setAttribute('points', `${position.x},${position.y} ${position.x},${position.y}`);
 		this.canvas.layers.selected.base.appendChild(this.element);
 	}
 
@@ -29,15 +29,13 @@ export default class extends Tool {
 			return;
 		}
 
-		const toolSize = this.size;
+		const eraser = this.canvas.tools.cache.get('eraser');
+		const eraserSize = eraser && eraser.size | 0;
 		const temp = this.element.cloneNode();
 		temp.erase = function (event) {
-			const points = this.getAttribute('points').split(/\s+/g).map(function (point) {
-				const [x, y] = point.split(',').map(value => +value);
-				return {
-					x,
-					y
-				}
+			const points = this.getAttribute('points').split(/\s+/g).map(point => {
+				const [x, y] = point.split(',').map(value => parseFloat(value));
+				return { x, y }
 			});
 
 			return !!points.find((point, index, points) => {
@@ -65,7 +63,7 @@ export default class extends Tool {
 					}
 				}
 
-				return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 <= toolSize && !this.remove();
+				return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 < eraserSize && !this.remove();
 			});
 		}
 

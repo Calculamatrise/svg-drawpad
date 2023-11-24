@@ -8,6 +8,7 @@ const parser = new DOMParser();
 export default class extends EventEmitter {
 	alerts = []
 	config = new Proxy(Object.assign({
+		dismissedNotices: [],
 		randomizeStyle: false,
 		styles: {
 			primary: '#87Ceeb',
@@ -58,10 +59,14 @@ export default class extends EventEmitter {
 		this.text.style.setProperty('text-anchor', 'middle');
 
 		this.on('settingsChange', this.setColorScheme);
-		this.setColorScheme();
+		this.on('toolSelected', name => {
+			this.alert(name.replace(/^\w/, c => c.toUpperCase()));
+		});
 
 		document.addEventListener('keydown', this.keydown.bind(this));
 		window.addEventListener('resize', this.resize.bind(this));
+
+		this.emit('settingsChange');
 	}
 
 	get container() {
@@ -93,7 +98,10 @@ export default class extends EventEmitter {
 
 	setColorScheme({ theme } = this.config) {
 		if (theme == 'dark') {
-			document.documentElement.attributeStyleMap.clear();
+			// document.documentElement.attributeStyleMap.clear();
+			document.documentElement.style.removeProperty('--background');
+			document.documentElement.style.removeProperty('--hard-background');
+			document.documentElement.style.removeProperty('--text-color');
 		} else {
 			document.documentElement.style.setProperty('--background', '#EBEBEB');
 			document.documentElement.style.setProperty('--hard-background', '#EEEEEE');
@@ -120,7 +128,7 @@ export default class extends EventEmitter {
 		try {
 			this.view.innerHTML = parser.parseFromString(data, 'text/xml').querySelector('svg').innerHTML;
 			while (true) {
-				if ([...document.querySelectorAll('g:not([data-id])')].filter(element => element.parentElement.id === 'view').length < 1) {
+				if (Array.prototype.filter.call(document.querySelectorAll('g:not([data-id])'), element => element.parentElement.id === 'view').length < 1) {
 					break;
 				}
 
@@ -150,11 +158,9 @@ export default class extends EventEmitter {
 				case 'add':
 					event.value.remove();
 					break;
-
 				case 'remove':
 					this.view.prepend(event.value);
 					break;
-
 				case 'move_selected':
 					event.data.selected.map(function (line, index) {
 						let type = parseInt(line.getAttribute('x')) ? 0 : parseInt(line.getAttribute('x1')) ? 1 : parseInt(line.getAttribute('cx')) ? 2 : parseInt(line.getAttribute('points')) ? 3 : NaN;
@@ -167,25 +173,20 @@ export default class extends EventEmitter {
 								line.setAttribute('x', event.data.cache[index].getAttribute('x'));
 								line.setAttribute('y', event.data.cache[index].getAttribute('y'));
 								break;
-
 							case 1:
 								line.setAttribute('x1', event.data.cache[index].getAttribute('x1'));
 								line.setAttribute('y1', event.data.cache[index].getAttribute('y1'));
 								line.setAttribute('x2', event.data.cache[index].getAttribute('x2'));
 								line.setAttribute('y2', event.data.cache[index].getAttribute('y2'));
 								break;
-
 							case 2:
 								line.setAttribute('cx', event.data.cache[index].getAttribute('cx'));
 								line.setAttribute('cy', event.data.cache[index].getAttribute('cy'));
 								break;
-
 							case 3:
 								line.setAttribute('points', event.data.cache[index].getAttribute('points'));
-								break;
 						}
 					});
-					break;
 			}
 
 			return event;
@@ -218,25 +219,20 @@ export default class extends EventEmitter {
 								line.setAttribute('x', event.data.secondaryCache[index].getAttribute('x'));
 								line.setAttribute('y', event.data.secondaryCache[index].getAttribute('y'));
 								break;
-
 							case 1:
 								line.setAttribute('x1', event.data.secondaryCache[index].getAttribute('x1'));
 								line.setAttribute('y1', event.data.secondaryCache[index].getAttribute('y1'));
 								line.setAttribute('x2', event.data.secondaryCache[index].getAttribute('x2'));
 								line.setAttribute('y2', event.data.secondaryCache[index].getAttribute('y2'));
 								break;
-
 							case 2:
 								line.setAttribute('cx', event.data.secondaryCache[index].getAttribute('cx'));
 								line.setAttribute('cy', event.data.secondaryCache[index].getAttribute('cy'));
 								break;
-
 							case 3:
 								line.setAttribute('points', event.data.secondaryCache[index].getAttribute('points'));
-								break;
 						}
 					});
-					break;
 			}
 
 			return event;
@@ -269,7 +265,7 @@ export default class extends EventEmitter {
 			this.tools.selected.stroke(event);
 		}
 
-		if (this.tools._selected.match(/^eraser|(bezier)?curve$/gi)) {
+		if (/^eraser|(bezier)?curve$/gi.test(this.tools._selected)) {
 			this.tools.selected.stroke(event);
 		}
 	}
@@ -307,7 +303,6 @@ export default class extends EventEmitter {
 				settingschkbx.checked = !settingschkbx.checked;
 				settingschkbx.dispatchEvent(new Event('change'));
 				break;
-
 			case '+':
 			case '=':
 				if (event.ctrlKey || this.tools._selected === 'camera') {
@@ -321,7 +316,6 @@ export default class extends EventEmitter {
 					this.tools.selected.size += 1;
 				}
 				break;
-
 			case '-':
 				if (event.ctrlKey || this.tools._selected === 'camera') {
 					this.zoom = Math.max(this.zoom / window.devicePixelRatio - .25, window.devicePixelRatio / 5);
@@ -334,7 +328,6 @@ export default class extends EventEmitter {
 					this.tools.selected.size -= 1;
 				}
 				break;
-
 			case '0':
 				this.tools.select('camera');
 				break;
@@ -356,7 +349,6 @@ export default class extends EventEmitter {
 			case 'f':
 				this.fill = !this.fill;
 				break;
-
 			case 'ArrowUp':
 				if (this.layers.selected.id >= this.layers.cache.length) {
 					if (!event.shiftKey) {
@@ -368,32 +360,22 @@ export default class extends EventEmitter {
 
 				this.layers.select(this.layers.selected.id + 1);
 				break;
-
 			case 'ArrowDown':
 				if (this.layers.selected.id > 1) {
 					this.layers.select(this.layers.selected.id - 1);
 				}
 				break;
-
 			case 'z':
 				this.undo();
 				break;
-
 			case 'x':
 				this.redo();
 				break;
-
 			case 'c':
-				if (this.tools._selected === 'select' && event.ctrlKey) {
-					this.tools.selected.copy();
-				}
+				this.tools._selected === 'select' && event.ctrlKey && this.tools.selected.copy();
 				break;
-
 			case 'v':
-				if (this.tools._selected === 'select' && event.ctrlKey) {
-					this.tools.selected.paste();
-				}
-				break;
+				this.tools._selected === 'select' && event.ctrlKey && this.tools.selected.paste();
 		}
 	}
 

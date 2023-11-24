@@ -37,6 +37,8 @@ export default class extends Tool {
 			return;
 		}
 
+		const eraser = this.canvas.tools.cache.get('eraser');
+		const eraserSize = eraser && eraser.size | 0;
 		const line = this.element.cloneNode();
 		line.erase = function (event) {
 			let vector = {
@@ -59,7 +61,7 @@ export default class extends Tool {
 				}
 			}
 
-			return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 <= window.canvas.tools.selected.size && !this.remove();
+			return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 < eraserSize && !this.remove();
 		}
 
 		this.canvas.layers.selected.push(line);

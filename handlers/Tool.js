@@ -17,7 +17,7 @@ export default class {
 	}
 
 	set selected(toolName) {
-		if (!this.cache.has(toolName)) {
+		if (!this.cache.has(toolName.toLowerCase())) {
 			throw new Error(`Hmm. What's a "${toolName}" tool?`);
 		} else if (this._selected === toolName.toLowerCase()) {
 			return;
@@ -27,11 +27,7 @@ export default class {
 		this._selected = toolName.toLowerCase();
 		this.selected.init();
 
-		this.canvas.view.parentElement.style.cursor = this._selected === 'camera' ? 'move' : 'default';
-		this.canvas.alert(this._selected.charAt(0).toUpperCase() + this._selected.slice(1));
-
-		const colours = document.querySelector('#container section.bottom.left');
-		colours !== null && colours.style[(/^(brush|c(urve|ircle)|ellipse|heart|line|rectangle)$/i.test(toolName) ? 'remove' : 'set') + 'Property']('display', 'none');
+		this.canvas.emit('toolSelected', this._selected, this.selected);
 	}
 
 	_selected = 'line';

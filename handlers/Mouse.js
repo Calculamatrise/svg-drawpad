@@ -36,7 +36,7 @@ export default class extends EventEmitter {
 		this.down = true;
 		this.locked || (this.position.x = event.offsetX,
 		this.position.y = event.offsetY,
-		this.old = Object.assign({}, this.position),
+		Object.assign(this.old, this.position),
 		target.setPointerCapture(event.pointerId));
 		this.emit('down', event);
 	}
