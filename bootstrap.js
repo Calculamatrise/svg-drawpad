@@ -11,7 +11,7 @@ window.canvas.addEventListener('toolSelected', (name, tool) => {
 	// toolbar.removeAttribute('open');
 });
 
-let contextmenu = document.querySelector('context-menu#ctx-menu');
+let contextmenu = document.querySelector('context-menu');
 contextmenu !== null && (contextmenu.remove(),
 contextmenu.style.removeProperty('display'));
 container.addEventListener('contextmenu', event => {
@@ -37,6 +37,18 @@ if (themeselect !== null) {
 
 let changes = document.querySelector('#changes');
 if (changes !== null) {
-	let dismissed = window.canvas.config.dismissedNotices.includes('2023-11-23');
-	dismissed ? changes.remove() : changes.style.removeProperty('display');
+	let tag = null; // '2023-11-25';
+	let dismissed = window.canvas.config.dismissedNotices.includes(tag);
+	if (tag && !dismissed) {
+		window.canvas.config.dismissedNotices.splice(0);
+		let dismiss = changes.querySelector('button');
+		dismiss.addEventListener('click', () => {
+			window.canvas.config.dismissedNotices.push(tag);
+			changes.remove();
+		});
+
+		changes.style.removeProperty('display');
+	} else {
+		changes.remove();
+	}
 }

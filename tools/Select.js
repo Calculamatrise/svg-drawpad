@@ -15,16 +15,16 @@ export default class extends Tool {
 			return;
 		}
 
-		this.element.style.setProperty('stroke', "#87CEEB");
-		this.element.style.setProperty('fill', "#87CEEB80");
+		this.element.style.setProperty('stroke', "#87CEEB"),
+		this.element.style.setProperty('fill', "#87CEEB80"),
 		this.element.style.setProperty('stroke-width', 2);
 		const position = this.mouse.position.toCanvas(this.canvas);
-		this.element.setAttribute('x', position.x);
-		this.element.setAttribute('y', position.y);
-		this.element.setAttribute('width', 0);
-		this.element.setAttribute('height', 0);
-		this.element.setAttribute('rx', .5);
-		this.canvas.view.appendChild(this.element);
+		this.element.setAttribute('x', position.x),
+		this.element.setAttribute('y', position.y),
+		this.element.setAttribute('width', 0),
+		this.element.setAttribute('height', 0),
+		this.element.setAttribute('rx', .5),
+		this.canvas.view.appendChild(this.element)
 	}
 
 	stroke(event) {
@@ -34,31 +34,27 @@ export default class extends Tool {
 				let type = parseInt(line.getAttribute('x')) ? 0 : parseInt(line.getAttribute('x1')) ? 1 : parseInt(line.getAttribute('cx')) ? 2 : parseInt(line.getAttribute('points')) ? 3 : NaN;
 				if (isNaN(type)) return;
 				switch (type) {
-					case 0:
-						line.setAttribute('x', parseInt(line.getAttribute('x')) + event.movementX);
-						line.setAttribute('y', parseInt(line.getAttribute('y')) + event.movementY);
-						break;
-
-					case 1:
-						line.setAttribute('x1', parseInt(line.getAttribute('x1')) + event.movementX);
-						line.setAttribute('y1', parseInt(line.getAttribute('y1')) + event.movementY);
-						line.setAttribute('x2', parseInt(line.getAttribute('x2')) + event.movementX);
-						line.setAttribute('y2', parseInt(line.getAttribute('y2')) + event.movementY);
-						break;
-
-					case 2:
-						line.setAttribute('cx', parseInt(line.getAttribute('cx')) + event.movementX);
-						line.setAttribute('cy', parseInt(line.getAttribute('cy')) + event.movementY);
-						break;
-
-					case 3:
-						line.setAttribute('points', line.getAttribute('points').split(/\s+/g).map(function (coord) {
-							coord = coord.split(/\u002C/g).map(value => parseInt(value));
-							coord[0] += event.movementX
-							coord[1] += event.movementY
-							return coord.join(",");
-						}).join(" "));
-						break;
+				case 0:
+					line.setAttribute('x', parseInt(line.getAttribute('x')) + event.movementX);
+					line.setAttribute('y', parseInt(line.getAttribute('y')) + event.movementY);
+					break;
+				case 1:
+					line.setAttribute('x1', parseInt(line.getAttribute('x1')) + event.movementX);
+					line.setAttribute('y1', parseInt(line.getAttribute('y1')) + event.movementY);
+					line.setAttribute('x2', parseInt(line.getAttribute('x2')) + event.movementX);
+					line.setAttribute('y2', parseInt(line.getAttribute('y2')) + event.movementY);
+					break;
+				case 2:
+					line.setAttribute('cx', parseInt(line.getAttribute('cx')) + event.movementX);
+					line.setAttribute('cy', parseInt(line.getAttribute('cy')) + event.movementY);
+					break;
+				case 3:
+					line.setAttribute('points', line.getAttribute('points').split(/\s+/g).map(function (coord) {
+						coord = coord.split(/\u002C/g).map(value => parseInt(value));
+						coord[0] += event.movementX
+						coord[1] += event.movementY
+						return coord.join(",");
+					}).join(" "))
 				}
 			});
 			return;
@@ -74,11 +70,10 @@ export default class extends Tool {
 
 	clip(event) {
 		if (this.active) {
-			this.deselect();
+			this.deselect(),
 			this.secondaryCache = this.selected.map(function (line) {
 				return line.cloneNode();
-			});
-
+			}),
 			this.canvas.events.push({
 				action: 'move_selected',
 				data: {
@@ -90,7 +85,7 @@ export default class extends Tool {
 			return;
 		}
 
-		this.deselect();
+		this.deselect(),
 		this.element.remove();
 
 		const old = this.mouse.old.toCanvas(this.canvas);
@@ -133,9 +128,7 @@ export default class extends Tool {
 			line.classList.add('highlighted');
 		}
 
-		if (this.selected.length > 0) {
-			this.active = true;
-		}
+		this.selected.length > 0 && (this.active = true)
 	}
 
 	copy() {
@@ -144,27 +137,26 @@ export default class extends Tool {
 			line.classList.remove('highlighted');
 			return line.cloneNode();
 		}));
-
-		this.selected = [];
-		this.parent.this.canvas.text.innerHTML = "Selection copied!";
-		this.parent.this.canvas.view.appendChild(this.parent.this.canvas.text);
-		this.parent.this.canvas.text.timeout = setTimeout(() => this.parent.this.canvas.text.remove(), 2e3);
+		this.selected = [],
+		this.parent.this.canvas.text.innerHTML = "Selection copied!",
+		this.parent.this.canvas.view.appendChild(this.parent.this.canvas.text),
+		this.parent.this.canvas.text.timeout = setTimeout(() => this.parent.this.canvas.text.remove(), 2e3)
 	}
 
 	paste() {
 		clearTimeout(this.parent.this.canvas.text.timeout);
 		if (this.constructor.id === "select") {
-			this.parent.this.canvas.text.innerHTML = "Selection pasted!";
-			this.parent.this.canvas.view.appendChild(this.parent.this.canvas.text);
-			this.parent.this.canvas.text.timeout = setTimeout(() => this.parent.this.canvas.text.remove(), 2e3);
-			this.parent.this.canvas.layers.selected.push(...this.clipboard);
+			this.parent.this.canvas.text.innerHTML = "Selection pasted!",
+			this.parent.this.canvas.view.appendChild(this.parent.this.canvas.text),
+			this.parent.this.canvas.text.timeout = setTimeout(() => this.parent.this.canvas.text.remove(), 2e3),
+			this.parent.this.canvas.layers.selected.push(...this.clipboard),
 			this.clipboard = [];
 			return;
 		}
 
-		this.parent.this.canvas.text.innerHTML = "Select tool must be active to paste!";
-		this.parent.this.canvas.view.appendChild(this.parent.this.canvas.text);
-		this.parent.this.canvas.text.timeout = setTimeout(() => this.parent.this.canvas.text.remove(), 2e3);
+		this.parent.this.canvas.text.innerHTML = "Select tool must be active to paste!",
+		this.parent.this.canvas.view.appendChild(this.parent.this.canvas.text),
+		this.parent.this.canvas.text.timeout = setTimeout(() => this.parent.this.canvas.text.remove(), 2e3)
 	}
 
 	deselect() {
@@ -172,11 +164,11 @@ export default class extends Tool {
 			line.classList.remove('highlighted');
 		}
 
-		this.active = false;
+		this.active = false
 	}
 
 	close() {
-		this.deselect();
-		this.element.remove();
+		this.deselect(),
+		this.element.remove()
 	}
 }

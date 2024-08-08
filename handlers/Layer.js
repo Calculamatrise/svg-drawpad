@@ -2,54 +2,52 @@ import Layer from "../utils/Layer.js";
 
 export default class {
 	get selected() {
-		return this.cache.find(({ element }) => element.classList.contains('selected')) ?? this.get(0);
+		return this.cache.find(({ element }) => element.classList.contains('selected')) ?? this.get(0)
 	}
 
 	cache = []
 	constructor(parent) {
-		this.canvas = parent;
+		Object.defineProperty(this, 'canvas', { value: parent, writable: true })
 	}
 
 	create() {
-		for (const layer of this.cache) {
+		for (const layer of this.cache.filter(layer => layer.element.classList.contains('selected'))) {
 			layer.element.classList.remove('selected');
 		}
 
 		const layer = new Layer(this);
 		this.cache.push(layer);
-		return layer;
+		return layer
 	}
 
 	get(layerId) {
-		return this.cache.find(({ id }) => id === parseInt(layerId));
+		return this.cache.find(({ id }) => id === parseInt(layerId))
 	}
 
 	has(layerId) {
-		return !!this.get(layerId);
+		return Boolean(this.get(layerId))
 	}
 
 	insert(layer, newIndex) {
 		this.cache.splice(newIndex - 1, 0, layer);
 		const hasBefore = this.has(newIndex - 1);
 		const adjacent = hasBefore ? this.get(newIndex - 1) : this.get(newIndex + 1);
-		adjacent.element[hasBefore ? 'after' : 'before'](layer.element);
+		adjacent.element[hasBefore ? 'after' : 'before'](layer.element),
 		this.cache.forEach((layer, index) => {
 			layer.selector.value = index + 1;
 			layer.element.classList[layer.id == newIndex ? 'add' : 'remove']('selected');
 		});
-
 		return this;
 	}
 
 	remove(layer) {
 		const spliceIndex = this.cache.indexOf(layer);
-		this.cache.splice(spliceIndex, 1);
+		this.cache.splice(spliceIndex, 1),
 		this.cache.forEach((layer, index) => {
 			layer.selector.value = index + 1;
 			layer.element.classList[layer.id == Math.min(spliceIndex + 1, this.cache.length) ? 'add' : 'remove']('selected');
 		});
-
-		return layer;
+		return layer
 	}
 
 	select(id) {
@@ -57,13 +55,13 @@ export default class {
 			layer.element.classList[layer.id == id ? 'add' : 'remove']('selected');
 		}
 
-		this.selected.selector.focus();
-		this.canvas.alert('Layer ' + id);
+		this.selected.selector.focus(),
+		this.canvas.alert('Layer ' + id)
 	}
 
 	close() {
 		for (const layer of this.cache.splice(0)) {
-			layer.remove();
+			layer.remove()
 		}
 	}
 
@@ -94,6 +92,7 @@ export default class {
 		}
 
 		Object.assign(element, options);
-		return typeof callback == 'function' && callback(element), element;
+		return typeof callback == 'function' && callback(element),
+		element
 	}
 }

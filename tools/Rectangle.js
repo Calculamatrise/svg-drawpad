@@ -12,30 +12,30 @@ export default class extends Tool {
 			]);
 		}
 
-		return points;
+		return points
 	}
 
 	roundedRect() { }
 	press() {
-		this.element.style.setProperty('stroke', this.canvas.primary);
-		this.element.style.setProperty('fill', this.canvas.fill ? this.canvas.primary : "#FFFFFF00");
+		this.element.style.setProperty('stroke', this.canvas.primary),
+		this.element.style.setProperty('fill', this.canvas.fill ? this.canvas.primary : "#FFFFFF00"),
 		this.element.style.setProperty('stroke-width', this.size);
 		const position = this.mouse.position.toCanvas(this.canvas);
-		this.element.setAttribute('x', position.x);
-		this.element.setAttribute('y', position.y);
-		this.element.setAttribute('width', 1);
-		this.element.setAttribute('height', 1);
-		this.element.setAttribute('rx', .5);
-		this.canvas.layers.selected.base.appendChild(this.element);
+		this.element.setAttribute('x', position.x),
+		this.element.setAttribute('y', position.y),
+		this.element.setAttribute('width', 1),
+		this.element.setAttribute('height', 1),
+		this.element.setAttribute('rx', .5),
+		this.canvas.layers.selected.base.appendChild(this.element)
 	}
 
 	stroke() {
 		const old = this.mouse.old.toCanvas(this.canvas);
 		const position = this.mouse.position.toCanvas(this.canvas);
-		this.element.setAttribute('x', Math.min(old.x, position.x));
-		this.element.setAttribute('y', Math.min(old.y, position.y));
-		this.element.setAttribute('width', Math.abs(position.x - old.x));
-		this.element.setAttribute('height', Math.abs(position.y - old.y));
+		this.element.setAttribute('x', Math.min(old.x, position.x)),
+		this.element.setAttribute('y', Math.min(old.y, position.y)),
+		this.element.setAttribute('width', Math.abs(position.x - old.x)),
+		this.element.setAttribute('height', Math.abs(position.y - old.y))
 	}
 
 	clip() {
@@ -46,55 +46,57 @@ export default class extends Tool {
 			return;
 		}
 
-		const rectangle = this.element.cloneNode();
-		rectangle.erase = function (event) {
-			const points = [{
-				x: +this.getAttribute('x'),
-				y: +this.getAttribute('y')
-			}, {
-				x: +this.getAttribute('x'),
-				y: +this.getAttribute('y') + +this.getAttribute('height')
-			}, {
-				x: +this.getAttribute('x') + +this.getAttribute('width'),
-				y: +this.getAttribute('y') + +this.getAttribute('height')
-			}, {
-				x: +this.getAttribute('x') + +this.getAttribute('width'),
-				y: +this.getAttribute('y')
-			}];
+		const temp = this.element.cloneNode();
+		Object.defineProperty(temp, 'erase', {
+			value(event) {
+				const points = [{
+					x: +this.getAttribute('x'),
+					y: +this.getAttribute('y')
+				}, {
+					x: +this.getAttribute('x'),
+					y: +this.getAttribute('y') + +this.getAttribute('height')
+				}, {
+					x: +this.getAttribute('x') + +this.getAttribute('width'),
+					y: +this.getAttribute('y') + +this.getAttribute('height')
+				}, {
+					x: +this.getAttribute('x') + +this.getAttribute('width'),
+					y: +this.getAttribute('y')
+				}];
 
-			return !!points.concat(points[0]).find((point, index, points) => {
-				if (!points[index - 1]) {
-					return false;
-				}
-
-				let vector = {
-					x: points[index - 1].x - window.canvas.viewBox.x - point.x - window.canvas.viewBox.x,
-					y: points[index - 1].y - window.canvas.viewBox.y - point.y - window.canvas.viewBox.y
-				}
-
-				let len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
-				let b = -(point.x - window.canvas.viewBox.x - event.offsetX) * (vector.x / len) - (point.y - window.canvas.viewBox.y - event.offsetY) * (vector.y / len);
-				if (b >= len) {
-					vector.x = points[index - 1].x - window.canvas.viewBox.x - event.offsetX;
-					vector.y = points[index - 1].y - window.canvas.viewBox.y - event.offsetY;
-				} else {
-					let { x, y } = window.structuredClone(vector);
-					vector.x = point.x - window.canvas.viewBox.x - event.offsetX;
-					vector.y = point.y - window.canvas.viewBox.y - event.offsetY;
-					if (b > 0) {
-						vector.x += x / len * b;
-						vector.y += y / len * b;
+				return !!points.concat(points[0]).find((point, index, points) => {
+					if (!points[index - 1]) {
+						return false;
 					}
-				}
 
-				return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 <= window.canvas.tools.selected.size && !this.remove();
-			});
-		}
+					let vector = {
+						x: points[index - 1].x - window.canvas.viewBox.x - point.x - window.canvas.viewBox.x,
+						y: points[index - 1].y - window.canvas.viewBox.y - point.y - window.canvas.viewBox.y
+					}
 
-		this.canvas.layers.selected.push(rectangle);
+					let len = Math.sqrt(vector.x ** 2 + vector.y ** 2);
+					let b = -(point.x - window.canvas.viewBox.x - event.offsetX) * (vector.x / len) - (point.y - window.canvas.viewBox.y - event.offsetY) * (vector.y / len);
+					if (b >= len) {
+						vector.x = points[index - 1].x - window.canvas.viewBox.x - event.offsetX;
+						vector.y = points[index - 1].y - window.canvas.viewBox.y - event.offsetY;
+					} else {
+						let { x, y } = window.structuredClone(vector);
+						vector.x = point.x - window.canvas.viewBox.x - event.offsetX;
+						vector.y = point.y - window.canvas.viewBox.y - event.offsetY;
+						if (b > 0) {
+							vector.x += x / len * b;
+							vector.y += y / len * b;
+						}
+					}
+
+					return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 <= window.canvas.tools.selected.size && !this.remove()
+				});
+			},
+			writable: true
+		}),
+		this.canvas.layers.selected.push(temp),
 		this.canvas.events.push({
 			action: 'add',
-			value: rectangle
-		});
+			value: temp
+		})
 	}
 }

@@ -1,7 +1,7 @@
 export default class {
 	#events = new Map();
 	get events() {
-		return this.#events.keys();
+		return this.#events.keys()
 	}
 
 	/**
@@ -21,7 +21,7 @@ export default class {
 			listener.apply(this, args);
 		}
 
-		return true;
+		return true
 	}
 
 	/**
@@ -40,7 +40,7 @@ export default class {
 		}
 
 		let listeners = this.#events.get(type);
-		return listeners.add(listener).size;
+		return listeners.add(listener).size
 	}
 
 	/**
@@ -53,7 +53,7 @@ export default class {
 	off = this.removeEventListener;
 	removeEventListener(type, listener, options) {
 		let listeners = this.#events.get(type);
-		return listeners.delete(listener);
+		return listeners.delete(listener)
 	}
 
 	/**
@@ -62,6 +62,6 @@ export default class {
 	 * @returns {boolean}
 	 */
 	removeAllListeners(type) {
-		return this.#events.delete(type);
+		return this.#events.delete(type)
 	}
 }

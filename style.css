@@ -208,8 +208,12 @@ select > option {
 	align-items: center;
 	display: grid;
 	grid-auto-rows: min-content;
+	/* grid-auto-rows: clamp(265px, 16rem, 300px); */
 	grid-gap: 0.4rem;
-	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+	/* grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); */
+	grid-template-columns: repeat(auto-fill, clamp(130px, 10rem, 160px));
+	/* grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); */
+	justify-content: center;
 	overflow: auto;
 	position: relative;
 	width: -webkit-fill-available;

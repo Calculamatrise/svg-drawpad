@@ -36,8 +36,8 @@
 						<button class="ripple" onclick="canvas.tools.select('eraser')">Eraser</button>
 						<button class="ripple" onclick="canvas.tools.select('camera')">Camera</button>
 						<button class="ripple" onclick="canvas.tools.select('select')">Select</button>
-						<details name="toolbar">
-							<summary class="button secondary show-prefix">Advanced Tools</summary>
+						<details name="sub-toolbar">
+							<summary class="button secondary show-prefix" onmouseup="setTimeout(() => this.nextElementSibling.lastElementChild.scrollIntoView({ behavior: 'smooth' }),10)">Advanced Tools</summary>
 							<div class="toolbar">
 								<button onclick="canvas.tools.select('beziercurve');">Bezier Curve</button>
 								<button onclick="canvas.tools.select('ellipse');">Ellipse</button>
@@ -71,7 +71,7 @@
 			<div class="overlay" id="layers">
 				<input type="checkbox" name="overlay" id="layerschkbx" style="display: none;" onchange="this.checked && (settingschkbx.checked = false)">
 				<div id="layer-container">
-					<button class="secondary ripple" onclick="canvas.layers.create(), canvas.layerDepth = canvas.layerDepth + 1;" style="aspect-ratio: unset;height: 100%;">New Layer</button>
+					<button class="secondary ripple" onclick="canvas.layers.create(), canvas.layerDepth = canvas.layerDepth + 1;" style="aspect-ratio: unset;height: 100%;min-height: 3rem;">New Layer</button>
 				</div>
 			</div>
 			<!-- Settings Overlay -->
@@ -108,12 +108,12 @@
 					<input type="radio" name="settings-overlay-nav" id="config" style="display: none;">
 					<button class="secondary ripple" onclick="confirm('Are you sure you would like to reset your settings?') && (localStorage.removeItem('svg-drawpad-settings'), alert('Configuration has successfully been reset.'))">Reset Config</button>
 				</section>
-				<footer>Version 0.0.57</footer>
+				<footer>Version 0.0.59</footer>
 			</div>
 			<div class="overlay" id="changes" style="display: none;">
 				<h2>What's new</h2>
-				<p>Various minor bug fixes and improvements</p>
-				<button style="width: 100%;width: -webkit-fill-available;" onclick="canvas.config.dismissedNotices.push('2023-11-23'),this.parentElement.remove()">Dismiss</button>
+				<p>Various minor bug fixes and performance improvements</p>
+				<button style="width: 100%;width: -webkit-fill-available;">Dismiss</button>
 			</div>
 		</user-interface>
 		<!-- <context-menu id="ctx-menu" style="display: none;">
