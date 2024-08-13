@@ -5,6 +5,7 @@ export default class extends Tool {
 	active = false;
 	anchorA = null;
 	anchorB = null;
+	precise = true;
 	segmentLength = 1;
 	element = document.createElementNS("http://www.w3.org/2000/svg", 'polyline');
 	reset() {
@@ -21,9 +22,19 @@ export default class extends Tool {
 	}
 
 	stroke() {
-		const position = this.mouse.position.toCanvas(this.canvas);
+		let position = this.mouse.position.toCanvas(this.canvas);
 		if (this.active) {
 			const points = [];
+			if (this.precise) {
+				const midpoint = {
+					x: (this.anchorA.x + this.anchorB.x) / 2,
+					y: (this.anchorA.y + this.anchorB.y) / 2
+				};
+				position = {
+					x: position.x + (position.x - midpoint.x),
+					y: position.y + (position.y - midpoint.y)
+				};
+			}
 			const length = (Math.sqrt((this.anchorB.x - position.x) ** 2 + (this.anchorB.y - position.y) ** 2) + Math.sqrt((position.x - this.anchorA.x) ** 2 + (position.y - this.anchorA.y) ** 2)) / 2;
 			for (let i = 0; i < length; i += this.segmentLength) {
 				let n = i / length;
@@ -84,7 +95,7 @@ export default class extends Tool {
 							}
 						}
 
-						return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 <= eraserSize && !this.remove();
+						return Math.sqrt(vector.x ** 2 + vector.y ** 2) - this.style.getPropertyValue('stroke-width') / 2 <= eraserSize && !this.remove()
 					}))
 				},
 				writable: true,
