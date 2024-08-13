@@ -22,7 +22,9 @@ export default class {
 	reset() {}
 	stroke() {}
 	clip() {}
-	close() {}
+	close() {
+		this.active = false
+	}
 
 	static createElementNS(element, properties = {}) {
 		if (typeof element != 'string' || element === void 0) {

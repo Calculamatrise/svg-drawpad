@@ -2,7 +2,6 @@ import Tool from "./Tool.js";
 
 export default class extends Tool {
 	_size = 4;
-	active = false;
 	anchorA = null;
 	anchorB = null;
 	precise = true;
@@ -113,5 +112,9 @@ export default class extends Tool {
 		this.active = true,
 		this.anchorB = this.mouse.position.toCanvas(this.canvas),
 		this.element.setAttribute('points', `${this.anchorA.x},${this.anchorA.y} ${this.anchorB.x},${this.anchorB.y}`)
+	}
+
+	close() {
+		this.element.remove()
 	}
 }

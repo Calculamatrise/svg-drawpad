@@ -120,4 +120,8 @@ export default class extends Tool {
 			value: temp
 		})
 	}
+
+	close() {
+		this.element.remove()
+	}
 }

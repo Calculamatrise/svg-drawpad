@@ -1,7 +1,6 @@
 import Tool from "./Tool.js";
 
 export default class extends Tool {
-	active = false;
 	selected = []
 	cache = []
 	secondaryCache = []

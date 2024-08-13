@@ -1,31 +1,33 @@
-import Tool from "./Tool.js";
+import Curve from "./Curve.js";
 
-export default class extends Tool {
-	_size = 4;
-	stage = 0;
-	active = false;
-	anchorA = null;
-	anchorB = null;
+export default class extends Curve {
 	control = null;
-	segmentLength = 1;
-	element = document.createElementNS("http://www.w3.org/2000/svg", 'polyline');
-	reset() {
-		this.element.style.setProperty('stroke-width', this.size)
-	}
-
-	press() {
-		if (this.active) return;
-		this.anchorA = this.mouse.position.toCanvas(this.canvas),
-		this.element.style.setProperty('stroke', this.canvas.primary),
-		this.element.style.setProperty('stroke-width', this.size),
-		this.element.setAttribute('points', `${this.anchorA.x},${this.anchorA.y}`),
-		this.canvas.layers.selected.base.appendChild(this.element)
-	}
-
+	precise = false;
+	stage = 0;
 	stroke() {
-		const position = this.mouse.position.toCanvas(this.canvas);
+		let position = this.mouse.position.toCanvas(this.canvas);
 		if (this.active) {
 			const points = [];
+			if (this.precise) {
+				// const midpoint = {
+				// 	x: ((this.control || this.anchorA).x + this.anchorB.x) / 2,
+				// 	y: ((this.control || this.anchorA).y + this.anchorB.y) / 2
+				// };
+				let midpoint = {
+					x: (this.anchorA.x + this.anchorB.x) / 2,
+					y: (this.anchorA.y + this.anchorB.y) / 2
+				};
+				if (this.control) {
+					midpoint = {
+						x: (this.anchorA.x + this.control.x + this.anchorB.x) / 3,
+						y: (this.anchorA.y + this.control.y + this.anchorB.y) / 3
+					}
+				}
+				position = {
+					x: position.x + (position.x - midpoint.x),
+					y: position.y + (position.y - midpoint.y)
+				};
+			}
 			const length = (Math.sqrt((this.anchorB.x - position.x) ** 2 + (this.anchorB.y - position.y) ** 2) + Math.sqrt((position.x - (this.control || position).x) ** 2 + (position.y - (this.control || position).y) ** 2) + Math.sqrt(((this.control || position).x - this.anchorA.x) ** 2 + ((this.control || position).y - this.anchorA.y) ** 2)) / 3;
 			for (let i = 0; i < length; i += this.segmentLength) {
 				points.push(this.constructor.bezier(i / length, this.anchorA, this.control || position, position, this.anchorB))
@@ -95,7 +97,18 @@ export default class extends Tool {
 			});
 			return;
 		} else if (this.active && this.stage === 1) {
-			this.control = this.mouse.position.toCanvas(this.canvas),
+			let position = this.mouse.position.toCanvas(this.canvas);
+			if (this.precise) {
+				const midpoint = {
+					x: (this.anchorA.x + this.anchorB.x) / 2,
+					y: (this.anchorA.y + this.anchorB.y) / 2
+				};
+				position = {
+					x: position.x + (position.x - midpoint.x),
+					y: position.y + (position.y - midpoint.y)
+				};
+			}
+			this.control = position,
 			this.stage++;
 			return;
 		} else if (old.x === position.x && old.y === position.y) {

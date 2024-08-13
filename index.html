@@ -25,15 +25,15 @@
 		<svg id="view" xmlns="http://www.w3.org/2000/svg">Sorry, your browser does not support inline SVG.</svg>
 		<user-interface>
 			<section class="left top">
-				<details name="toolbar">
+				<details name="toolbar" open>
 					<summary class="button secondary show-prefix">Toolbar</summary>
 					<div class="toolbar">
 						<button class="ripple" onclick="canvas.tools.select('line')">Line</button>
 						<button class="ripple" onclick="canvas.tools.select('brush')">Brush</button>
 						<button class="ripple" onclick="canvas.tools.select('curve')">Curve</button>
+						<button class="ripple" onclick="canvas.tools.select('eraser')">Eraser</button>
 						<button class="ripple" onclick="canvas.tools.select('circle')">Circle</button>
 						<button class="ripple" onclick="canvas.tools.select('rectangle')">Rectangle</button>
-						<button class="ripple" onclick="canvas.tools.select('eraser')">Eraser</button>
 						<button class="ripple" onclick="canvas.tools.select('camera')">Camera</button>
 						<button class="ripple" onclick="canvas.tools.select('select')">Select</button>
 						<details name="sub-toolbar">
@@ -47,6 +47,12 @@
 								">
 									Enable Random Colours
 								</button>
+							</div>
+						</details>
+						<details name="sub-toolbar">
+							<summary class="button secondary show-prefix" onmouseup="setTimeout(() => this.nextElementSibling.lastElementChild.scrollIntoView({ behavior: 'smooth' }),10)">Experimental Tools</summary>
+							<div class="toolbar">
+								<button onclick="canvas.tools.select('heart');">Heart</button>
 							</div>
 						</details>
 					</div>

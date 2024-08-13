@@ -1,7 +1,8 @@
 export default class extends Array {
-	cache = []
+	cache = [];
 	constructor() {
 		super(...arguments),
+		Object.defineProperty(this, 'cache', { enumerable: false }),
 		Object.defineProperty(this.cache, 'pop', {
 			enumerable: false,
 			value: () => {
@@ -15,6 +16,7 @@ export default class extends Array {
 			writable: true
 		})
 	}
+
 	push(...args) {
 		super.push(...args),
 		this.cache.splice(0);
@@ -30,6 +32,8 @@ export default class extends Array {
 		return popped
 	}
 
+	redo() {}
+	undo() {}
 	close() {
 		this.splice(0),
 		this.cache.splice(0)

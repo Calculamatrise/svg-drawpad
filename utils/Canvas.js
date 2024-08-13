@@ -43,19 +43,19 @@ export default class extends EventEmitter {
 	tools = new ToolHandler(this);
 	zoom = 1;
 	constructor(view) {
-		super();
+		super(),
 		this.view = view;
 		const { width, height } = view.getBoundingClientRect();
-		this.view.style.setProperty('stroke-linecap', 'round');
-		this.view.style.setProperty('stroke-linejoin', 'round');
+		this.view.style.setProperty('stroke-linecap', 'round'),
+		this.view.style.setProperty('stroke-linejoin', 'round'),
 		this.view.setAttribute('viewBox', `0 0 ${width} ${height}`);
 
-		this.layers.create();
-		this.mouse.init(this.view);
-		this.mouse.on('down', this.press.bind(this));
-		this.mouse.on('move', this.stroke.bind(this));
-		this.mouse.on('up', this.clip.bind(this));
-		this.mouse.on('wheel', this.wheel.bind(this));
+		this.layers.create(),
+		this.mouse.init(this.view),
+		this.mouse.on('down', this.press.bind(this)),
+		this.mouse.on('move', this.stroke.bind(this)),
+		this.mouse.on('up', this.clip.bind(this)),
+		this.mouse.on('wheel', this.wheel.bind(this)),
 		this.text.style.setProperty('text-anchor', 'middle');
 
 		this.on('settingsChange', this.setColorScheme);
@@ -63,10 +63,9 @@ export default class extends EventEmitter {
 			this.alert(name.replace(/^\w/, c => c.toUpperCase()));
 		});
 
-		document.addEventListener('keydown', this.keydown.bind(this));
-		window.addEventListener('resize', this.resize.bind(this));
-
-		this.emit('settingsChange');
+		document.addEventListener('keydown', this.keydown.bind(this)),
+		window.addEventListener('resize', this.resize.bind(this), { passive: true }),
+		this.emit('settingsChange')
 	}
 
 	get container() {
@@ -153,92 +152,84 @@ export default class extends EventEmitter {
 
 	undo() {
 		const event = this.events.pop();
-		if (event) {
-			switch (event.action) {
-				case 'add':
-					event.value.remove();
-					break;
-				case 'remove':
-					this.view.prepend(event.value);
-					break;
-				case 'move_selected':
-					event.data.selected.map(function (line, index) {
-						let type = parseInt(line.getAttribute('x')) ? 0 : parseInt(line.getAttribute('x1')) ? 1 : parseInt(line.getAttribute('cx')) ? 2 : parseInt(line.getAttribute('points')) ? 3 : NaN;
-						if (isNaN(type)) {
-							return;
-						}
+		if (!event) return;
+		switch (event.action) {
+		case 'add':
+			event.value.remove();
+			break;
+		case 'remove':
+			this.view.prepend(event.value);
+			break;
+		case 'move_selected':
+			event.data.selected.map(function (line, index) {
+				let type = parseInt(line.getAttribute('x')) ? 0 : parseInt(line.getAttribute('x1')) ? 1 : parseInt(line.getAttribute('cx')) ? 2 : parseInt(line.getAttribute('points')) ? 3 : NaN;
+				if (isNaN(type)) {
+					return;
+				}
 
-						switch (type) {
-							case 0:
-								line.setAttribute('x', event.data.cache[index].getAttribute('x'));
-								line.setAttribute('y', event.data.cache[index].getAttribute('y'));
-								break;
-							case 1:
-								line.setAttribute('x1', event.data.cache[index].getAttribute('x1'));
-								line.setAttribute('y1', event.data.cache[index].getAttribute('y1'));
-								line.setAttribute('x2', event.data.cache[index].getAttribute('x2'));
-								line.setAttribute('y2', event.data.cache[index].getAttribute('y2'));
-								break;
-							case 2:
-								line.setAttribute('cx', event.data.cache[index].getAttribute('cx'));
-								line.setAttribute('cy', event.data.cache[index].getAttribute('cy'));
-								break;
-							case 3:
-								line.setAttribute('points', event.data.cache[index].getAttribute('points'));
-						}
-					});
-			}
-
-			return event;
+				switch (type) {
+					case 0:
+						line.setAttribute('x', event.data.cache[index].getAttribute('x'));
+						line.setAttribute('y', event.data.cache[index].getAttribute('y'));
+						break;
+					case 1:
+						line.setAttribute('x1', event.data.cache[index].getAttribute('x1'));
+						line.setAttribute('y1', event.data.cache[index].getAttribute('y1'));
+						line.setAttribute('x2', event.data.cache[index].getAttribute('x2'));
+						line.setAttribute('y2', event.data.cache[index].getAttribute('y2'));
+						break;
+					case 2:
+						line.setAttribute('cx', event.data.cache[index].getAttribute('cx'));
+						line.setAttribute('cy', event.data.cache[index].getAttribute('cy'));
+						break;
+					case 3:
+						line.setAttribute('points', event.data.cache[index].getAttribute('points'));
+				}
+			});
 		}
 
-		return null;
+		return event
 	}
 
 	redo() {
 		const event = this.events.cache.pop();
-		if (event) {
-			switch (event.action) {
-				case 'add':
-					this.view.prepend(event.value);
-					break;
+		if (!event) return null;
+		switch (event.action) {
+			case 'add':
+				this.view.prepend(event.value);
+				break;
+			case 'remove':
+				event.value.remove();
+				break;
+			case 'move_selected':
+				event.data.selected.map(function (line, index) {
+					let type = parseInt(line.getAttribute('x')) ? 0 : parseInt(line.getAttribute('x1')) ? 1 : parseInt(line.getAttribute('cx')) ? 2 : parseInt(line.getAttribute('points')) ? 3 : NaN;
+					if (isNaN(type)) {
+						return;
+					}
 
-				case 'remove':
-					event.value.remove();
-					break;
-
-				case 'move_selected':
-					event.data.selected.map(function (line, index) {
-						let type = parseInt(line.getAttribute('x')) ? 0 : parseInt(line.getAttribute('x1')) ? 1 : parseInt(line.getAttribute('cx')) ? 2 : parseInt(line.getAttribute('points')) ? 3 : NaN;
-						if (isNaN(type)) {
-							return;
-						}
-
-						switch (type) {
-							case 0:
-								line.setAttribute('x', event.data.secondaryCache[index].getAttribute('x'));
-								line.setAttribute('y', event.data.secondaryCache[index].getAttribute('y'));
-								break;
-							case 1:
-								line.setAttribute('x1', event.data.secondaryCache[index].getAttribute('x1'));
-								line.setAttribute('y1', event.data.secondaryCache[index].getAttribute('y1'));
-								line.setAttribute('x2', event.data.secondaryCache[index].getAttribute('x2'));
-								line.setAttribute('y2', event.data.secondaryCache[index].getAttribute('y2'));
-								break;
-							case 2:
-								line.setAttribute('cx', event.data.secondaryCache[index].getAttribute('cx'));
-								line.setAttribute('cy', event.data.secondaryCache[index].getAttribute('cy'));
-								break;
-							case 3:
-								line.setAttribute('points', event.data.secondaryCache[index].getAttribute('points'));
-						}
-					});
-			}
-
-			return event;
+					switch (type) {
+					case 0:
+						line.setAttribute('x', event.data.secondaryCache[index].getAttribute('x'));
+						line.setAttribute('y', event.data.secondaryCache[index].getAttribute('y'));
+						break;
+					case 1:
+						line.setAttribute('x1', event.data.secondaryCache[index].getAttribute('x1'));
+						line.setAttribute('y1', event.data.secondaryCache[index].getAttribute('y1'));
+						line.setAttribute('x2', event.data.secondaryCache[index].getAttribute('x2'));
+						line.setAttribute('y2', event.data.secondaryCache[index].getAttribute('y2'));
+						break;
+					case 2:
+						line.setAttribute('cx', event.data.secondaryCache[index].getAttribute('cx'));
+						line.setAttribute('cy', event.data.secondaryCache[index].getAttribute('cy'));
+						break;
+					case 3:
+						line.setAttribute('points', event.data.secondaryCache[index].getAttribute('points'));
+					}
+				});
 		}
 
-		return null;
+		return event
 	}
 
 	press(event) {
@@ -266,12 +257,12 @@ export default class extends EventEmitter {
 		}
 
 		if (/^eraser|(bezier)?curve$/gi.test(this.tools._selected)) {
-			this.tools.selected.stroke(event);
+			this.tools.selected.stroke(event)
 		}
 	}
 
 	clip(event) {
-		!this.mouse.isAlternate && !event.shiftKey && this.tools.selected.clip(event);
+		!this.mouse.isAlternate && !event.shiftKey && this.tools.selected.clip(event)
 	}
 
 	wheel(event) {
@@ -292,100 +283,100 @@ export default class extends EventEmitter {
 			return;
 		}
 
-		this.tools.selected.size -= event.deltaY / 100;
+		this.tools.selected.size -= event.deltaY / 100
 	}
 
 	keydown(event) {
-		event.preventDefault();
-		event.stopPropagation();
 		switch (event.key) {
-			case 'Escape':
-				settingschkbx.checked = !settingschkbx.checked;
-				settingschkbx.dispatchEvent(new Event('change'));
+		case 'Escape':
+			event.preventDefault();
+			settingschkbx.checked = !settingschkbx.checked;
+			settingschkbx.dispatchEvent(new Event('change'));
+			break;
+		case '+':
+		case '=':
+			if (event.ctrlKey || this.tools._selected === 'camera') {
+				event.preventDefault();
+				this.zoom = Math.min(this.zoom * window.devicePixelRatio + .25, window.devicePixelRatio * 4);
+				window.dispatchEvent(new Event('resize'));
+				this.tools.selected.init();
 				break;
-			case '+':
-			case '=':
-				if (event.ctrlKey || this.tools._selected === 'camera') {
-					this.zoom = Math.min(this.zoom * window.devicePixelRatio + .25, window.devicePixelRatio * 4);
-					window.dispatchEvent(new Event('resize'));
-					this.tools.selected.init();
+			} else if (this.tools.selected.size < 100) {
+				this.tools.selected.size += 1;
+			}
+			break;
+		case '-':
+			if (event.ctrlKey || this.tools._selected === 'camera') {
+				event.preventDefault();
+				this.zoom = Math.max(this.zoom / window.devicePixelRatio - .25, window.devicePixelRatio / 5);
+				window.dispatchEvent(new Event('resize'));
+				this.tools.selected.init();
+				break;
+			} else if (this.tools.selected.size > 2) {
+				this.tools.selected.size -= 1;
+			}
+			break;
+		case '0':
+			this.tools.select('camera');
+			break;
+		case '1':
+			this.tools.select('line');
+			break;
+		case '2':
+			this.tools.select('brush');
+			break;
+		case '3':
+			this.tools.select('circle');
+			break;
+		case '4':
+			this.tools.select('rectangle');
+			break;
+		case '5':
+			this.tools.select('eraser');
+			break;
+		case 'f':
+			this.fill = !this.fill;
+			break;
+		case 'ArrowUp':
+			if (this.layers.selected.id >= this.layers.cache.length) {
+				if (!event.shiftKey) {
 					break;
 				}
 
-				if (this.tools.selected.size < 100) {
-					this.tools.selected.size += 1;
-				}
-				break;
-			case '-':
-				if (event.ctrlKey || this.tools._selected === 'camera') {
-					this.zoom = Math.max(this.zoom / window.devicePixelRatio - .25, window.devicePixelRatio / 5);
-					window.dispatchEvent(new Event('resize'));
-					this.tools.selected.init();
-					break;
-				}
+				this.layers.create();
+			}
 
-				if (this.tools.selected.size > 2) {
-					this.tools.selected.size -= 1;
-				}
+			this.layers.select(this.layers.selected.id + 1);
+			break;
+		case 'ArrowDown':
+			if (this.layers.selected.id > 1) {
+				this.layers.select(this.layers.selected.id - 1);
+			}
+			break;
+		case 'z':
+			if (!event.shiftKey) {
+				event.ctrlKey && this.undo();
 				break;
-			case '0':
-				this.tools.select('camera');
-				break;
-			case '1':
-				this.tools.select('line');
-				break;
-			case '2':
-				this.tools.select('brush');
-				break;
-			case '3':
-				this.tools.select('circle');
-				break;
-			case '4':
-				this.tools.select('rectangle');
-				break;
-			case '5':
-				this.tools.select('eraser');
-				break;
-			case 'f':
-				this.fill = !this.fill;
-				break;
-			case 'ArrowUp':
-				if (this.layers.selected.id >= this.layers.cache.length) {
-					if (!event.shiftKey) {
-						break;
-					}
-
-					this.layers.create();
-				}
-
-				this.layers.select(this.layers.selected.id + 1);
-				break;
-			case 'ArrowDown':
-				if (this.layers.selected.id > 1) {
-					this.layers.select(this.layers.selected.id - 1);
-				}
-				break;
-			case 'z':
-				this.undo();
-				break;
-			case 'x':
-				this.redo();
-				break;
-			case 'c':
-				this.tools._selected === 'select' && event.ctrlKey && this.tools.selected.copy();
-				break;
-			case 'v':
-				this.tools._selected === 'select' && event.ctrlKey && this.tools.selected.paste();
+			}
+		case 'x':
+		case 'y':
+			event.ctrlKey && this.redo();
+			break;
+		case 'c':
+			this.tools._selected === 'select' && event.ctrlKey && this.tools.selected.copy();
+			break;
+		case 'v':
+			this.tools._selected === 'select' && event.ctrlKey && this.tools.selected.paste();
 		}
 	}
 
 	toString() {
-		return this.view.outerHTML;
+		return this.view.outerHTML
 	}
 
 	close() {
-		this.layers.close();
-		this.mouse.close();
-		this.events.close();
+		this.layers.close(),
+		this.mouse.close(),
+		this.events.close()
 	}
 }
