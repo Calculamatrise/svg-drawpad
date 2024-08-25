@@ -1,5 +1,5 @@
 import Tool from "./Tool.js";
-import BezierCurve from "./BezierCurve.js";
+import Curve from "./Curve.js";
 
 export default class extends Tool {
 	_size = 4;
@@ -30,7 +30,7 @@ export default class extends Tool {
 		const points = [];
 		for (let i = 0; i < 1; i += this.segmentLength / 100) {
 			// top left curve
-			points.push(BezierCurve.bezier(i, { x, y: y + topCurveHeight },
+			points.push(Curve.multiCurve(i, { x, y: y + topCurveHeight },
 				{ x, y },
 				{ x: x - width, y },
 				{ x: x - width, y: y + topCurveHeight }
@@ -45,7 +45,7 @@ export default class extends Tool {
 			]);
 
 			// style 2 - dripping
-			// points.push(BezierCurve.bezier(i, { x: x - width, y: y + topCurveHeight },
+			// points.push(Curve.multiCurve(i, { x: x - width, y: y + topCurveHeight },
 			//     { x: x - width, y: y + (height + topCurveHeight) / 2 },
 			//     { x, y: y + (height + topCurveHeight) / 2 },
 			//     { x, y: y + height }
@@ -60,7 +60,7 @@ export default class extends Tool {
 			]);
 
 			// style 2 - dripping
-			// points.push(BezierCurve.bezier(i, { x, y: y + height },
+			// points.push(Curve.multiCurve(i, { x, y: y + height },
 			//     { x, y: y + (height + topCurveHeight) / 2 },
 			//     { x: x + width, y: y + (height + topCurveHeight) / 2 },
 			//     { x: x + width, y: y + topCurveHeight }
@@ -69,7 +69,7 @@ export default class extends Tool {
 
 		for (let i = 0; i < 1; i += this.segmentLength / 100) {
 			// top right curve
-			points.push(BezierCurve.bezier(i, { x: x + width, y: y + topCurveHeight },
+			points.push(Curve.multiCurve(i, { x: x + width, y: y + topCurveHeight },
 				{ x: x + width, y },
 				{ x, y },
 				{ x, y: y + topCurveHeight }

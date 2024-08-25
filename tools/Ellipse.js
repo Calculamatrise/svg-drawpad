@@ -3,6 +3,7 @@ import Tool from "./Tool.js";
 export default class extends Tool {
 	_size = 4;
 	color = null;
+	lockAspectRatio = false;
 	segmentLength = 5;
 	element = document.createElementNS("http://www.w3.org/2000/svg", 'ellipse');
 	get current() {
@@ -101,6 +102,7 @@ export default class extends Tool {
 			return;
 		}
 
+		// if aspect ratio is 1, create circle
 		const temp = this.element.cloneNode();
 		Object.defineProperty(temp, 'erase', {
 			value(event) {

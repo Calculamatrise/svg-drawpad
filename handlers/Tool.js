@@ -1,5 +1,4 @@
 import Line from "../tools/Line.js";
-import BezierCurve from "../tools/BezierCurve.js";
 import Brush from "../tools/Brush.js";
 import Curve from "../tools/Curve.js";
 import Circle from "../tools/Circle.js";
@@ -34,7 +33,6 @@ export default class {
 	constructor(parent) {
 		Object.defineProperty(this, 'canvas', { value: parent, writable: true }),
 		this.cache.set('line', new Line(this)),
-		this.cache.set('beziercurve', new BezierCurve(this)),
 		this.cache.set('brush', new Brush(this)),
 		this.cache.set('curve', new Curve(this)),
 		this.cache.set('circle', new Circle(this)),
@@ -47,8 +45,10 @@ export default class {
 		this.cache.set('select', new Select(this))
 	}
 
-	select(toolName) {
-		return this.selected = toolName.toLowerCase()
+	select(toolName, options) {
+		this.selected = toolName.toLowerCase();
+		typeof options == 'object' && Object.assign(this.selected, options);
+		return this._selected
 	}
 
 	isSelected(toolName) {

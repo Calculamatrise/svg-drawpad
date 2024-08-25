@@ -30,7 +30,7 @@
 					<div class="toolbar">
 						<button class="ripple" onclick="canvas.tools.select('line')">Line</button>
 						<button class="ripple" onclick="canvas.tools.select('brush')">Brush</button>
-						<button class="ripple" onclick="canvas.tools.select('curve')">Curve</button>
+						<button class="ripple" onclick="canvas.tools.select('curve', { maxControlPoints: 1 })">Curve</button>
 						<button class="ripple" onclick="canvas.tools.select('eraser')">Eraser</button>
 						<button class="ripple" onclick="canvas.tools.select('circle')">Circle</button>
 						<button class="ripple" onclick="canvas.tools.select('rectangle')">Rectangle</button>
@@ -39,20 +39,21 @@
 						<details name="sub-toolbar">
 							<summary class="button secondary show-prefix" onmouseup="setTimeout(() => this.nextElementSibling.lastElementChild.scrollIntoView({ behavior: 'smooth' }),10)">Advanced Tools</summary>
 							<div class="toolbar">
-								<button onclick="canvas.tools.select('beziercurve');">Bezier Curve</button>
-								<button onclick="canvas.tools.select('ellipse');">Ellipse</button>
-								<button class="option ripple rainbow" id="randomColors" onclick="
-									canvas.config.randomizeStyle = !canvas.config.randomizeStyle;
-									this.innerText = (canvas.config.randomizeStyle ? 'Dis' : 'En') + 'able Random Colours';
-								">
-									Enable Random Colours
-								</button>
+								<button onclick="canvas.tools.select('curve', { maxControlPoints: 2 })">Bezier Curve</button>
+								<button onclick="canvas.tools.select('ellipse')">Ellipse</button>
 							</div>
 						</details>
 						<details name="sub-toolbar">
 							<summary class="button secondary show-prefix" onmouseup="setTimeout(() => this.nextElementSibling.lastElementChild.scrollIntoView({ behavior: 'smooth' }),10)">Experimental Tools</summary>
 							<div class="toolbar">
 								<button onclick="canvas.tools.select('heart');">Heart</button>
+								<button onclick="canvas.tools.select('curve', { maxControlPoints: 3 })">Multi Curve</button>
+								<button class="option ripple rainbow" id="randomColors" onclick="
+									canvas.config.randomizeStyle = !canvas.config.randomizeStyle;
+									this.innerText = (canvas.config.randomizeStyle ? 'Dis' : 'En') + 'able Random Colours';
+								">
+									Enable Random Colours
+								</button>
 							</div>
 						</details>
 					</div>
